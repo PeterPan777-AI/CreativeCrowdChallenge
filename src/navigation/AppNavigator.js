@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../context/AuthContext';
 import { Feather } from '@expo/vector-icons';
@@ -15,7 +15,7 @@ import BusinessCompetitionScreen from '../screens/BusinessCompetitionScreen';
 import AdminScreen from '../screens/AdminScreen';
 import LoadingComponent from '../components/LoadingComponent';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Main tab navigator for authenticated users

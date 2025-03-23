@@ -15,7 +15,7 @@ import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import supabase from '../utils/supabaseClient';
 import { useAuth } from '../context/AuthContext';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+// import DateTimePickerModal from 'react-native-modal-datetime-picker'; // Temporarily disabled
 
 export default function BusinessCompetitionScreen({ navigation }) {
   const { user, userDetails } = useAuth();
@@ -356,22 +356,18 @@ export default function BusinessCompetitionScreen({ navigation }) {
                 <View className="flex-row space-x-4">
                   <View className="flex-1">
                     <Text className="text-gray-700 mb-1 font-medium">Start Date</Text>
-                    <TouchableOpacity
-                      className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3"
-                      onPress={() => setShowStartDatePicker(true)}
-                    >
+                    <View className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3">
                       <Text className="text-gray-800">{formatDate(startDate)}</Text>
-                    </TouchableOpacity>
+                      <Text className="text-xs text-gray-500 mt-1">Default: Today</Text>
+                    </View>
                   </View>
                   
                   <View className="flex-1">
                     <Text className="text-gray-700 mb-1 font-medium">End Date</Text>
-                    <TouchableOpacity
-                      className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3"
-                      onPress={() => setShowEndDatePicker(true)}
-                    >
+                    <View className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3">
                       <Text className="text-gray-800">{formatDate(endDate)}</Text>
-                    </TouchableOpacity>
+                      <Text className="text-xs text-gray-500 mt-1">Default: 7 days later</Text>
+                    </View>
                   </View>
                 </View>
                 
@@ -524,7 +520,7 @@ export default function BusinessCompetitionScreen({ navigation }) {
         </View>
       </ScrollView>
       
-      {/* Date pickers */}
+      {/* Date pickers - temporarily disabled
       <DateTimePickerModal
         isVisible={showStartDatePicker}
         mode="date"
@@ -545,7 +541,7 @@ export default function BusinessCompetitionScreen({ navigation }) {
         }}
         onCancel={() => setShowEndDatePicker(false)}
         minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)} // At least 1 day after start date
-      />
+      /> */}
     </KeyboardAvoidingView>
   );
 }
