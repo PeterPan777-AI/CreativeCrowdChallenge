@@ -10,12 +10,298 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import supabase from '../utils/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { theme, globalStyles } from '../styles';
 // import DateTimePickerModal from 'react-native-modal-datetime-picker'; // Temporarily disabled
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  contentContainer: {
+    padding: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  loadingText: {
+    color: theme.colors.gray[600],
+    marginTop: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+    marginBottom: 8,
+  },
+  subtitle: {
+    color: theme.colors.gray[600],
+    marginBottom: 24,
+  },
+  createButton: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  createButtonText: {
+    color: theme.colors.white,
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  formContainer: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+    marginBottom: 24,
+  },
+  formHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  formTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+  },
+  formGroup: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    color: theme.colors.gray[700],
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+  textInput: {
+    backgroundColor: theme.colors.gray[50],
+    borderWidth: 1,
+    borderColor: theme.colors.gray[300],
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    color: theme.colors.gray[800],
+  },
+  textArea: {
+    backgroundColor: theme.colors.gray[50],
+    borderWidth: 1,
+    borderColor: theme.colors.gray[300],
+    borderRadius: 8,
+    padding: 16,
+    color: theme.colors.gray[800],
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  categoryChip: {
+    marginRight: 8,
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  categoryChipActive: {
+    backgroundColor: theme.colors.primary,
+  },
+  categoryChipInactive: {
+    backgroundColor: theme.colors.gray[200],
+  },
+  categoryChipTextActive: {
+    color: theme.colors.white,
+  },
+  categoryChipTextInactive: {
+    color: theme.colors.gray[700],
+  },
+  dateRow: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  dateColumn: {
+    flex: 1,
+  },
+  dateDisplay: {
+    backgroundColor: theme.colors.gray[50],
+    borderWidth: 1,
+    borderColor: theme.colors.gray[300],
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  dateText: {
+    color: theme.colors.gray[800],
+  },
+  dateHint: {
+    fontSize: 12,
+    color: theme.colors.gray[500],
+    marginTop: 4,
+  },
+  mediaPreviewContainer: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  mediaImage: {
+    width: '100%',
+    height: 192,
+    backgroundColor: theme.colors.gray[200],
+  },
+  removeMediaButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: theme.colors.white,
+    borderRadius: 20,
+    padding: 8,
+  },
+  uploadContainer: {
+    backgroundColor: theme.colors.gray[50],
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: theme.colors.gray[300],
+    borderRadius: 8,
+    paddingVertical: 24,
+    alignItems: 'center',
+  },
+  uploadIcon: {
+    color: theme.colors.gray[400],
+  },
+  uploadText: {
+    color: theme.colors.gray[500],
+    marginTop: 8,
+  },
+  submitButton: {
+    borderRadius: 8,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  submitButtonEnabled: {
+    backgroundColor: theme.colors.primary,
+  },
+  submitButtonDisabled: {
+    backgroundColor: theme.colors.primary + '80', // 50% opacity
+  },
+  submitButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: theme.colors.white,
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  loadingText: {
+    color: theme.colors.white,
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginLeft: 8,
+  },
+  competitionsList: {
+    gap: 16,
+  },
+  competitionCard: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  competitionCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  competitionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+    flex: 1,
+    marginRight: 8,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  activeBadge: {
+    backgroundColor: theme.colors.success + '20', // 20% opacity
+  },
+  endedBadge: {
+    backgroundColor: theme.colors.error + '20', // 20% opacity
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  activeStatusText: {
+    color: theme.colors.success,
+  },
+  endedStatusText: {
+    color: theme.colors.error,
+  },
+  metadataRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 12,
+  },
+  metadataItem: {
+    marginRight: 16,
+    marginBottom: 8,
+  },
+  metadataLabel: {
+    fontSize: 12,
+    color: theme.colors.gray[500],
+  },
+  metadataValue: {
+    color: theme.colors.gray[800],
+  },
+  competitionFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  createdAtText: {
+    color: theme.colors.gray[500],
+    fontSize: 12,
+  },
+  viewDetailsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  viewDetailsText: {
+    color: theme.colors.primary,
+    fontWeight: '500',
+    marginRight: 4,
+  },
+});
 
 export default function BusinessCompetitionScreen({ navigation }) {
   const { user, userDetails } = useAuth();
@@ -253,9 +539,9 @@ export default function BusinessCompetitionScreen({ navigation }) {
   
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="text-gray-600 mt-4">Loading your competitions...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>Loading your competitions...</Text>
       </View>
     );
   }
@@ -263,22 +549,22 @@ export default function BusinessCompetitionScreen({ navigation }) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      style={styles.container}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
     >
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
-          <Text className="text-2xl font-bold text-gray-800 mb-2">Business Dashboard</Text>
-          <Text className="text-gray-600 mb-6">
+      <ScrollView style={styles.scrollContainer}>
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>Business Dashboard</Text>
+          <Text style={styles.subtitle}>
             Manage your business competitions
           </Text>
           
           {!showForm ? (
             <TouchableOpacity
-              className="bg-primary py-3 rounded-lg items-center mb-6"
+              style={styles.createButton}
               onPress={() => setShowForm(true)}
             >
-              <Text className="text-white font-bold text-lg">Create New Competition</Text>
+              <Text style={styles.createButtonText}>Create New Competition</Text>
             </TouchableOpacity>
           ) : (
             // Competition creation form
