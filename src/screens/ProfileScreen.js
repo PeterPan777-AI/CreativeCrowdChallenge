@@ -7,12 +7,134 @@ import {
   ActivityIndicator,
   Alert,
   RefreshControl,
+  StyleSheet,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import supabase from '../utils/supabaseClient';
 import UserProfileHeader from '../components/UserProfileHeader';
 import SubmissionItem from '../components/SubmissionItem';
+import { globalStyles, theme, combineStyles } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  contentContainer: {
+    padding: 16,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 24,
+    marginTop: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  statColumn: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statColumnBordered: {
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: theme.colors.gray[200],
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+  },
+  bestScoreValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.primary,
+  },
+  statLabel: {
+    color: theme.colors.gray[600],
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+    marginBottom: 16,
+  },
+  emptyStateContainer: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    padding: 32,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    color: theme.colors.gray[500],
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  browseButton: {
+    marginTop: 16,
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  browseButtonText: {
+    color: theme.colors.white,
+    fontWeight: '500',
+  },
+  submissionContainer: {
+    marginBottom: 16,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  ratingContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  ratingText: {
+    color: theme.colors.gray[700],
+    marginLeft: 4,
+  },
+  viewCompetitionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  viewCompetitionText: {
+    color: theme.colors.primary,
+    fontWeight: '500',
+    marginRight: 4,
+  },
+  logoutButton: {
+    backgroundColor: theme.colors.gray[200],
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  logoutText: {
+    color: theme.colors.gray[800],
+    fontWeight: '500',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  loadingText: {
+    color: theme.colors.gray[600],
+    marginTop: 16,
+  },
+});
 
 export default function ProfileScreen({ navigation }) {
   const { user, userDetails, signOut } = useAuth();
@@ -115,85 +237,85 @@ export default function ProfileScreen({ navigation }) {
   
   if (!user || loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="text-gray-600 mt-4">Loading profile...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>Loading profile...</Text>
       </View>
     );
   }
   
   return (
     <ScrollView 
-      className="flex-1 bg-background"
+      style={styles.container}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <View className="p-4">
+      <View style={styles.contentContainer}>
         <UserProfileHeader 
           userDetails={userDetails}
           stats={stats}
         />
         
         {/* User stats */}
-        <View className="flex-row justify-between bg-white rounded-lg p-4 shadow-sm mb-6 mt-4">
-          <View className="items-center flex-1">
-            <Text className="text-2xl font-bold text-gray-800">{stats.submissionsCount}</Text>
-            <Text className="text-gray-600">Submissions</Text>
+        <View style={styles.statsContainer}>
+          <View style={styles.statColumn}>
+            <Text style={styles.statValue}>{stats.submissionsCount}</Text>
+            <Text style={styles.statLabel}>Submissions</Text>
           </View>
-          <View className="items-center flex-1 border-l border-r border-gray-200">
-            <Text className="text-2xl font-bold text-gray-800">{stats.averageRating}</Text>
-            <Text className="text-gray-600">Avg Rating</Text>
+          <View style={[styles.statColumn, styles.statColumnBordered]}>
+            <Text style={styles.statValue}>{stats.averageRating}</Text>
+            <Text style={styles.statLabel}>Avg Rating</Text>
           </View>
-          <View className="items-center flex-1">
-            <Text className="text-2xl font-bold text-primary">
+          <View style={styles.statColumn}>
+            <Text style={styles.bestScoreValue}>
               {stats.highestRated?.avgRating || 0}
             </Text>
-            <Text className="text-gray-600">Best Score</Text>
+            <Text style={styles.statLabel}>Best Score</Text>
           </View>
         </View>
         
         {/* Submissions list */}
-        <View className="mb-6">
-          <Text className="text-xl font-bold text-gray-800 mb-4">
+        <View style={globalStyles.mb5}>
+          <Text style={styles.sectionTitle}>
             Your Submissions
           </Text>
           
           {userSubmissions.length === 0 ? (
-            <View className="bg-white rounded-lg p-8 items-center">
+            <View style={styles.emptyStateContainer}>
               <Feather name="file-text" size={48} color="#CBD5E1" />
-              <Text className="text-gray-500 mt-4 text-center">
+              <Text style={styles.emptyStateText}>
                 You haven't submitted any entries yet.
               </Text>
               <TouchableOpacity
-                className="mt-4 bg-primary px-6 py-2 rounded-lg"
+                style={styles.browseButton}
                 onPress={() => navigation.navigate('Home')}
               >
-                <Text className="text-white font-medium">Browse Competitions</Text>
+                <Text style={styles.browseButtonText}>Browse Competitions</Text>
               </TouchableOpacity>
             </View>
           ) : (
             userSubmissions.map((submission) => (
-              <View key={submission.id} className="mb-4">
+              <View key={submission.id} style={styles.submissionContainer}>
                 <SubmissionItem 
                   submission={submission}
                   showCompetition={true}
                 />
                 
-                <View className="flex-row mt-2">
-                  <View className="flex-1 flex-row items-center">
+                <View style={styles.ratingRow}>
+                  <View style={styles.ratingContainer}>
                     <Feather name="star" size={16} color="#F59E0B" />
-                    <Text className="text-gray-700 ml-1">
+                    <Text style={styles.ratingText}>
                       Average Rating: {submission.avgRating}
                     </Text>
                   </View>
                   
                   <TouchableOpacity
-                    className="flex-row items-center"
+                    style={styles.viewCompetitionButton}
                     onPress={() => handleViewCompetition(submission.competition_id)}
                   >
-                    <Text className="text-primary font-medium mr-1">View Competition</Text>
-                    <Feather name="chevron-right" size={16} color="#3B82F6" />
+                    <Text style={styles.viewCompetitionText}>View Competition</Text>
+                    <Feather name="chevron-right" size={16} color={theme.colors.primary} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -203,10 +325,10 @@ export default function ProfileScreen({ navigation }) {
         
         {/* Logout button */}
         <TouchableOpacity
-          className="bg-gray-200 py-3 rounded-lg items-center mb-10"
+          style={styles.logoutButton}
           onPress={handleLogout}
         >
-          <Text className="text-gray-800 font-medium">Log Out</Text>
+          <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
