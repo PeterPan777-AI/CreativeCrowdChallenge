@@ -6,9 +6,78 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  StyleSheet,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { theme } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+  },
+  formContainer: {
+    marginTop: 16,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    color: theme.colors.gray[700],
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+  input: {
+    backgroundColor: theme.colors.gray[50],
+    borderWidth: 1,
+    borderColor: theme.colors.gray[300],
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    color: theme.colors.gray[800],
+  },
+  textArea: {
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  submitButton: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  submitButtonDisabled: {
+    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+  },
+  submitButtonText: {
+    color: theme.colors.white,
+    fontWeight: 'bold',
+  },
+  footerText: {
+    fontSize: 12,
+    color: theme.colors.gray[500],
+    textAlign: 'center',
+    fontStyle: 'italic',
+  }
+});
 
 export default function CategorySuggestionForm({ onSubmit }) {
   const { user } = useAuth();
@@ -49,12 +118,12 @@ export default function CategorySuggestionForm({ onSubmit }) {
   };
   
   return (
-    <View className="bg-white rounded-lg p-4 shadow-sm">
+    <View style={styles.container}>
       <TouchableOpacity 
-        className="flex-row justify-between items-center"
+        style={styles.headerRow}
         onPress={() => setExpanded(!expanded)}
       >
-        <Text className="text-lg font-bold text-gray-800">Suggest a New Category</Text>
+        <Text style={styles.headerText}>Suggest a New Category</Text>
         <Feather 
           name={expanded ? 'chevron-up' : 'chevron-down'} 
           size={20} 
@@ -63,11 +132,11 @@ export default function CategorySuggestionForm({ onSubmit }) {
       </TouchableOpacity>
       
       {expanded && (
-        <View className="mt-4 space-y-4">
-          <View>
-            <Text className="text-gray-700 mb-1 font-medium">Category Name</Text>
+        <View style={styles.formContainer}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Category Name</Text>
             <TextInput
-              className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+              style={styles.input}
               placeholder="Enter a name for the category"
               value={name}
               onChangeText={setName}
@@ -75,10 +144,10 @@ export default function CategorySuggestionForm({ onSubmit }) {
             />
           </View>
           
-          <View>
-            <Text className="text-gray-700 mb-1 font-medium">Description</Text>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Description</Text>
             <TextInput
-              className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+              style={[styles.input, styles.textArea]}
               placeholder="Describe what this category is about"
               value={description}
               onChangeText={setDescription}
@@ -89,18 +158,21 @@ export default function CategorySuggestionForm({ onSubmit }) {
           </View>
           
           <TouchableOpacity
-            className={`rounded-lg py-3 items-center ${loading ? 'bg-primary/70' : 'bg-primary'}`}
+            style={[
+              styles.submitButton,
+              (loading || !name.trim() || !description.trim()) && styles.submitButtonDisabled
+            ]}
             onPress={handleSubmit}
             disabled={loading || !name.trim() || !description.trim()}
           >
             {loading ? (
               <ActivityIndicator size="small" color="white" />
             ) : (
-              <Text className="text-white font-bold">Submit Suggestion</Text>
+              <Text style={styles.submitButtonText}>Submit Suggestion</Text>
             )}
           </TouchableOpacity>
           
-          <Text className="text-xs text-gray-500 text-center italic">
+          <Text style={styles.footerText}>
             Your suggestion will be reviewed by our administrators.
           </Text>
         </View>

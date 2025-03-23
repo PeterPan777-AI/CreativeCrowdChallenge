@@ -6,8 +6,134 @@ import {
   TouchableOpacity,
   Linking,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { theme } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+  },
+  dateText: {
+    fontSize: 12,
+    color: theme.colors.gray[500],
+  },
+  competitionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  competitionText: {
+    marginLeft: 4,
+    fontSize: 14,
+  },
+  businessText: {
+    color: '#B45309', // amber-600
+  },
+  individualText: {
+    color: '#6D28D9', // purple-600
+  },
+  statusBadge: {
+    marginLeft: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  activeBadge: {
+    backgroundColor: '#D1FAE5', // green-100
+  },
+  endedBadge: {
+    backgroundColor: theme.colors.gray[100],
+  },
+  statusText: {
+    fontSize: 12,
+  },
+  activeStatusText: {
+    color: '#047857', // green-700
+  },
+  endedStatusText: {
+    color: theme.colors.gray[700],
+  },
+  description: {
+    color: theme.colors.gray[600],
+    marginBottom: 12,
+  },
+  photoContainer: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 12,
+    backgroundColor: theme.colors.gray[100],
+  },
+  photo: {
+    width: '100%',
+    height: 224,
+  },
+  videoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.gray[100],
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  videoTextContainer: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  videoTitle: {
+    color: theme.colors.gray[800],
+    fontWeight: '500',
+  },
+  videoSubtitle: {
+    color: theme.colors.gray[500],
+    fontSize: 14,
+  },
+  textContentContainer: {
+    backgroundColor: theme.colors.gray[50],
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.gray[200],
+  },
+  textContent: {
+    color: theme.colors.gray[800],
+    fontStyle: 'italic',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  userContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  username: {
+    color: theme.colors.gray[600],
+    marginLeft: 4,
+    fontSize: 14,
+  },
+});
 
 export default function SubmissionItem({ submission, showCompetition = false }) {
   if (!submission) return null;
@@ -28,47 +154,56 @@ export default function SubmissionItem({ submission, showCompetition = false }) 
   };
   
   return (
-    <View className="bg-white rounded-lg p-4 shadow-sm">
-      <View className="flex-row justify-between items-center mb-2">
-        <Text className="text-lg font-bold text-gray-800">
+    <View style={styles.container}>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>
           {submission.title}
         </Text>
-        <Text className="text-xs text-gray-500">
+        <Text style={styles.dateText}>
           {formatDate(submission.created_at)}
         </Text>
       </View>
       
       {showCompetition && submission.competitions && (
-        <View className="flex-row items-center mb-2">
+        <View style={styles.competitionRow}>
           <Feather 
             name={submission.competitions.type === 'business' ? 'briefcase' : 'user'} 
             size={14} 
             color={submission.competitions.type === 'business' ? '#F59E0B' : '#8B5CF6'} 
           />
-          <Text className={`ml-1 text-sm ${submission.competitions.type === 'business' ? 'text-amber-600' : 'text-purple-600'}`}>
+          <Text style={[
+            styles.competitionText,
+            submission.competitions.type === 'business' ? styles.businessText : styles.individualText
+          ]}>
             {submission.competitions.title}
           </Text>
-          <View className={`ml-2 px-2 py-0.5 rounded-full ${submission.competitions.status === 'active' ? 'bg-green-100' : 'bg-gray-100'}`}>
-            <Text className={`text-xs ${submission.competitions.status === 'active' ? 'text-green-700' : 'text-gray-700'}`}>
+          <View style={[
+            styles.statusBadge,
+            submission.competitions.status === 'active' ? styles.activeBadge : styles.endedBadge
+          ]}>
+            <Text style={[
+              styles.statusText,
+              submission.competitions.status === 'active' ? styles.activeStatusText : styles.endedStatusText
+            ]}>
               {submission.competitions.status === 'active' ? 'Active' : 'Ended'}
             </Text>
           </View>
         </View>
       )}
       
-      <Text className="text-gray-600 mb-3">
+      <Text style={styles.description}>
         {submission.description}
       </Text>
       
       {submission.media_type === 'photo' && submission.media_url && (
         <TouchableOpacity 
-          className="rounded-lg overflow-hidden mb-3 bg-gray-100"
+          style={styles.photoContainer}
           onPress={() => handleOpenMedia(submission.media_url)}
           activeOpacity={0.9}
         >
           <Image 
             source={{ uri: submission.media_url }} 
-            className="w-full h-56"
+            style={styles.photo}
             resizeMode="cover"
           />
         </TouchableOpacity>
@@ -76,21 +211,21 @@ export default function SubmissionItem({ submission, showCompetition = false }) 
       
       {submission.media_type === 'video' && submission.media_url && (
         <TouchableOpacity 
-          className="flex-row items-center bg-gray-100 p-4 rounded-lg mb-3"
+          style={styles.videoContainer}
           onPress={() => handleOpenMedia(submission.media_url)}
         >
           <Feather name="video" size={24} color="#4B5563" />
-          <View className="ml-3 flex-1">
-            <Text className="text-gray-800 font-medium">Video Submission</Text>
-            <Text className="text-gray-500 text-sm">Tap to view the video</Text>
+          <View style={styles.videoTextContainer}>
+            <Text style={styles.videoTitle}>Video Submission</Text>
+            <Text style={styles.videoSubtitle}>Tap to view the video</Text>
           </View>
-          <Feather name="external-link" size={20} color="#3B82F6" />
+          <Feather name="external-link" size={20} color={theme.colors.primary} />
         </TouchableOpacity>
       )}
       
       {submission.media_type === 'text' && submission.text_content && (
-        <View className="bg-gray-50 p-4 rounded-lg mb-3 border border-gray-200">
-          <Text className="text-gray-800 italic">
+        <View style={styles.textContentContainer}>
+          <Text style={styles.textContent}>
             "{submission.text_content.length > 150 
               ? submission.text_content.substring(0, 150) + '...' 
               : submission.text_content}"
@@ -98,10 +233,10 @@ export default function SubmissionItem({ submission, showCompetition = false }) 
         </View>
       )}
       
-      <View className="flex-row justify-between items-center">
-        <View className="flex-row items-center">
-          <Feather name="user" size={14} color="#6B7280" />
-          <Text className="text-gray-600 ml-1 text-sm">
+      <View style={styles.footer}>
+        <View style={styles.userContainer}>
+          <Feather name="user" size={14} color={theme.colors.gray[600]} />
+          <Text style={styles.username}>
             {submission.profiles?.username || 'Anonymous'}
           </Text>
         </View>

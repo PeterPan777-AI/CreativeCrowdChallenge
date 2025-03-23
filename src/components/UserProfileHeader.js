@@ -1,6 +1,95 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { theme } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  initials: {
+    color: theme.colors.white,
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  userInfoContainer: {
+    marginLeft: 16,
+    flex: 1,
+  },
+  username: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+  },
+  email: {
+    color: theme.colors.gray[500],
+  },
+  joinDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  joinDateText: {
+    color: theme.colors.gray[500],
+    fontSize: 14,
+    marginLeft: 4,
+  },
+  roleBadge: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  businessBadge: {
+    backgroundColor: '#FEF3C7', // amber-100
+  },
+  adminBadge: {
+    backgroundColor: '#F3E8FF', // purple-100
+  },
+  roleBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  roleBadgeText: {
+    marginLeft: 4,
+    fontWeight: '500',
+  },
+  businessText: {
+    color: '#B45309', // amber-700
+  },
+  adminText: {
+    color: '#6D28D9', // purple-700
+  },
+  achievementContainer: {
+    marginTop: 12,
+    backgroundColor: '#EFF6FF', // blue-50
+    padding: 12,
+    borderRadius: 8,
+  },
+  achievementText: {
+    color: '#1E40AF', // blue-800
+    fontWeight: '500',
+  }
+});
 
 export default function UserProfileHeader({ userDetails, stats }) {
   if (!userDetails) return null;
@@ -50,29 +139,28 @@ export default function UserProfileHeader({ userDetails, stats }) {
   const isAdmin = userDetails.role === 'admin';
   
   return (
-    <View className="bg-white rounded-lg p-4 shadow-sm">
-      <View className="flex-row items-center">
+    <View style={styles.container}>
+      <View style={styles.profileRow}>
         {/* User avatar */}
         <View 
-          className="w-16 h-16 rounded-full items-center justify-center"
-          style={{ backgroundColor: avatarColor }}
+          style={[styles.avatar, { backgroundColor: avatarColor }]}
         >
-          <Text className="text-white text-xl font-bold">{userInitials}</Text>
+          <Text style={styles.initials}>{userInitials}</Text>
         </View>
         
         {/* User info */}
-        <View className="ml-4 flex-1">
-          <Text className="text-xl font-bold text-gray-800">
+        <View style={styles.userInfoContainer}>
+          <Text style={styles.username}>
             {userDetails.username}
           </Text>
           
-          <Text className="text-gray-500">
+          <Text style={styles.email}>
             {userDetails.email}
           </Text>
           
-          <View className="flex-row items-center mt-1">
-            <Feather name="calendar" size={14} color="#6B7280" />
-            <Text className="text-gray-500 text-sm ml-1">
+          <View style={styles.joinDateRow}>
+            <Feather name="calendar" size={14} color={theme.colors.gray[500]} />
+            <Text style={styles.joinDateText}>
               Member since {joinDate}
             </Text>
           </View>
@@ -81,18 +169,20 @@ export default function UserProfileHeader({ userDetails, stats }) {
       
       {/* Role badge */}
       {(isBusiness || isAdmin) && (
-        <View className={`mt-3 py-2 px-3 rounded-lg self-start ${
-          isBusiness ? 'bg-amber-100' : 'bg-purple-100'
-        }`}>
-          <View className="flex-row items-center">
+        <View style={[
+          styles.roleBadge,
+          isBusiness ? styles.businessBadge : styles.adminBadge
+        ]}>
+          <View style={styles.roleBadgeRow}>
             <Feather 
               name={isBusiness ? 'briefcase' : 'shield'} 
               size={14} 
               color={isBusiness ? '#F59E0B' : '#8B5CF6'} 
             />
-            <Text className={`ml-1 font-medium ${
-              isBusiness ? 'text-amber-700' : 'text-purple-700'
-            }`}>
+            <Text style={[
+              styles.roleBadgeText,
+              isBusiness ? styles.businessText : styles.adminText
+            ]}>
               {isBusiness ? 'Business Account' : 'Administrator'}
             </Text>
           </View>
@@ -101,8 +191,8 @@ export default function UserProfileHeader({ userDetails, stats }) {
       
       {/* Best achievement */}
       {stats?.highestRated && stats.highestRated.avgRating > 0 && (
-        <View className="mt-3 bg-blue-50 p-3 rounded-lg">
-          <Text className="text-blue-800 font-medium">
+        <View style={styles.achievementContainer}>
+          <Text style={styles.achievementText}>
             <Feather name="award" size={14} color="#3B82F6" /> Top Rated Submission: {stats.highestRated.title} ({stats.highestRated.avgRating}/10)
           </Text>
         </View>
