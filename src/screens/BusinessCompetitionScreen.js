@@ -632,10 +632,10 @@ export default function BusinessCompetitionScreen({ navigation }) {
                 </View>
                 
                 {/* Prize amount */}
-                <View>
-                  <Text className="text-gray-700 mb-1 font-medium">Prize Amount ($)</Text>
+                <View style={styles.formGroup}>
+                  <Text style={styles.inputLabel}>Prize Amount ($)</Text>
                   <TextInput
-                    className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+                    style={styles.textInput}
                     placeholder="Enter prize amount"
                     value={prizeAmount}
                     onChangeText={setPrizeAmount}
@@ -644,39 +644,39 @@ export default function BusinessCompetitionScreen({ navigation }) {
                 </View>
                 
                 {/* Date selection */}
-                <View className="flex-row space-x-4">
-                  <View className="flex-1">
-                    <Text className="text-gray-700 mb-1 font-medium">Start Date</Text>
-                    <View className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3">
-                      <Text className="text-gray-800">{formatDate(startDate)}</Text>
-                      <Text className="text-xs text-gray-500 mt-1">Default: Today</Text>
+                <View style={styles.dateRow}>
+                  <View style={styles.dateColumn}>
+                    <Text style={styles.inputLabel}>Start Date</Text>
+                    <View style={styles.dateDisplay}>
+                      <Text style={styles.dateText}>{formatDate(startDate)}</Text>
+                      <Text style={styles.dateHint}>Default: Today</Text>
                     </View>
                   </View>
                   
-                  <View className="flex-1">
-                    <Text className="text-gray-700 mb-1 font-medium">End Date</Text>
-                    <View className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3">
-                      <Text className="text-gray-800">{formatDate(endDate)}</Text>
-                      <Text className="text-xs text-gray-500 mt-1">Default: 7 days later</Text>
+                  <View style={styles.dateColumn}>
+                    <Text style={styles.inputLabel}>End Date</Text>
+                    <View style={styles.dateDisplay}>
+                      <Text style={styles.dateText}>{formatDate(endDate)}</Text>
+                      <Text style={styles.dateHint}>Default: 7 days later</Text>
                     </View>
                   </View>
                 </View>
                 
                 {/* Product information */}
-                <View>
-                  <Text className="text-gray-700 mb-1 font-medium">Product Name</Text>
+                <View style={styles.formGroup}>
+                  <Text style={styles.inputLabel}>Product Name</Text>
                   <TextInput
-                    className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+                    style={styles.textInput}
                     placeholder="Enter product name"
                     value={productName}
                     onChangeText={setProductName}
                   />
                 </View>
                 
-                <View>
-                  <Text className="text-gray-700 mb-1 font-medium">Product Description</Text>
+                <View style={styles.formGroup}>
+                  <Text style={styles.inputLabel}>Product Description</Text>
                   <TextInput
-                    className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+                    style={styles.textArea}
                     placeholder="Detailed description of your product"
                     value={productDescription}
                     onChangeText={setProductDescription}
@@ -687,17 +687,17 @@ export default function BusinessCompetitionScreen({ navigation }) {
                 </View>
                 
                 {/* Product image */}
-                <View>
-                  <Text className="text-gray-700 mb-2 font-medium">Product Image</Text>
+                <View style={styles.formGroup}>
+                  <Text style={styles.inputLabel}>Product Image</Text>
                   {productImage ? (
-                    <View className="rounded-lg overflow-hidden mb-2">
+                    <View style={styles.mediaPreviewContainer}>
                       <Image
                         source={{ uri: productImage.uri }}
-                        className="w-full h-48 bg-gray-200"
+                        style={styles.mediaImage}
                         resizeMode="cover"
                       />
                       <TouchableOpacity
-                        className="absolute top-2 right-2 bg-white rounded-full p-2"
+                        style={styles.removeMediaButton}
                         onPress={() => setProductImage(null)}
                       >
                         <Feather name="x" size={20} color="#EF4444" />
@@ -705,11 +705,11 @@ export default function BusinessCompetitionScreen({ navigation }) {
                     </View>
                   ) : (
                     <TouchableOpacity
-                      className="bg-gray-50 border border-dashed border-gray-300 rounded-lg py-6 items-center"
+                      style={styles.uploadContainer}
                       onPress={pickImage}
                     >
-                      <Feather name="image" size={32} color="#9CA3AF" />
-                      <Text className="text-gray-500 mt-2">
+                      <Feather name="image" size={32} style={styles.uploadIcon} />
+                      <Text style={styles.uploadText}>
                         Upload product image or banner
                       </Text>
                     </TouchableOpacity>
@@ -717,21 +717,24 @@ export default function BusinessCompetitionScreen({ navigation }) {
                 </View>
                 
                 <TouchableOpacity
-                  className={`rounded-lg py-3.5 items-center mt-4 ${
-                    formLoading ? 'bg-primary/70' : 'bg-primary'
-                  }`}
+                  style={[
+                    styles.submitButton, 
+                    formLoading 
+                      ? styles.submitButtonDisabled 
+                      : styles.submitButtonEnabled
+                  ]}
                   onPress={handleSubmit}
                   disabled={formLoading}
                 >
                   {formLoading ? (
-                    <View className="flex-row items-center">
+                    <View style={styles.submitButtonContent}>
                       <ActivityIndicator size="small" color="white" />
-                      <Text className="text-white font-bold text-lg ml-2">
+                      <Text style={styles.submitButtonText}>
                         Creating...
                       </Text>
                     </View>
                   ) : (
-                    <Text className="text-white font-bold text-lg">
+                    <Text style={styles.submitButtonText}>
                       Create Competition
                     </Text>
                   )}
@@ -741,14 +744,14 @@ export default function BusinessCompetitionScreen({ navigation }) {
           )}
           
           {/* Display business competitions */}
-          <Text className="text-xl font-bold text-gray-800 mb-4">
+          <Text style={styles.title}>
             Your Competitions
           </Text>
           
           {competitions.length === 0 ? (
-            <View className="bg-white rounded-lg p-8 items-center">
+            <View style={[styles.formContainer, { alignItems: 'center', padding: 32 }]}>
               <Feather name="award" size={48} color="#CBD5E1" />
-              <Text className="text-gray-500 mt-4 text-center">
+              <Text style={[styles.subtitle, { textAlign: 'center', marginTop: 16 }]}>
                 You haven't created any competitions yet.
               </Text>
             </View>
@@ -756,53 +759,59 @@ export default function BusinessCompetitionScreen({ navigation }) {
             competitions.map((competition) => (
               <View 
                 key={competition.id} 
-                className="bg-white rounded-lg p-4 shadow-sm mb-4"
+                style={styles.competitionCard}
               >
-                <View className="flex-row justify-between items-center mb-2">
-                  <Text className="text-lg font-bold text-gray-800">
+                <View style={styles.competitionCardHeader}>
+                  <Text style={styles.competitionTitle}>
                     {competition.title}
                   </Text>
-                  <View className={`px-3 py-1 rounded-full ${competition.status === 'active' ? 'bg-green-100' : 'bg-gray-100'}`}>
-                    <Text className={`text-xs font-medium ${competition.status === 'active' ? 'text-green-800' : 'text-gray-800'}`}>
+                  <View style={[
+                    styles.statusBadge,
+                    competition.status === 'active' ? styles.activeBadge : styles.endedBadge
+                  ]}>
+                    <Text style={[
+                      styles.statusText,
+                      competition.status === 'active' ? styles.activeStatusText : styles.endedStatusText
+                    ]}>
                       {competition.status.charAt(0).toUpperCase() + competition.status.slice(1)}
                     </Text>
                   </View>
                 </View>
                 
-                <Text className="text-gray-600 mb-3">
+                <Text style={globalStyles.bodyText}>
                   {competition.description.length > 100 
                     ? competition.description.substring(0, 100) + '...' 
                     : competition.description}
                 </Text>
                 
-                <View className="flex-row mb-3">
-                  <View className="mr-4">
-                    <Text className="text-xs text-gray-500">Category</Text>
-                    <Text className="text-gray-800">{competition.categories?.name}</Text>
+                <View style={styles.metadataRow}>
+                  <View style={styles.metadataItem}>
+                    <Text style={styles.metadataLabel}>Category</Text>
+                    <Text style={styles.metadataValue}>{competition.categories?.name}</Text>
                   </View>
                   
-                  <View className="mr-4">
-                    <Text className="text-xs text-gray-500">Prize</Text>
-                    <Text className="text-gray-800">${competition.prize_amount}</Text>
+                  <View style={styles.metadataItem}>
+                    <Text style={styles.metadataLabel}>Prize</Text>
+                    <Text style={styles.metadataValue}>${competition.prize_amount}</Text>
                   </View>
                   
-                  <View>
-                    <Text className="text-xs text-gray-500">Product</Text>
-                    <Text className="text-gray-800">{competition.product_name}</Text>
+                  <View style={styles.metadataItem}>
+                    <Text style={styles.metadataLabel}>Product</Text>
+                    <Text style={styles.metadataValue}>{competition.product_name}</Text>
                   </View>
                 </View>
                 
-                <View className="flex-row justify-between">
-                  <Text className="text-gray-500 text-xs">
+                <View style={styles.competitionFooter}>
+                  <Text style={styles.createdAtText}>
                     {formatDate(new Date(competition.start_date))} - {formatDate(new Date(competition.end_date))}
                   </Text>
                   
                   <TouchableOpacity
-                    className="flex-row items-center"
+                    style={styles.viewDetailsButton}
                     onPress={() => handleViewCompetition(competition.id)}
                   >
-                    <Text className="text-primary font-medium mr-1">View Details</Text>
-                    <Feather name="chevron-right" size={16} color="#3B82F6" />
+                    <Text style={styles.viewDetailsText}>View Details</Text>
+                    <Feather name="chevron-right" size={16} color={theme.colors.primary} />
                   </TouchableOpacity>
                 </View>
               </View>
