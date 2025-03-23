@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Image,
   useWindowDimensions,
+  StyleSheet,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import supabase from '../utils/supabaseClient';
@@ -15,6 +16,190 @@ import { useAuth } from '../context/AuthContext';
 import SubmissionItem from '../components/SubmissionItem';
 import RatingComponent from '../components/RatingComponent';
 import BusinessFeatures from '../components/BusinessFeatures';
+import { theme, globalStyles } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  contentContainer: {
+    padding: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  loadingText: {
+    color: theme.colors.gray[600],
+    marginTop: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  errorIcon: {
+    color: theme.colors.error,
+  },
+  errorText: {
+    fontSize: 18,
+    color: theme.colors.gray[700],
+    marginTop: 16,
+  },
+  backButton: {
+    marginTop: 24,
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: theme.colors.white,
+    fontWeight: '500',
+  },
+  competitionCard: {
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  businessCard: {
+    backgroundColor: '#FEF3C7', // amber-50
+    borderWidth: 1,
+    borderColor: '#FDE68A', // amber-200
+  },
+  individualCard: {
+    backgroundColor: '#F5F3FF', // purple-50
+    borderWidth: 1,
+    borderColor: '#DDD6FE', // purple-200
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  typeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  businessTypeText: {
+    marginLeft: 8,
+    fontWeight: '500',
+    color: '#B45309', // amber-700
+  },
+  individualTypeText: {
+    marginLeft: 8,
+    fontWeight: '500',
+    color: '#6D28D9', // purple-700
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
+  },
+  activeBadge: {
+    backgroundColor: '#D1FAE5', // green-100
+  },
+  endedBadge: {
+    backgroundColor: '#FEE2E2', // red-100
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  activeStatusText: {
+    color: '#065F46', // green-800
+  },
+  endedStatusText: {
+    color: '#991B1B', // red-800
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+    marginBottom: 8,
+  },
+  description: {
+    color: theme.colors.gray[600],
+    marginBottom: 16,
+  },
+  metadataContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  metadataItem: {
+    marginRight: 16,
+    marginBottom: 8,
+  },
+  metadataLabel: {
+    fontSize: 12,
+    color: theme.colors.gray[500],
+  },
+  metadataValue: {
+    color: theme.colors.gray[800],
+    fontWeight: '500',
+  },
+  submitButton: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  submitButtonText: {
+    color: theme.colors.white,
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  submittedContainer: {
+    backgroundColor: '#D1FAE5', // green-100
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  submittedText: {
+    color: '#065F46', // green-800
+    marginLeft: 8,
+    flex: 1,
+  },
+  submissionsHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+    marginBottom: 16,
+  },
+  submissionsLoadingContainer: {
+    paddingVertical: 48,
+    alignItems: 'center',
+  },
+  submissionsLoadingText: {
+    color: theme.colors.gray[500],
+    marginTop: 8,
+  },
+  emptySubmissionsContainer: {
+    paddingVertical: 48,
+    alignItems: 'center',
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+  },
+  emptySubmissionsIcon: {
+    color: '#CBD5E1', // slate-300
+  },
+  emptySubmissionsText: {
+    color: theme.colors.gray[500],
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  submissionContainer: {
+    marginBottom: 16,
+  },
+});
 
 export default function CompetitionDetailsScreen({ route, navigation }) {
   const { competitionId } = route.params;
@@ -184,23 +369,23 @@ export default function CompetitionDetailsScreen({ route, navigation }) {
   
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="text-gray-600 mt-4">Loading competition details...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>Loading competition details...</Text>
       </View>
     );
   }
   
   if (!competition) {
     return (
-      <View className="flex-1 justify-center items-center bg-background">
-        <Feather name="alert-circle" size={60} color="#EF4444" />
-        <Text className="text-lg text-gray-700 mt-4">Competition not found</Text>
+      <View style={styles.errorContainer}>
+        <Feather name="alert-circle" size={60} style={styles.errorIcon} />
+        <Text style={styles.errorText}>Competition not found</Text>
         <TouchableOpacity
-          className="mt-6 bg-primary px-6 py-3 rounded-lg"
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text className="text-white font-medium">Go Back</Text>
+          <Text style={styles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -210,57 +395,66 @@ export default function CompetitionDetailsScreen({ route, navigation }) {
   const isBusiness = competition.type === 'business';
   
   return (
-    <ScrollView className="flex-1 bg-background">
-      <View className="p-4">
+    <ScrollView style={styles.container}>
+      <View style={styles.contentContainer}>
         {/* Competition header */}
-        <View className={`p-4 rounded-lg mb-4 ${isBusiness ? 'bg-amber-50 border border-amber-200' : 'bg-purple-50 border border-purple-200'}`}>
-          <View className="flex-row justify-between items-center mb-2">
-            <View className="flex-row items-center">
+        <View style={[
+          styles.competitionCard,
+          isBusiness ? styles.businessCard : styles.individualCard
+        ]}>
+          <View style={styles.cardHeader}>
+            <View style={styles.typeContainer}>
               <Feather 
                 name={isBusiness ? 'briefcase' : 'user'} 
                 size={20} 
                 color={isBusiness ? '#F59E0B' : '#8B5CF6'} 
               />
-              <Text className={`ml-2 font-medium ${isBusiness ? 'text-amber-700' : 'text-purple-700'}`}>
+              <Text style={isBusiness ? styles.businessTypeText : styles.individualTypeText}>
                 {isBusiness ? 'Business' : 'Individual'} Competition
               </Text>
             </View>
-            <View className={`px-3 py-1 rounded-full ${isCompetitionActive ? 'bg-green-100' : 'bg-red-100'}`}>
-              <Text className={`text-xs font-medium ${isCompetitionActive ? 'text-green-800' : 'text-red-800'}`}>
+            <View style={[
+              styles.statusBadge,
+              isCompetitionActive ? styles.activeBadge : styles.endedBadge
+            ]}>
+              <Text style={[
+                styles.statusText,
+                isCompetitionActive ? styles.activeStatusText : styles.endedStatusText
+              ]}>
                 {isCompetitionActive ? 'Active' : 'Ended'}
               </Text>
             </View>
           </View>
           
-          <Text className="text-2xl font-bold text-gray-800 mb-2">
+          <Text style={styles.title}>
             {competition.title}
           </Text>
           
-          <Text className="text-gray-600 mb-4">
+          <Text style={styles.description}>
             {competition.description}
           </Text>
           
-          <View className="flex-row flex-wrap">
-            <View className="mr-4 mb-2">
-              <Text className="text-xs text-gray-500">Category</Text>
-              <Text className="text-gray-800 font-medium">{competition.category}</Text>
+          <View style={styles.metadataContainer}>
+            <View style={styles.metadataItem}>
+              <Text style={styles.metadataLabel}>Category</Text>
+              <Text style={styles.metadataValue}>{competition.category}</Text>
             </View>
             
-            <View className="mr-4 mb-2">
-              <Text className="text-xs text-gray-500">Prize</Text>
-              <Text className="text-gray-800 font-medium">${competition.prize_amount}</Text>
+            <View style={styles.metadataItem}>
+              <Text style={styles.metadataLabel}>Prize</Text>
+              <Text style={styles.metadataValue}>${competition.prize_amount}</Text>
             </View>
             
-            <View className="mr-4 mb-2">
-              <Text className="text-xs text-gray-500">Start Date</Text>
-              <Text className="text-gray-800 font-medium">
+            <View style={styles.metadataItem}>
+              <Text style={styles.metadataLabel}>Start Date</Text>
+              <Text style={styles.metadataValue}>
                 {new Date(competition.start_date).toLocaleDateString()}
               </Text>
             </View>
             
-            <View className="mb-2">
-              <Text className="text-xs text-gray-500">End Date</Text>
-              <Text className="text-gray-800 font-medium">
+            <View style={styles.metadataItem}>
+              <Text style={styles.metadataLabel}>End Date</Text>
+              <Text style={styles.metadataValue}>
                 {new Date(competition.end_date).toLocaleDateString()}
               </Text>
             </View>
@@ -274,17 +468,17 @@ export default function CompetitionDetailsScreen({ route, navigation }) {
         {/* Submit button */}
         {isCompetitionActive && user && !userHasSubmitted && (
           <TouchableOpacity
-            className="bg-primary py-3 rounded-lg items-center mb-6"
+            style={styles.submitButton}
             onPress={handleSubmit}
           >
-            <Text className="text-white font-bold text-lg">Submit Your Entry</Text>
+            <Text style={styles.submitButtonText}>Submit Your Entry</Text>
           </TouchableOpacity>
         )}
         
         {userHasSubmitted && (
-          <View className="bg-green-100 p-4 rounded-lg mb-6 flex-row items-center">
+          <View style={styles.submittedContainer}>
             <Feather name="check-circle" size={20} color="#10B981" />
-            <Text className="text-green-800 ml-2 flex-1">
+            <Text style={styles.submittedText}>
               You've already submitted an entry to this competition.
             </Text>
           </View>
@@ -292,25 +486,25 @@ export default function CompetitionDetailsScreen({ route, navigation }) {
         
         {/* Submissions section */}
         <View>
-          <Text className="text-xl font-bold text-gray-800 mb-4">
+          <Text style={styles.submissionsHeader}>
             Submissions ({submissions.length})
           </Text>
           
           {submissionsLoading ? (
-            <View className="py-12 items-center">
-              <ActivityIndicator size="small" color="#3B82F6" />
-              <Text className="text-gray-500 mt-2">Loading submissions...</Text>
+            <View style={styles.submissionsLoadingContainer}>
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+              <Text style={styles.submissionsLoadingText}>Loading submissions...</Text>
             </View>
           ) : submissions.length === 0 ? (
-            <View className="py-12 items-center bg-white rounded-lg">
-              <Feather name="inbox" size={48} color="#CBD5E1" />
-              <Text className="text-gray-500 mt-4 text-center">
+            <View style={styles.emptySubmissionsContainer}>
+              <Feather name="inbox" size={48} style={styles.emptySubmissionsIcon} />
+              <Text style={styles.emptySubmissionsText}>
                 No submissions yet. Be the first to submit!
               </Text>
             </View>
           ) : (
             submissions.map((submission) => (
-              <View key={submission.id} className="mb-4">
+              <View key={submission.id} style={styles.submissionContainer}>
                 <SubmissionItem submission={submission} />
                 <RatingComponent
                   userRating={submission.userRating}

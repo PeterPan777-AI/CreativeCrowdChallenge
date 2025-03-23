@@ -10,11 +10,183 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  StyleSheet,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../context/AuthContext';
 import supabase from '../utils/supabaseClient';
+import { theme, globalStyles } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  contentContainer: {
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+    marginBottom: 8,
+  },
+  subtitle: {
+    color: theme.colors.gray[600],
+    marginBottom: 24,
+  },
+  formContainer: {
+    gap: 16,
+  },
+  formGroup: {
+  },
+  inputLabel: {
+    color: theme.colors.gray[700],
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+  textInput: {
+    backgroundColor: theme.colors.white,
+    borderWidth: 1,
+    borderColor: theme.colors.gray[300],
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    color: theme.colors.gray[800],
+  },
+  textArea: {
+    backgroundColor: theme.colors.white,
+    borderWidth: 1,
+    borderColor: theme.colors.gray[300],
+    borderRadius: 8,
+    padding: 16,
+    color: theme.colors.gray[800],
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  largeTextArea: {
+    minHeight: 160,
+  },
+  typeSelection: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  typeButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  typeButtonActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  typeButtonInactive: {
+    backgroundColor: theme.colors.white,
+    borderColor: theme.colors.gray[300],
+  },
+  typeButtonText: {
+    marginTop: 4,
+  },
+  activeButtonText: {
+    color: theme.colors.white,
+  },
+  inactiveButtonText: {
+    color: theme.colors.gray[700],
+  },
+  mediaPreviewContainer: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  mediaImage: {
+    width: '100%',
+    height: 256,
+    backgroundColor: theme.colors.gray[200],
+  },
+  removeMediaButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: theme.colors.white,
+    borderRadius: 20,
+    padding: 8,
+  },
+  uploadContainer: {
+    backgroundColor: theme.colors.white,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: theme.colors.gray[300],
+    borderRadius: 8,
+    paddingVertical: 32,
+    alignItems: 'center',
+  },
+  uploadIcon: {
+    color: theme.colors.gray[400],
+  },
+  uploadText: {
+    color: theme.colors.gray[500],
+    marginTop: 8,
+  },
+  selectedVideoContainer: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 8,
+    backgroundColor: theme.colors.gray[100],
+    padding: 16,
+  },
+  selectedVideoText: {
+    color: theme.colors.gray[800],
+  },
+  removeVideoButton: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.gray[300],
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  removeVideoButtonText: {
+    color: theme.colors.gray[700],
+    marginLeft: 4,
+  },
+  submitButton: {
+    borderRadius: 8,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  submitButtonEnabled: {
+    backgroundColor: theme.colors.primary,
+  },
+  submitButtonDisabled: {
+    backgroundColor: theme.colors.primary + '80', // 50% opacity
+  },
+  submitButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: theme.colors.white,
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  loadingText: {
+    color: theme.colors.white,
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginLeft: 8,
+  },
+});
 
 export default function SubmissionScreen({ route, navigation }) {
   const { competitionId, competitionTitle } = route.params;
@@ -173,21 +345,21 @@ export default function SubmissionScreen({ route, navigation }) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      style={styles.container}
     >
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
-          <Text className="text-2xl font-bold text-gray-800 mb-2">Submit Your Entry</Text>
-          <Text className="text-gray-600 mb-6">
+      <ScrollView style={styles.scrollContainer}>
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>Submit Your Entry</Text>
+          <Text style={styles.subtitle}>
             for "{competitionTitle}"
           </Text>
           
-          <View className="space-y-4">
+          <View style={styles.formContainer}>
             {/* Title input */}
-            <View>
-              <Text className="text-gray-700 mb-1 font-medium">Title</Text>
+            <View style={styles.formGroup}>
+              <Text style={styles.inputLabel}>Title</Text>
               <TextInput
-                className="bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+                style={styles.textInput}
                 placeholder="Enter a title for your submission"
                 value={title}
                 onChangeText={setTitle}
@@ -195,10 +367,10 @@ export default function SubmissionScreen({ route, navigation }) {
             </View>
             
             {/* Description input */}
-            <View>
-              <Text className="text-gray-700 mb-1 font-medium">Description</Text>
+            <View style={styles.formGroup}>
+              <Text style={styles.inputLabel}>Description</Text>
               <TextInput
-                className="bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+                style={styles.textArea}
                 placeholder="Describe your submission"
                 value={description}
                 onChangeText={setDescription}
@@ -209,11 +381,14 @@ export default function SubmissionScreen({ route, navigation }) {
             </View>
             
             {/* Media type selection */}
-            <View>
-              <Text className="text-gray-700 mb-2 font-medium">Submission Type</Text>
-              <View className="flex-row space-x-4">
+            <View style={styles.formGroup}>
+              <Text style={styles.inputLabel}>Submission Type</Text>
+              <View style={styles.typeSelection}>
                 <TouchableOpacity
-                  className={`flex-1 border rounded-lg py-3 items-center ${mediaType === 'photo' ? 'bg-primary border-primary' : 'bg-white border-gray-300'}`}
+                  style={[
+                    styles.typeButton,
+                    mediaType === 'photo' ? styles.typeButtonActive : styles.typeButtonInactive
+                  ]}
                   onPress={() => setMediaType('photo')}
                 >
                   <Feather 
@@ -222,14 +397,20 @@ export default function SubmissionScreen({ route, navigation }) {
                     color={mediaType === 'photo' ? 'white' : '#4B5563'} 
                   />
                   <Text 
-                    className={`mt-1 ${mediaType === 'photo' ? 'text-white' : 'text-gray-700'}`}
+                    style={[
+                      styles.typeButtonText,
+                      mediaType === 'photo' ? styles.activeButtonText : styles.inactiveButtonText
+                    ]}
                   >
                     Photo
                   </Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity
-                  className={`flex-1 border rounded-lg py-3 items-center ${mediaType === 'video' ? 'bg-primary border-primary' : 'bg-white border-gray-300'}`}
+                  style={[
+                    styles.typeButton,
+                    mediaType === 'video' ? styles.typeButtonActive : styles.typeButtonInactive
+                  ]}
                   onPress={() => setMediaType('video')}
                 >
                   <Feather 
@@ -238,14 +419,20 @@ export default function SubmissionScreen({ route, navigation }) {
                     color={mediaType === 'video' ? 'white' : '#4B5563'} 
                   />
                   <Text 
-                    className={`mt-1 ${mediaType === 'video' ? 'text-white' : 'text-gray-700'}`}
+                    style={[
+                      styles.typeButtonText,
+                      mediaType === 'video' ? styles.activeButtonText : styles.inactiveButtonText
+                    ]}
                   >
                     Video
                   </Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity
-                  className={`flex-1 border rounded-lg py-3 items-center ${mediaType === 'text' ? 'bg-primary border-primary' : 'bg-white border-gray-300'}`}
+                  style={[
+                    styles.typeButton,
+                    mediaType === 'text' ? styles.typeButtonActive : styles.typeButtonInactive
+                  ]}
                   onPress={() => setMediaType('text')}
                 >
                   <Feather 
@@ -254,7 +441,10 @@ export default function SubmissionScreen({ route, navigation }) {
                     color={mediaType === 'text' ? 'white' : '#4B5563'} 
                   />
                   <Text 
-                    className={`mt-1 ${mediaType === 'text' ? 'text-white' : 'text-gray-700'}`}
+                    style={[
+                      styles.typeButtonText,
+                      mediaType === 'text' ? styles.activeButtonText : styles.inactiveButtonText
+                    ]}
                   >
                     Text
                   </Text>
@@ -264,17 +454,17 @@ export default function SubmissionScreen({ route, navigation }) {
             
             {/* Media content based on type */}
             {mediaType === 'photo' && (
-              <View>
-                <Text className="text-gray-700 mb-2 font-medium">Upload Photo</Text>
+              <View style={styles.formGroup}>
+                <Text style={styles.inputLabel}>Upload Photo</Text>
                 {selectedMedia ? (
-                  <View className="rounded-lg overflow-hidden mb-2">
+                  <View style={styles.mediaPreviewContainer}>
                     <Image
                       source={{ uri: selectedMedia.uri }}
-                      className="w-full h-64 bg-gray-200"
+                      style={styles.mediaImage}
                       resizeMode="cover"
                     />
                     <TouchableOpacity
-                      className="absolute top-2 right-2 bg-white rounded-full p-2"
+                      style={styles.removeMediaButton}
                       onPress={() => setSelectedMedia(null)}
                     >
                       <Feather name="x" size={20} color="#EF4444" />
@@ -282,11 +472,11 @@ export default function SubmissionScreen({ route, navigation }) {
                   </View>
                 ) : (
                   <TouchableOpacity
-                    className="bg-white border border-dashed border-gray-300 rounded-lg py-8 items-center"
+                    style={styles.uploadContainer}
                     onPress={pickImage}
                   >
-                    <Feather name="upload" size={32} color="#9CA3AF" />
-                    <Text className="text-gray-500 mt-2">
+                    <Feather name="upload" size={32} style={styles.uploadIcon} />
+                    <Text style={styles.uploadText}>
                       Tap to select a photo
                     </Text>
                   </TouchableOpacity>
@@ -295,28 +485,28 @@ export default function SubmissionScreen({ route, navigation }) {
             )}
             
             {mediaType === 'video' && (
-              <View>
-                <Text className="text-gray-700 mb-2 font-medium">Upload Video</Text>
+              <View style={styles.formGroup}>
+                <Text style={styles.inputLabel}>Upload Video</Text>
                 {selectedMedia ? (
-                  <View className="rounded-lg overflow-hidden mb-2 bg-gray-100 p-4">
-                    <Text className="text-gray-800">
+                  <View style={styles.selectedVideoContainer}>
+                    <Text style={styles.selectedVideoText}>
                       Video selected: {selectedMedia.uri.split('/').pop()}
                     </Text>
                     <TouchableOpacity
-                      className="bg-white rounded-lg py-2 px-4 mt-3 border border-gray-300 flex-row items-center justify-center"
+                      style={styles.removeVideoButton}
                       onPress={() => setSelectedMedia(null)}
                     >
                       <Feather name="x" size={16} color="#4B5563" />
-                      <Text className="text-gray-700 ml-1">Remove Video</Text>
+                      <Text style={styles.removeVideoButtonText}>Remove Video</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
                   <TouchableOpacity
-                    className="bg-white border border-dashed border-gray-300 rounded-lg py-8 items-center"
+                    style={styles.uploadContainer}
                     onPress={pickVideo}
                   >
-                    <Feather name="video" size={32} color="#9CA3AF" />
-                    <Text className="text-gray-500 mt-2">
+                    <Feather name="video" size={32} style={styles.uploadIcon} />
+                    <Text style={styles.uploadText}>
                       Tap to select a video (max 60 sec)
                     </Text>
                   </TouchableOpacity>
@@ -325,10 +515,10 @@ export default function SubmissionScreen({ route, navigation }) {
             )}
             
             {mediaType === 'text' && (
-              <View>
-                <Text className="text-gray-700 mb-2 font-medium">Text Content</Text>
+              <View style={styles.formGroup}>
+                <Text style={styles.inputLabel}>Text Content</Text>
                 <TextInput
-                  className="bg-white border border-gray-300 rounded-lg p-4 text-gray-800"
+                  style={[styles.textArea, styles.largeTextArea]}
                   placeholder="Enter your text content here (lyrics, poem, story, etc.)"
                   value={textContent}
                   onChangeText={setTextContent}
@@ -340,19 +530,22 @@ export default function SubmissionScreen({ route, navigation }) {
             )}
             
             <TouchableOpacity
-              className={`rounded-lg py-3.5 items-center mt-6 ${loading ? 'bg-primary/70' : 'bg-primary'}`}
+              style={[
+                styles.submitButton,
+                loading ? styles.submitButtonDisabled : styles.submitButtonEnabled
+              ]}
               onPress={handleSubmit}
               disabled={loading}
             >
               {loading ? (
-                <View className="flex-row items-center">
+                <View style={styles.submitButtonContent}>
                   <ActivityIndicator size="small" color="white" />
-                  <Text className="text-white font-bold text-lg ml-2">
+                  <Text style={styles.loadingText}>
                     Submitting...
                   </Text>
                 </View>
               ) : (
-                <Text className="text-white font-bold text-lg">
+                <Text style={styles.submitButtonText}>
                   Submit Entry
                 </Text>
               )}

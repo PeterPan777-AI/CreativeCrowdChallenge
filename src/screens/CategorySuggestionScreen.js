@@ -7,11 +7,123 @@ import {
   FlatList,
   Alert,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import supabase from '../utils/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import CategorySuggestionForm from '../components/CategorySuggestionForm';
+import { theme, globalStyles } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  contentContainer: {
+    padding: 16,
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+    marginBottom: 8,
+  },
+  pageSubtitle: {
+    color: theme.colors.gray[600],
+    marginBottom: 24,
+  },
+  sectionContainer: {
+    marginTop: 32,
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+    marginBottom: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  loadingText: {
+    color: theme.colors.gray[600],
+    marginTop: 16,
+  },
+  categoryItem: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  categoryDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.success,
+    marginRight: 12,
+  },
+  categoryName: {
+    color: theme.colors.gray[800],
+    fontWeight: '500',
+  },
+  itemSeparator: {
+    height: 8,
+  },
+  emptyContainer: {
+    paddingVertical: 24,
+    alignItems: 'center',
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+  },
+  emptyText: {
+    color: theme.colors.gray[500],
+  },
+  suggestionItem: {
+    backgroundColor: theme.colors.white,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+  },
+  suggestionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  suggestionName: {
+    color: theme.colors.gray[800],
+    fontWeight: '500',
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusText: {
+    marginLeft: 4,
+  },
+  approvedText: {
+    color: '#059669', // green-600
+  },
+  rejectedText: {
+    color: '#DC2626', // red-600
+  },
+  pendingText: {
+    color: '#D97706', // amber-600
+  },
+  suggestionDescription: {
+    color: theme.colors.gray[600],
+  },
+  suggestionDate: {
+    color: theme.colors.gray[400],
+    fontSize: 12,
+    marginTop: 8,
+  }
+});
 
 export default function CategorySuggestionScreen() {
   const { user, userDetails } = useAuth();
@@ -137,18 +249,18 @@ export default function CategorySuggestionScreen() {
   };
   
   const renderCategoryItem = ({ item }) => (
-    <View className="bg-white rounded-lg p-4 flex-row items-center">
-      <View className="w-2 h-2 rounded-full bg-green-500 mr-3" />
-      <Text className="text-gray-800 font-medium">{item.name}</Text>
+    <View style={styles.categoryItem}>
+      <View style={styles.categoryDot} />
+      <Text style={styles.categoryName}>{item.name}</Text>
     </View>
   );
   
   const renderUserSuggestionItem = ({ item }) => {
     const getStatusColor = (status) => {
       switch (status) {
-        case 'approved': return 'text-green-600';
-        case 'rejected': return 'text-red-600';
-        default: return 'text-amber-600';
+        case 'approved': return styles.approvedText;
+        case 'rejected': return styles.rejectedText;
+        default: return styles.pendingText;
       }
     };
     
@@ -160,23 +272,31 @@ export default function CategorySuggestionScreen() {
       }
     };
     
+    const getStatusIconColor = (status) => {
+      switch (status) {
+        case 'approved': return '#059669'; // green-600
+        case 'rejected': return '#DC2626'; // red-600
+        default: return '#D97706'; // amber-600
+      }
+    };
+    
     return (
-      <View className="bg-white rounded-lg p-4 mb-3">
-        <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-gray-800 font-medium">{item.name}</Text>
-          <View className="flex-row items-center">
+      <View style={styles.suggestionItem}>
+        <View style={styles.suggestionHeader}>
+          <Text style={styles.suggestionName}>{item.name}</Text>
+          <View style={styles.statusContainer}>
             <Feather 
               name={getStatusIcon(item.status)} 
               size={16} 
-              color={item.status === 'approved' ? '#059669' : item.status === 'rejected' ? '#DC2626' : '#D97706'} 
+              color={getStatusIconColor(item.status)} 
             />
-            <Text className={`ml-1 ${getStatusColor(item.status)}`}>
+            <Text style={[styles.statusText, getStatusColor(item.status)]}>
               {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
             </Text>
           </View>
         </View>
-        <Text className="text-gray-600">{item.description}</Text>
-        <Text className="text-gray-400 text-xs mt-2">
+        <Text style={styles.suggestionDescription}>{item.description}</Text>
+        <Text style={styles.suggestionDate}>
           Submitted on {new Date(item.created_at).toLocaleDateString()}
         </Text>
       </View>
@@ -185,18 +305,18 @@ export default function CategorySuggestionScreen() {
   
   if (loading && !refreshing) {
     return (
-      <View className="flex-1 justify-center items-center bg-background">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="text-gray-600 mt-4">Loading categories...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>Loading categories...</Text>
       </View>
     );
   }
   
   return (
-    <View className="flex-1 bg-background">
-      <View className="p-4">
-        <Text className="text-2xl font-bold text-gray-800 mb-2">Categories</Text>
-        <Text className="text-gray-600 mb-6">
+    <View style={styles.container}>
+      <View style={styles.contentContainer}>
+        <Text style={styles.pageTitle}>Categories</Text>
+        <Text style={styles.pageSubtitle}>
           Browse available categories or suggest a new one
         </Text>
         
@@ -204,8 +324,8 @@ export default function CategorySuggestionScreen() {
         <CategorySuggestionForm onSubmit={handleSubmitSuggestion} />
         
         {/* Current categories */}
-        <View className="mt-8 mb-6">
-          <Text className="text-xl font-bold text-gray-800 mb-4">
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>
             Available Categories
           </Text>
           
@@ -213,12 +333,12 @@ export default function CategorySuggestionScreen() {
             data={categories}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderCategoryItem}
-            ItemSeparatorComponent={() => <View className="h-2" />}
+            ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
             contentContainerStyle={{ paddingBottom: 8 }}
             scrollEnabled={false}
             ListEmptyComponent={
-              <View className="py-6 items-center bg-white rounded-lg">
-                <Text className="text-gray-500">No categories available</Text>
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No categories available</Text>
               </View>
             }
           />
@@ -226,8 +346,8 @@ export default function CategorySuggestionScreen() {
         
         {/* User's suggestions */}
         {user && (
-          <View className="mb-6">
-            <Text className="text-xl font-bold text-gray-800 mb-4">
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>
               Your Suggestions
             </Text>
             
@@ -239,8 +359,8 @@ export default function CategorySuggestionScreen() {
                 scrollEnabled={false}
               />
             ) : (
-              <View className="py-6 items-center bg-white rounded-lg">
-                <Text className="text-gray-500">
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>
                   You haven't suggested any categories yet
                 </Text>
               </View>
