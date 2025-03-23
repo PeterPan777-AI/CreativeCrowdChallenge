@@ -1,0 +1,62 @@
+Help me create and deploy a cross-platform mobile app using **Expo and React Native** for an online competition platform called **Score4Me**. The app should have the following features:
+
+1. **User Authentication**:
+   - Users can register with a username, email, and password.
+   - Users can log in and log out.
+   - Passwords should be securely stored.
+
+2. **Competitions**:
+   - Competitions are divided into two streams:
+     - **Individual Competitions**: For individual users.
+     - **Business Competitions**: For businesses (e.g., Best AI Agent, Best Robot, or other products).
+   - Competitions are created by admins or businesses (not regular users).
+   - Competitions have the following fields:
+     - **General Fields** (for both Individual and Business Competitions):
+       - Title, description, category, prize amount.
+       - Start date, end date, and status (active/inactive).
+     - **Business-Specific Fields**:
+       - Product name.
+       - Product description (detailed information about the product).
+       - Product image or promotional banner.
+   - Users can view a list of active competitions in a scrollable feed, with filters for Individual and Business competitions.
+
+3. **Category Suggestions**:
+   - Users can suggest new categories for competitions.
+   - Admins can approve or reject category suggestions.
+
+4. **Submissions**:
+   - Users can submit entries to competitions (e.g., photos, videos, music, lyrics).
+   - Submissions can be rated by other users on a scale of 1 to 10.
+   - Users can view submissions and their average ratings.
+
+5. **Business Features**:
+   - Businesses can sponsor competitions.
+   - Business competitions can have additional features (e.g., product showcases, promotional banners).
+   - Premium users (individuals or businesses) can have additional features (e.g., more votes, exclusive competitions).
+
+6. **Frontend**:
+   - Use React Native for the frontend with TailwindCSS (via a library like `nativewind`).
+   - Include components for:
+     - Competition cards (with labels for Individual or Business).
+     - Submission forms.
+     - Voting interfaces.
+     - User profiles.
+     - Category suggestion forms.
+   - Add a toggle or tab system to switch between Individual and Business competitions.
+   - Ensure the product description field is displayed prominently in Business Competition details.
+
+7. **Backend**:
+   - Use **Supabase** for:
+     - Authentication (login, sign-up, logout).
+     - Database (competitions, submissions, ratings, category suggestions).
+     - File storage (user uploads like photos, videos).
+   - Implement real-time updates for competitions and submissions.
+
+8. **Replit Setup and Deployment**:
+   - Set up the project on Replit, including connecting to a GitHub repository (if applicable).
+   - Configure environment variables (e.g., Supabase keys) in Replit.
+   - Ensure the app runs smoothly in Replit’s development environment.
+   - Provide instructions for testing the app locally using Expo Go.
+   - Guide me on how to deploy the app for web access via Replit.
+
+Provide the complete code for the app, including all necessary files and step-by-step instructions for setup and deployment on Replit."
