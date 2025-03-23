@@ -5,8 +5,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { AuthProvider } from './src/context/AuthContext';
 import { StatusBar } from 'expo-status-bar';
 
-// Initialize NativeWind
-import 'nativewind';
+// We don't need to explicitly import nativewind here
 
 export default function App() {
   return (

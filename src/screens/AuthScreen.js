@@ -9,10 +9,12 @@ import {
   Platform,
   Alert,
   Image,
+  StyleSheet,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
+import { globalStyles, theme } from '../styles';
 
 export default function AuthScreen() {
   const [isLogin, setIsLogin] = useState(true);
@@ -83,30 +85,30 @@ export default function AuthScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      style={styles.container}
     >
       <StatusBar style="dark" />
       <ScrollView 
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
-        className="bg-background"
+        style={styles.scrollView}
       >
-        <View className="flex-1 justify-center px-6 py-12">
-          <View className="items-center mb-10">
-            <Text className="text-4xl font-bold text-primary mb-2">Score4Me</Text>
-            <Text className="text-lg text-gray-600 text-center">
+        <View style={styles.contentContainer}>
+          <View style={styles.headerContainer}>
+            <Text style={styles.appTitle}>Score4Me</Text>
+            <Text style={styles.welcomeText}>
               {isLogin ? 'Welcome back!' : 'Create your account'}
             </Text>
           </View>
           
-          <View className="space-y-4">
+          <View style={styles.formContainer}>
             {!isLogin && (
-              <View>
-                <Text className="text-gray-700 mb-1 ml-1 font-medium">Username</Text>
-                <View className="flex-row items-center border border-gray-300 rounded-lg px-4 py-3 bg-white">
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Username</Text>
+                <View style={styles.inputWrapper}>
                   <Feather name="user" size={20} color="#4B5563" />
                   <TextInput
-                    className="flex-1 ml-2 text-base text-gray-800"
+                    style={styles.input}
                     placeholder="Enter your username"
                     value={username}
                     onChangeText={setUsername}
@@ -118,12 +120,12 @@ export default function AuthScreen() {
               </View>
             )}
             
-            <View>
-              <Text className="text-gray-700 mb-1 ml-1 font-medium">Email</Text>
-              <View className="flex-row items-center border border-gray-300 rounded-lg px-4 py-3 bg-white">
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Email</Text>
+              <View style={styles.inputWrapper}>
                 <Feather name="mail" size={20} color="#4B5563" />
                 <TextInput
-                  className="flex-1 ml-2 text-base text-gray-800"
+                  style={styles.input}
                   placeholder="Enter your email"
                   value={email}
                   onChangeText={setEmail}
@@ -139,12 +141,12 @@ export default function AuthScreen() {
               </View>
             </View>
             
-            <View>
-              <Text className="text-gray-700 mb-1 ml-1 font-medium">Password</Text>
-              <View className="flex-row items-center border border-gray-300 rounded-lg px-4 py-3 bg-white">
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Password</Text>
+              <View style={styles.inputWrapper}>
                 <Feather name="lock" size={20} color="#4B5563" />
                 <TextInput
-                  className="flex-1 ml-2 text-base text-gray-800"
+                  style={styles.input}
                   placeholder="Enter your password"
                   value={password}
                   onChangeText={setPassword}
@@ -164,20 +166,20 @@ export default function AuthScreen() {
             </View>
             
             <TouchableOpacity
-              className={`rounded-lg py-3.5 items-center ${loading ? 'bg-primary/70' : 'bg-primary'} mt-4`}
+              style={[styles.button, loading ? styles.buttonDisabled : null]}
               onPress={handleSubmit}
               disabled={loading}
             >
-              <Text className="text-white font-bold text-lg">
+              <Text style={styles.buttonText}>
                 {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
               </Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
-              className="items-center py-4"
+              style={styles.switchModeButton}
               onPress={toggleAuthMode}
             >
-              <Text className="text-primary font-medium">
+              <Text style={styles.switchModeText}>
                 {isLogin 
                   ? "Don't have an account? Sign Up" 
                   : "Already have an account? Sign In"}
