@@ -5,8 +5,71 @@ import {
   Image,
   TouchableOpacity,
   Linking,
+  StyleSheet,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { theme } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 16,
+    backgroundColor: '#FEF3C7', // amber-50
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FDE68A', // amber-200
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#92400E', // amber-800
+    marginBottom: 8,
+  },
+  fieldContainer: {
+    marginBottom: 8,
+  },
+  fieldLabel: {
+    color: theme.colors.gray[500],
+    fontSize: 12,
+  },
+  fieldValue: {
+    color: theme.colors.gray[800],
+    fontWeight: '500',
+  },
+  fieldValueRegular: {
+    color: theme.colors.gray[800],
+  },
+  imageContainer: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  productImage: {
+    width: '100%',
+    height: 160,
+    backgroundColor: theme.colors.gray[200],
+  },
+  linkIconContainer: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: theme.colors.white,
+    borderRadius: 999,
+    padding: 8,
+  },
+  sponsoredBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7', // amber-100
+    padding: 8,
+    borderRadius: 8,
+  },
+  sponsoredText: {
+    color: '#B45309', // amber-700
+    marginLeft: 8,
+    fontWeight: '500',
+  }
+});
 
 export default function BusinessFeatures({ competition }) {
   if (!competition || competition.type !== 'business') return null;
@@ -18,42 +81,42 @@ export default function BusinessFeatures({ competition }) {
   };
   
   return (
-    <View className="mt-4 bg-amber-50 p-3 rounded-lg border border-amber-200">
-      <Text className="text-lg font-bold text-amber-800 mb-2">
+    <View style={styles.container}>
+      <Text style={styles.title}>
         Product Information
       </Text>
       
-      <View className="mb-2">
-        <Text className="text-gray-500 text-xs">PRODUCT NAME</Text>
-        <Text className="text-gray-800 font-medium">{competition.product_name}</Text>
+      <View style={styles.fieldContainer}>
+        <Text style={styles.fieldLabel}>PRODUCT NAME</Text>
+        <Text style={styles.fieldValue}>{competition.product_name}</Text>
       </View>
       
-      <View className="mb-3">
-        <Text className="text-gray-500 text-xs">PRODUCT DESCRIPTION</Text>
-        <Text className="text-gray-800">{competition.product_description}</Text>
+      <View style={styles.fieldContainer}>
+        <Text style={styles.fieldLabel}>PRODUCT DESCRIPTION</Text>
+        <Text style={styles.fieldValueRegular}>{competition.product_description}</Text>
       </View>
       
       {competition.product_image_url && (
         <TouchableOpacity 
-          className="rounded-lg overflow-hidden mb-2"
+          style={styles.imageContainer}
           onPress={handleOpenProductImage}
           activeOpacity={0.9}
         >
           <Image 
             source={{ uri: competition.product_image_url }} 
-            className="w-full h-40 bg-gray-200"
+            style={styles.productImage}
             resizeMode="cover"
           />
-          <View className="absolute bottom-2 right-2 bg-white rounded-full p-2">
+          <View style={styles.linkIconContainer}>
             <Feather name="external-link" size={16} color="#F59E0B" />
           </View>
         </TouchableOpacity>
       )}
       
       {competition.sponsored && (
-        <View className="flex-row items-center bg-amber-100 p-2 rounded-lg">
+        <View style={styles.sponsoredBadge}>
           <Feather name="award" size={16} color="#F59E0B" />
-          <Text className="text-amber-700 ml-2 font-medium">
+          <Text style={styles.sponsoredText}>
             Sponsored Competition
           </Text>
         </View>
