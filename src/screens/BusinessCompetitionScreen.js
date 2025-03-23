@@ -568,20 +568,20 @@ export default function BusinessCompetitionScreen({ navigation }) {
             </TouchableOpacity>
           ) : (
             // Competition creation form
-            <View className="bg-white rounded-lg p-4 shadow-sm mb-6">
-              <View className="flex-row justify-between items-center mb-4">
-                <Text className="text-xl font-bold text-gray-800">Create Competition</Text>
+            <View style={styles.formContainer}>
+              <View style={styles.formHeader}>
+                <Text style={styles.formTitle}>Create Competition</Text>
                 <TouchableOpacity onPress={() => setShowForm(false)}>
                   <Feather name="x" size={24} color="#4B5563" />
                 </TouchableOpacity>
               </View>
               
-              <View className="space-y-4">
+              <View style={{gap: 16}}>
                 {/* Title input */}
-                <View>
-                  <Text className="text-gray-700 mb-1 font-medium">Competition Title</Text>
+                <View style={styles.formGroup}>
+                  <Text style={styles.inputLabel}>Competition Title</Text>
                   <TextInput
-                    className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+                    style={styles.textInput}
                     placeholder="Enter competition title"
                     value={title}
                     onChangeText={setTitle}
@@ -589,10 +589,10 @@ export default function BusinessCompetitionScreen({ navigation }) {
                 </View>
                 
                 {/* Description input */}
-                <View>
-                  <Text className="text-gray-700 mb-1 font-medium">Description</Text>
+                <View style={styles.formGroup}>
+                  <Text style={styles.inputLabel}>Description</Text>
                   <TextInput
-                    className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+                    style={styles.textArea}
                     placeholder="Describe your competition"
                     value={description}
                     onChangeText={setDescription}
@@ -603,21 +603,26 @@ export default function BusinessCompetitionScreen({ navigation }) {
                 </View>
                 
                 {/* Category selection */}
-                <View>
-                  <Text className="text-gray-700 mb-1 font-medium">Category</Text>
-                  <View className="flex-row flex-wrap">
+                <View style={styles.formGroup}>
+                  <Text style={styles.inputLabel}>Category</Text>
+                  <View style={styles.categoriesContainer}>
                     {categories.map((category) => (
                       <TouchableOpacity
                         key={category.id}
-                        className={`mr-2 mb-2 px-3 py-2 rounded-full ${
-                          categoryId === category.id ? 'bg-primary' : 'bg-gray-200'
-                        }`}
+                        style={[
+                          styles.categoryChip,
+                          categoryId === category.id 
+                            ? styles.categoryChipActive 
+                            : styles.categoryChipInactive
+                        ]}
                         onPress={() => setCategoryId(category.id)}
                       >
                         <Text
-                          className={`${
-                            categoryId === category.id ? 'text-white' : 'text-gray-700'
-                          }`}
+                          style={
+                            categoryId === category.id 
+                              ? styles.categoryChipTextActive 
+                              : styles.categoryChipTextInactive
+                          }
                         >
                           {category.name}
                         </Text>
