@@ -7,12 +7,46 @@ import {
   ActivityIndicator,
   Alert,
   TouchableOpacity,
+  StyleSheet,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import supabase from '../utils/supabaseClient';
 import CompetitionCard from '../components/CompetitionCard';
 import TabsComponent from '../components/TabsComponent';
+import { globalStyles, theme } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: theme.colors.gray[600],
+    marginTop: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 80,
+  },
+  emptyText: {
+    color: theme.colors.gray[500],
+    marginTop: 16,
+    fontSize: 18,
+    textAlign: 'center',
+    paddingHorizontal: 40,
+  },
+  separator: {
+    height: 16,
+  }
+});
 
 export default function HomeScreen({ navigation }) {
   const [competitions, setCompetitions] = useState([]);
@@ -99,9 +133,9 @@ export default function HomeScreen({ navigation }) {
     if (loading) return null;
     
     return (
-      <View className="flex-1 justify-center items-center py-20">
+      <View style={styles.emptyContainer}>
         <Feather name="award" size={60} color="#CBD5E1" />
-        <Text className="text-gray-500 mt-4 text-lg text-center px-10">
+        <Text style={styles.emptyText}>
           No competitions available right now.
           {selectedTab !== 'all' && ` Try checking the ${selectedTab === 'individual' ? 'Business' : 'Individual'} category.`}
         </Text>
@@ -110,7 +144,7 @@ export default function HomeScreen({ navigation }) {
   };
   
   return (
-    <View className="flex-1 bg-background">
+    <View style={styles.container}>
       <TabsComponent 
         tabs={tabs} 
         selectedTab={selectedTab} 
@@ -118,9 +152,9 @@ export default function HomeScreen({ navigation }) {
       />
       
       {loading && !refreshing ? (
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text className="text-gray-600 mt-4">Loading competitions...</Text>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>Loading competitions...</Text>
         </View>
       ) : (
         <FlatList
@@ -133,7 +167,7 @@ export default function HomeScreen({ navigation }) {
             />
           )}
           contentContainerStyle={{ padding: 12 }}
-          ItemSeparatorComponent={() => <View className="h-4" />}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }

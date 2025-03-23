@@ -1,11 +1,39 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { theme } from '../styles';
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 16,
+  },
+  tab: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginRight: 8,
+    borderRadius: 20,
+  },
+  selectedTab: {
+    backgroundColor: theme.colors.primary,
+  },
+  unselectedTab: {
+    backgroundColor: theme.colors.gray[200],
+  },
+  tabText: {
+    fontWeight: '500',
+  },
+  selectedTabText: {
+    color: theme.colors.white,
+  },
+  unselectedTabText: {
+    color: theme.colors.gray[700],
+  }
+});
 
 export default function TabsComponent({ tabs, selectedTab, onTabChange }) {
   if (!tabs || tabs.length === 0) return null;
   
   return (
-    <View className="mb-4">
+    <View style={styles.container}>
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
@@ -14,19 +42,17 @@ export default function TabsComponent({ tabs, selectedTab, onTabChange }) {
         {tabs.map((tab) => (
           <TouchableOpacity
             key={tab.key}
-            className={`py-2 px-4 mr-2 rounded-full ${
-              selectedTab === tab.key 
-                ? 'bg-primary' 
-                : 'bg-gray-200'
-            }`}
+            style={[
+              styles.tab,
+              selectedTab === tab.key ? styles.selectedTab : styles.unselectedTab
+            ]}
             onPress={() => onTabChange(tab.key)}
           >
             <Text
-              className={`font-medium ${
-                selectedTab === tab.key 
-                  ? 'text-white' 
-                  : 'text-gray-700'
-              }`}
+              style={[
+                styles.tabText,
+                selectedTab === tab.key ? styles.selectedTabText : styles.unselectedTabText
+              ]}
             >
               {tab.label}
             </Text>

@@ -1,6 +1,137 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { theme } from '../styles';
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: theme.colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
+    borderWidth: 1,
+  },
+  businessBorder: {
+    borderColor: '#FDE68A', // amber-200
+  },
+  individualBorder: {
+    borderColor: '#DDD6FE', // purple-200
+  },
+  cardHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  businessHeader: {
+    backgroundColor: '#FEF3C7', // amber-50
+  },
+  individualHeader: {
+    backgroundColor: '#F5F3FF', // purple-50
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  businessLabel: {
+    color: '#B45309', // amber-700
+  },
+  individualLabel: {
+    color: '#6D28D9', // purple-700
+  },
+  labelText: {
+    marginLeft: 8,
+    fontWeight: '500',
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  activeBadge: {
+    backgroundColor: '#D1FAE5', // green-100
+  },
+  endedBadge: {
+    backgroundColor: '#FEE2E2', // red-100
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  activeText: {
+    color: '#047857', // green-700
+  },
+  endedText: {
+    color: '#B91C1C', // red-700
+  },
+  cardContent: {
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.gray[800],
+    marginBottom: 8,
+  },
+  description: {
+    color: theme.colors.gray[600],
+    marginBottom: 12,
+  },
+  metadataRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  metadataItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  metadataText: {
+    color: theme.colors.gray[500],
+    marginLeft: 4,
+    fontSize: 14,
+  },
+  productBadge: {
+    backgroundColor: '#FEF3C7', // amber-50
+    borderRadius: 6,
+    padding: 8,
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  productText: {
+    color: '#B45309', // amber-700
+    marginLeft: 4,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  footer: {
+    marginTop: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dateText: {
+    color: theme.colors.gray[500],
+    fontSize: 12,
+  },
+  viewDetails: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  viewDetailsText: {
+    color: theme.colors.primary,
+    fontWeight: '500',
+    marginRight: 4,
+  }
+});
 
 export default function CompetitionCard({ competition, onPress }) {
   if (!competition) return null;
@@ -10,27 +141,40 @@ export default function CompetitionCard({ competition, onPress }) {
   
   return (
     <TouchableOpacity
-      className={`rounded-lg overflow-hidden bg-white shadow-sm border ${
-        isBusiness ? 'border-amber-200' : 'border-purple-200'
-      }`}
+      style={[
+        styles.card,
+        isBusiness ? styles.businessBorder : styles.individualBorder
+      ]}
       onPress={onPress}
     >
       {/* Card Header with type label */}
-      <View className={`px-4 py-2 ${isBusiness ? 'bg-amber-50' : 'bg-purple-50'}`}>
-        <View className="flex-row justify-between items-center">
-          <View className="flex-row items-center">
+      <View style={[
+        styles.cardHeader,
+        isBusiness ? styles.businessHeader : styles.individualHeader
+      ]}>
+        <View style={styles.headerRow}>
+          <View style={styles.headerLabel}>
             <Feather 
               name={isBusiness ? 'briefcase' : 'user'} 
               size={16} 
               color={isBusiness ? '#F59E0B' : '#8B5CF6'} 
             />
-            <Text className={`ml-2 font-medium ${isBusiness ? 'text-amber-700' : 'text-purple-700'}`}>
+            <Text style={[
+              styles.labelText,
+              isBusiness ? styles.businessLabel : styles.individualLabel
+            ]}>
               {isBusiness ? 'Business' : 'Individual'} Competition
             </Text>
           </View>
           
-          <View className={`px-2 py-1 rounded-full ${isActive ? 'bg-green-100' : 'bg-red-100'}`}>
-            <Text className={`text-xs font-medium ${isActive ? 'text-green-700' : 'text-red-700'}`}>
+          <View style={[
+            styles.statusBadge,
+            isActive ? styles.activeBadge : styles.endedBadge
+          ]}>
+            <Text style={[
+              styles.statusText,
+              isActive ? styles.activeText : styles.endedText
+            ]}>
               {isActive ? 'Active' : 'Ended'}
             </Text>
           </View>
@@ -38,47 +182,47 @@ export default function CompetitionCard({ competition, onPress }) {
       </View>
       
       {/* Card Content */}
-      <View className="p-4">
-        <Text className="text-lg font-bold text-gray-800 mb-2">
+      <View style={styles.cardContent}>
+        <Text style={styles.title}>
           {competition.title}
         </Text>
         
-        <Text className="text-gray-600 mb-3" numberOfLines={2}>
+        <Text style={styles.description} numberOfLines={2}>
           {competition.description}
         </Text>
         
-        <View className="flex-row justify-between mb-1">
-          <View className="flex-row items-center">
+        <View style={styles.metadataRow}>
+          <View style={styles.metadataItem}>
             <Feather name="tag" size={14} color="#6B7280" />
-            <Text className="text-gray-500 ml-1 text-sm">
+            <Text style={styles.metadataText}>
               {competition.category || 'General'}
             </Text>
           </View>
           
-          <View className="flex-row items-center">
+          <View style={styles.metadataItem}>
             <Feather name="dollar-sign" size={14} color="#6B7280" />
-            <Text className="text-gray-500 ml-1 text-sm">
+            <Text style={styles.metadataText}>
               ${competition.prize_amount}
             </Text>
           </View>
         </View>
         
         {isBusiness && competition.product_name && (
-          <View className="bg-amber-50 rounded-md p-2 mt-2 flex-row items-center">
+          <View style={styles.productBadge}>
             <Feather name="package" size={14} color="#F59E0B" />
-            <Text className="text-amber-700 ml-1 text-sm font-medium">
+            <Text style={styles.productText}>
               Product: {competition.product_name}
             </Text>
           </View>
         )}
         
-        <View className="mt-3 flex-row justify-between items-center">
-          <Text className="text-gray-500 text-xs">
+        <View style={styles.footer}>
+          <Text style={styles.dateText}>
             Ends: {new Date(competition.end_date).toLocaleDateString()}
           </Text>
-          <View className="flex-row items-center">
-            <Text className="text-primary font-medium mr-1">View Details</Text>
-            <Feather name="chevron-right" size={16} color="#3B82F6" />
+          <View style={styles.viewDetails}>
+            <Text style={styles.viewDetailsText}>View Details</Text>
+            <Feather name="chevron-right" size={16} color={theme.colors.primary} />
           </View>
         </View>
       </View>
