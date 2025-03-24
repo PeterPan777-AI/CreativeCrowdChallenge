@@ -4,6 +4,7 @@ modules = ["nodejs-20"]
 channel = "stable-24_05"
 
 [workflows]
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
@@ -12,10 +13,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Expo Server"
+args = "expo-web"
 
 [[workflows.workflow]]
-name = "Expo Server"
+name = "expo-web"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -35,6 +36,10 @@ run = ["sh", "-c", "npx expo start --web --port 5000"]
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
 
 [[ports]]
 localPort = 19006

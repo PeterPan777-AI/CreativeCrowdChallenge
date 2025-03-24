@@ -25,6 +25,7 @@
     },
     "web": {
       "favicon": "./assets/favicon.png",
+      "bundler": "metro",
       "build": {
         "babel": {
           "include": ["@ui-kitten/components"]

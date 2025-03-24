@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import AppNavigator from './src/navigation/AppNavigator';
-import { AuthProvider } from './src/context/AuthContext';
+import { Text, View, StyleSheet, Button, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Text, View, StyleSheet, Button } from 'react-native';
 
 // Debug logging
 console.log('App.js is being executed');
+console.log('Running on platform:', Platform.OS);
 
 // Simple error boundary as a function component
 function ErrorFallback({ error, resetError }) {
@@ -22,8 +19,27 @@ function ErrorFallback({ error, resetError }) {
   );
 }
 
+// Simple welcome screen component
+function WelcomeScreen() {
+  return (
+    <View style={styles.welcomeContainer}>
+      <Text style={styles.welcomeTitle}>CreativeCrowdChallenge</Text>
+      <Text style={styles.welcomeSubtitle}>Welcome to the app!</Text>
+      <Text style={styles.welcomeInfo}>Platform: {Platform.OS}</Text>
+      <View style={styles.buttonContainer}>
+        <Button 
+          title="Get Started" 
+          onPress={() => console.log('Button pressed')} 
+          color="#4361EE"
+        />
+      </View>
+    </View>
+  );
+}
+
 export default function App() {
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     console.log('App component mounted');
@@ -45,9 +61,16 @@ export default function App() {
       }
     };
     
+    // Simulate initialization to demonstrate loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      console.log('App loaded successfully');
+    }, 1000);
+    
     return () => {
       // Restore original console.error on cleanup
       console.error = originalConsoleError;
+      clearTimeout(timer);
     };
   }, []);
 
@@ -58,20 +81,33 @@ export default function App() {
 
   // If there's an error, show the fallback UI
   if (error) {
-    return <ErrorFallback error={error} resetError={resetError} />;
+    return (
+      <>
+        <StatusBar style="auto" />
+        <ErrorFallback error={error} resetError={resetError} />
+      </>
+    );
   }
 
-  // Try rendering a minimal UI first to see if that works
+  // Show loading indicator
+  if (isLoading) {
+    return (
+      <>
+        <StatusBar style="auto" />
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading application...</Text>
+        </View>
+      </>
+    );
+  }
+
+  // Render a simplified app (without navigation or Supabase)
   try {
     return (
-      <SafeAreaProvider>
-        <AuthProvider>
-          <NavigationContainer>
-            <StatusBar style="auto" />
-            <AppNavigator />
-          </NavigationContainer>
-        </AuthProvider>
-      </SafeAreaProvider>
+      <>
+        <StatusBar style="auto" />
+        <WelcomeScreen />
+      </>
     );
   } catch (err) {
     console.log('Error rendering App:', err);
@@ -101,5 +137,40 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 16,
+  },
+  welcomeContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#3B82F6', // Blue background
+  },
+  welcomeTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  welcomeSubtitle: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  welcomeInfo: {
+    fontSize: 14,
+    color: '#E5E7EB',
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#3B82F6',
   },
 });
