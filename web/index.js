@@ -1,52 +1,67 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import App from '../App';
 
-// Debug logs
+// Enhanced debugging
 console.log('web/index.js is being executed');
 
-// Wait for DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', () => {
+// Create a very simple app wrapper
+const AppWrapper = () => {
+  console.log('AppWrapper rendering');
+  return (
+    <div style={{ 
+      height: '100%', 
+      width: '100%', 
+      backgroundColor: '#3B82F6',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexDirection: 'column',
+      padding: 20,
+      color: 'white'
+    }}>
+      <h1 style={{ fontSize: 28, marginBottom: 16 }}>CreativeCrowdChallenge</h1>
+      <p style={{ fontSize: 18, marginBottom: 24 }}>Welcome to the creative community!</p>
+      <button 
+        style={{ 
+          backgroundColor: 'white', 
+          color: '#3B82F6',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: 5,
+          cursor: 'pointer'
+        }}
+        onClick={() => alert('Button clicked!')}
+      >
+        Get Started
+      </button>
+    </div>
+  );
+};
+
+// Use direct DOM manipulation for a clean approach
+window.addEventListener('DOMContentLoaded', () => {
   console.log('DOM content loaded');
   
-  // Get root element and confirm it exists
-  const rootElement = document.getElementById('root');
-  console.log('Root element found:', !!rootElement);
-  
-  if (!rootElement) {
-    // Create root element if missing
-    console.log('Creating root element');
-    const newRoot = document.createElement('div');
-    newRoot.id = 'root';
-    document.body.appendChild(newRoot);
-  }
-  
   try {
-    // Always get the root element (either existing or newly created)
-    const root = createRoot(document.getElementById('root'));
+    console.log('Attempting to render App');
     
-    // Render with additional error handling
-    console.log('Attempting to render App component');
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
-    console.log('App rendered successfully');
+    // First try to render the simple wrapper
+    ReactDOM.render(<AppWrapper />, document.getElementById('root'));
     
   } catch (error) {
-    console.error('Error rendering App:', error);
+    console.error('Error rendering app:', error);
     
-    // Basic error display
+    // Show error directly in the DOM
     document.body.innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background-color:#3B82F6;color:white;padding:20px;text-align:center">
         <h1>CreativeCrowdChallenge</h1>
-        <p>Could not load application. Error: ${error.message}</p>
+        <p>Error loading app: ${error.message}</p>
         <button 
-          onclick="window.location.reload()"
+          onclick="window.location.reload()" 
           style="margin-top:20px;padding:10px 20px;background-color:white;color:#3B82F6;border:none;border-radius:5px;cursor:pointer"
         >
-          Reload Application
+          Reload
         </button>
       </div>
     `;
