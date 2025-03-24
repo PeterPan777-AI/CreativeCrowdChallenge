@@ -755,6 +755,165 @@ async function handleApiRequest(req, res) {
     return;
   }
 
+  // POST /api/submission/:id/vote
+  if (endpoint.match(/^\/submission\/[\w-]+\/vote$/) && req.method === 'POST') {
+    const submissionId = endpoint.split('/')[2];
+    console.log(`Processing vote for submission: ${submissionId}`);
+    
+    try {
+      const body = await parseRequestBody(req);
+      const { userId } = body;
+      
+      if (!userId) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'User ID is required' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log('Supabase not available, simulating vote submission');
+        // Simulate vote processing for demo purposes
+        const success = Math.random() > 0.1; // 90% success rate for demo
+        
+        if (success) {
+          res.writeHead(200);
+          res.end(JSON.stringify({ 
+            success: true, 
+            message: 'Vote recorded successfully',
+            submissionId: submissionId,
+            currentVotes: Math.floor(Math.random() * 50) + 1 // Random vote count for demo
+          }));
+        } else {
+          res.writeHead(400);
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: 'You have already voted for this submission' 
+          }));
+        }
+        return;
+      }
+      
+      // Real implementation with Supabase
+      try {
+        console.log(`Recording vote for submission ${submissionId} by user ${userId}`);
+        
+        // First check if user already voted for this submission
+        const { data: existingVote, error: voteCheckError } = await supabase
+          .from('votes')
+          .select('*')
+          .eq('submission_id', submissionId)
+          .eq('user_id', userId);
+          
+        if (voteCheckError) {
+          console.error('Error checking for existing vote:', voteCheckError);
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: 'Failed to process vote' }));
+          return;
+        }
+        
+        if (existingVote && existingVote.length > 0) {
+          console.log('User already voted for this submission');
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: 'You have already voted for this submission' }));
+          return;
+        }
+        
+        // Record the vote
+        const { error: voteError } = await supabase
+          .from('votes')
+          .insert([{ 
+            submission_id: submissionId,
+            user_id: userId,
+            created_at: new Date().toISOString()
+          }]);
+          
+        if (voteError) {
+          console.error('Error recording vote:', voteError);
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: 'Failed to record vote' }));
+          return;
+        }
+        
+        // Get current vote count
+        const { data: voteCount, error: countError } = await supabase
+          .from('votes')
+          .select('count')
+          .eq('submission_id', submissionId);
+          
+        if (countError) {
+          console.error('Error getting vote count:', countError);
+        }
+        
+        const count = voteCount ? voteCount.count : 1;
+        
+        console.log('Vote recorded successfully');
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          success: true, 
+          message: 'Vote recorded successfully',
+          submissionId: submissionId,
+          currentVotes: count
+        }));
+      } catch (supabaseError) {
+        console.error('Supabase error during vote submission:', supabaseError);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Vote submission service unavailable' }));
+      }
+    } catch (error) {
+      console.error('Error processing vote:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Vote processing failed' }));
+    }
+    return;
+  }
+  
+  // GET /api/submission/:id/votes
+  if (endpoint.match(/^\/submission\/[\w-]+\/votes$/) && req.method === 'GET') {
+    const submissionId = endpoint.split('/')[2];
+    console.log(`Getting votes for submission: ${submissionId}`);
+    
+    if (!supabase) {
+      console.log('Supabase not available, returning mock vote count');
+      // Return mock vote count for demo
+      const voteCount = Math.floor(Math.random() * 50) + 1; // Random between 1-50
+      res.writeHead(200);
+      res.end(JSON.stringify({ 
+        submissionId: submissionId,
+        votes: voteCount
+      }));
+      return;
+    }
+    
+    try {
+      // Get current vote count
+      const { data, error } = await supabase
+        .from('votes')
+        .select('count')
+        .eq('submission_id', submissionId);
+        
+      if (error) {
+        console.error('Error getting vote count:', error);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Failed to get vote count' }));
+        return;
+      }
+      
+      const count = data ? data.count : 0;
+      
+      console.log(`Retrieved ${count} votes for submission ${submissionId}`);
+      res.writeHead(200);
+      res.end(JSON.stringify({ 
+        submissionId: submissionId,
+        votes: count
+      }));
+    } catch (error) {
+      console.error('Error getting votes:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to get votes' }));
+    }
+    return;
+  }
+
   // Default response for unknown endpoints
   res.writeHead(404);
   res.end(JSON.stringify({ error: 'Not found' }));
