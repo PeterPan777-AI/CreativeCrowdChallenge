@@ -1520,6 +1520,52 @@
           <button onclick="exportAnalytics('json')" class="secondary">Export Raw Data</button>
         </div>
       </div>
+      
+      <div class="card" id="analytics-request-card">
+        <h3>Request Detailed Analytics</h3>
+        <p>Need more detailed analytics for your competitions? Submit a request and our team will provide you with a comprehensive report.</p>
+        
+        <form id="analytics-request-form" onsubmit="submitAnalyticsRequest(event)">
+          <div class="form-group">
+            <label for="competition-selector">Select Competition</label>
+            <select id="competition-selector" required>
+              <option value="">Select a competition</option>
+              <!-- Options will be populated dynamically -->
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="date-range">Time Period</label>
+            <select id="date-range" required>
+              <option value="last-30-days">Last 30 Days</option>
+              <option value="last-90-days">Last 90 Days</option>
+              <option value="last-6-months">Last 6 Months</option>
+              <option value="last-year">Last Year</option>
+              <option value="all-time">All Time</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="request-details">Additional Details (Optional)</label>
+            <textarea id="request-details" placeholder="Specify any particular metrics or insights you're interested in..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <button type="submit" class="primary" id="submit-request-btn">Submit Request</button>
+            <div id="request-status" class="request-status"></div>
+          </div>
+        </form>
+        
+        <div id="analytics-requests-list" class="analytics-requests-container">
+          <h4>Your Requests</h4>
+          <div class="requests-list" id="user-analytics-requests">
+            <!-- Will be populated dynamically -->
+            <div class="empty-state" id="no-requests-message">
+              You haven't submitted any analytics requests yet.
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     
     <style>
@@ -1749,6 +1795,87 @@
         .insights-container {
           grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         }
+      }
+      
+      /* Analytics Request Styles */
+      .analytics-requests-container {
+        margin-top: 25px;
+      }
+      
+      .requests-list {
+        margin-top: 15px;
+      }
+      
+      .request-item {
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      
+      .request-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      
+      .request-title {
+        font-weight: 600;
+        font-size: 16px;
+      }
+      
+      .request-date {
+        font-size: 14px;
+        color: #64748b;
+      }
+      
+      .request-status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 10px;
+      }
+      
+      .status-pending {
+        background-color: #fffbeb;
+        color: #d97706;
+      }
+      
+      .status-approved {
+        background-color: #ecfdf5;
+        color: #10b981;
+      }
+      
+      .status-rejected {
+        background-color: #fef2f2;
+        color: #ef4444;
+      }
+      
+      .status-completed {
+        background-color: #f0f9ff;
+        color: #0ea5e9;
+      }
+      
+      .request-details {
+        font-size: 14px;
+        margin-top: 10px;
+        color: #475569;
+      }
+      
+      .empty-state {
+        text-align: center;
+        padding: 30px;
+        color: #64748b;
+        font-style: italic;
+      }
+      
+      .request-status {
+        margin-top: 10px;
+        font-size: 14px;
+        height: 20px;
       }
     </style>
     
