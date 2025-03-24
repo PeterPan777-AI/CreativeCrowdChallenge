@@ -721,7 +721,8 @@ async function handleApiRequest(req, res) {
           title: title,
           description: description,
           created_at: new Date().toISOString(),
-          status: 'submitted'
+          status: 'submitted',
+          votes: 0
         }));
         return;
       }
@@ -734,7 +735,8 @@ async function handleApiRequest(req, res) {
             competition_id: competitionId,
             title: title,
             description: description,
-            status: 'submitted'
+            status: 'submitted',
+            votes: 0
           }])
           .select();
           
@@ -757,6 +759,93 @@ async function handleApiRequest(req, res) {
       console.error('Error submitting entry:', error);
       res.writeHead(500);
       res.end(JSON.stringify({ error: 'Submission failed' }));
+    }
+    return;
+  }
+  
+  // POST /api/vote
+  if (endpoint === '/vote' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { submissionId } = body;
+      
+      if (!submissionId) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Submission ID is required' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log('Supabase not available, simulating vote');
+        // Simulate voting for demo purposes
+        // Find the submission in our mock data
+        const submissionIndex = MOCK_DATA.submissions.findIndex(s => s.id === submissionId);
+        
+        if (submissionIndex === -1) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Submission not found' }));
+          return;
+        }
+        
+        // Increment votes
+        MOCK_DATA.submissions[submissionIndex].votes += 1;
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          success: true,
+          votes: MOCK_DATA.submissions[submissionIndex].votes
+        }));
+        return;
+      }
+      
+      try {
+        console.log(`Recording vote for submission: ${submissionId}`);
+        
+        // First get current vote count
+        const { data: submission, error: getError } = await supabase
+          .from('submissions')
+          .select('votes')
+          .eq('id', submissionId)
+          .single();
+          
+        if (getError) {
+          console.error('Error getting submission votes:', getError);
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Submission not found' }));
+          return;
+        }
+        
+        // Increment votes
+        const newVoteCount = (submission.votes || 0) + 1;
+        
+        // Update the vote count
+        const { error: updateError } = await supabase
+          .from('submissions')
+          .update({ votes: newVoteCount })
+          .eq('id', submissionId);
+          
+        if (updateError) {
+          console.error('Error updating vote count:', updateError);
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: 'Failed to record vote' }));
+          return;
+        }
+        
+        console.log('Vote recorded successfully');
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          success: true,
+          votes: newVoteCount
+        }));
+      } catch (supabaseError) {
+        console.error('Supabase error during voting:', supabaseError);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Voting service unavailable' }));
+      }
+    } catch (error) {
+      console.error('Error recording vote:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Voting failed' }));
     }
     return;
   }

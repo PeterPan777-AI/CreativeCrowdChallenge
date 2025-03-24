@@ -1617,11 +1617,14 @@
                 <div class="card">
                   <h3>Top Submissions</h3>
                   <div id="submissions-list">
-                    <p>Submissions will be displayed once the competition has ended.</p>
+                    <p class="loading">Loading submissions...</p>
                   </div>
                 </div>
               </div>
             `;
+            
+            // Load submissions for this competition
+            loadCompetitionSubmissions(competitionId);
           })
           .catch(error => {
             console.error('Error loading competition details:', error);
