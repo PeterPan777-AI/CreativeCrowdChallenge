@@ -29,23 +29,57 @@
             border-radius: 5px;
             font-size: 14px;
         }
+        /* Fallback loader */
+        .app-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #3B82F6;
+            color: white;
+            text-align: center;
+        }
+        .app-loading h1 {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+        .app-loading p {
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
     </style>
 </head>
 <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    
+    <!-- React will render into this root element -->
+    <div id="root">
+        <!-- Display a fallback UI until React loads -->
+        <div class="app-loading">
+            <h1>CreativeCrowdChallenge</h1>
+            <p>Loading application...</p>
+        </div>
+    </div>
     
     <!-- Debug element to verify page is loading correctly -->
     <script>
+        console.log('Initial HTML document loaded');
+        
+        // Add visible debug info to help troubleshoot
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Web page loaded successfully');
+            console.log('DOM fully loaded and parsed');
             
             // Create debug element
             const debugDiv = document.createElement('div');
-            debugDiv.id = 'debug-page-loaded';
-            debugDiv.style.display = 'none';
-            debugDiv.textContent = 'Page loaded at: ' + new Date().toLocaleString();
+            debugDiv.id = 'debug-info';
+            debugDiv.textContent = 'HTML loaded: ' + new Date().toLocaleTimeString();
             document.body.appendChild(debugDiv);
+            
+            // Hide debug info after 5 seconds
+            setTimeout(() => {
+                debugDiv.style.display = 'none';
+            }, 5000);
         });
     </script>
 </body>
