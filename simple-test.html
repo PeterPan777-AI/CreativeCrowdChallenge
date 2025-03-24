@@ -2385,8 +2385,10 @@
         detailsScreen.innerHTML = '<div class="container"><div class="card">Loading competition details...</div></div>';
         
         // Update header to show a back button
+        // Get the last screen the user was on (either individual or business)
+        const lastScreen = localStorage.getItem('lastCompetitionScreen') || 'individual';
         document.getElementById('main-header').innerHTML = `
-          <button class="back-button" onclick="showScreen('competitions')">
+          <button class="back-button" onclick="showScreen('${lastScreen}')">
             <span class="back-icon">←</span> Back
           </button>
           <h1>Competition Details</h1>
@@ -2464,7 +2466,7 @@
                   
                   <div style="margin-top: 20px; display: flex; gap: 10px;">
                     <button onclick="showScreen('submit'); document.getElementById('competition-select').value = '${competition.id}';">Submit Entry</button>
-                    <button onclick="showScreen('competitions')" class="secondary">Back to List</button>
+                    <button onclick="showScreen(localStorage.getItem('lastCompetitionScreen') || 'individual')" class="secondary">Back to List</button>
                   </div>
                 </div>
                 
@@ -2487,7 +2489,7 @@
                 <div class="card">
                   <h2>Error</h2>
                   <p>Error loading competition details: ${error.message}</p>
-                  <button onclick="showScreen('competitions')" class="secondary">Back to Competitions</button>
+                  <button onclick="showScreen(localStorage.getItem('lastCompetitionScreen') || 'individual')" class="secondary">Back to Competitions</button>
                 </div>
               </div>
             `;
@@ -2495,7 +2497,10 @@
       } catch (error) {
         console.error('Error in showCompetitionDetails function:', error);
         showNotification('An unexpected error occurred', 'error');
-        showScreen('competitions');
+        
+        // Get the last screen the user was on (either individual or business)
+        const lastScreen = localStorage.getItem('lastCompetitionScreen') || 'individual';
+        showScreen(lastScreen);
       }
     }
     
