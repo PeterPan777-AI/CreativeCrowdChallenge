@@ -2749,24 +2749,38 @@
     
     // Helper function to reset canvas for chart reuse
     function resetCanvasElement(canvasId) {
-      const container = document.getElementById(canvasId);
-      if (!container) {
-        console.error(`Container element not found: ${canvasId}`);
-        return;
+      // First check if this is already a canvas element
+      let canvas = document.getElementById(canvasId);
+      if (canvas && canvas.tagName === 'CANVAS') {
+        // It's already a canvas, just clear any existing Chart instance
+        console.log(`Found existing canvas element: ${canvasId}`);
+        return canvas;
       }
       
-      // Clear the container completely
-      container.innerHTML = '';
+      // Otherwise, look for a container and create a canvas inside it
+      const container = document.getElementById(canvasId.replace('-canvas', ''));
+      if (container) {
+        // Clear the container completely
+        container.innerHTML = '';
+        
+        // Create a fresh canvas element
+        canvas = document.createElement('canvas');
+        canvas.id = canvasId; // Use the exact ID that was requested
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        container.appendChild(canvas);
+        
+        console.log(`Created new canvas in container: ${container.id}`);
+        return canvas;
+      }
       
-      // Create a fresh canvas element
-      const canvas = document.createElement('canvas');
-      canvas.id = `${canvasId}-canvas`;
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-      container.appendChild(canvas);
-      
-      console.log(`Reset canvas for ${canvasId}`);
-      return canvas;
+      // If we get here, we couldn't find either the canvas or a suitable container
+      console.error(`Neither canvas nor container found for: ${canvasId}`);
+      console.log('Available elements:', 
+        Array.from(document.querySelectorAll('.chart-container'))
+          .map(el => el.id || 'unnamed-container')
+      );
+      return null;
     }
     
     function initializeAnalytics() {
@@ -2839,17 +2853,37 @@
       }
       
       // Show loading state and prepare chart containers
-      document.getElementById('competitions-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
-      document.getElementById('demographics-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
-      document.getElementById('timeline-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
+      const chartContainers = [
+        'competitions-chart',
+        'demographics-chart',
+        'timeline-chart',
+        'engagement-chart',
+        'sources-chart'
+      ];
       
-      // Add loading state for new chart containers
-      if (document.getElementById('engagement-chart')) {
-        document.getElementById('engagement-chart').innerHTML = '<div class="loading">Loading engagement data...</div>';
-      }
-      if (document.getElementById('sources-chart')) {
-        document.getElementById('sources-chart').innerHTML = '<div class="loading">Loading traffic data...</div>';
-      }
+      // Reset all chart containers
+      chartContainers.forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (container) {
+          container.innerHTML = '<div class="loading">Loading chart data...</div>';
+          // Add a canvas element that will be used for each chart
+          if (containerId === 'engagement-chart') {
+            const canvas = document.createElement('canvas');
+            canvas.id = 'engagement-line-chart';
+            container.appendChild(canvas);
+          } else if (containerId === 'sources-chart') {
+            const canvas = document.createElement('canvas');
+            canvas.id = 'traffic-sources-chart';
+            container.appendChild(canvas);
+          } else {
+            const canvas = document.createElement('canvas');
+            canvas.id = `${containerId}-canvas`;
+            container.appendChild(canvas);
+          }
+        }
+      });
+      
+      // Add loading state for metrics container
       if (document.getElementById('engagement-metrics')) {
         document.getElementById('engagement-metrics').innerHTML = '<div class="loading">Loading metrics...</div>';
       }
