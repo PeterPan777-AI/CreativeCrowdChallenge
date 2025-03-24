@@ -265,24 +265,37 @@
       padding: 0;
     }
 
-    /* Notification */
-    .notification {
+    /* Notification container */
+    #notification-container {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      padding: 15px 20px;
-      background-color: #10B981;
-      color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: none;
       z-index: 1000;
-      animation: slide-in 0.3s ease-out;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 10px;
       max-width: 300px;
-      font-size: 15px;
-      line-height: 1.5;
     }
     
+    /* Notification styling */
+    .notification {
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      position: relative;
+      animation: slide-in 0.3s ease-out forwards;
+      opacity: 0;
+      transform: translateX(30px);
+      margin-bottom: 8px;
+      overflow: hidden;
+      font-size: 15px;
+      line-height: 1.5;
+      display: none;
+    }
+    
+    /* Notification types */
     .notification.success {
       background-color: #10B981;
     }
@@ -297,6 +310,29 @@
     
     .notification.warning {
       background-color: #F59E0B;
+    }
+    
+    /* Animations */
+    @keyframes slide-in {
+      0% {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes slide-out {
+      0% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(30px);
+      }
     }
     
     @keyframes slide-in {
@@ -1126,7 +1162,7 @@
   </div>
   
   <!-- Notification -->
-  <div id="notification" class="notification"></div>
+  <!-- Notifications will be dynamically created -->
   
   <!-- Include Chart.js for analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1625,25 +1661,111 @@
     
     // Show notification
     function showNotification(message, type = 'success') {
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.style.display = 'block';
+      // Get or create notification container
+      let container = document.getElementById('notification-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        container.style.position = 'fixed';
+        container.style.bottom = '20px';
+        container.style.right = '20px';
+        container.style.zIndex = '1000';
+        document.body.appendChild(container);
+      }
       
-      // Set background color based on notification type
-      if (type === 'error') {
-        notification.style.backgroundColor = '#EF4444'; // Red
-      } else if (type === 'info') {
-        notification.style.backgroundColor = '#3B82F6'; // Blue
-      } else if (type === 'warning') {
-        notification.style.backgroundColor = '#F59E0B'; // Amber
-      } else {
-        notification.style.backgroundColor = '#10B981'; // Green for success
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      
+      // Create close button
+      const closeBtn = document.createElement('span');
+      closeBtn.innerHTML = '&times;';
+      closeBtn.style.position = 'absolute';
+      closeBtn.style.right = '10px';
+      closeBtn.style.top = '10px';
+      closeBtn.style.cursor = 'pointer';
+      closeBtn.style.fontSize = '16px';
+      closeBtn.style.opacity = '0.7';
+      closeBtn.style.transition = 'opacity 0.2s';
+      
+      closeBtn.addEventListener('mouseover', () => {
+        closeBtn.style.opacity = '1';
+      });
+      
+      closeBtn.addEventListener('mouseout', () => {
+        closeBtn.style.opacity = '0.7';
+      });
+      
+      closeBtn.addEventListener('click', () => {
+        // Add slide-out animation before removing
+        notification.style.animation = 'slide-out 0.3s forwards';
+        setTimeout(() => {
+          if (container.contains(notification)) {
+            container.removeChild(notification);
+          }
+        }, 300);
+      });
+      
+      // Create icon based on type
+      let icon = '';
+      switch(type) {
+        case 'success':
+          icon = '✓';
+          break;
+        case 'error':
+          icon = '✗';
+          break;
+        case 'info':
+          icon = 'ℹ';
+          break;
+        case 'warning':
+          icon = '⚠';
+          break;
+        default:
+          icon = '✓';
+      }
+      
+      const iconSpan = document.createElement('span');
+      iconSpan.textContent = icon;
+      iconSpan.style.marginRight = '10px';
+      iconSpan.style.fontWeight = 'bold';
+      
+      // Create message span
+      const messageSpan = document.createElement('span');
+      messageSpan.textContent = message;
+      
+      // Assemble notification
+      notification.appendChild(iconSpan);
+      notification.appendChild(messageSpan);
+      notification.appendChild(closeBtn);
+      
+      // Add to container
+      container.appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => {
+        notification.style.display = 'block';
+      }, 100);
+      
+      // Increment notification count for badge if relevant
+      if (['success', 'info', 'warning'].includes(type) && type !== 'error') {
+        if (typeof updateAppBadge === 'function') {
+          updateAppBadge(1);
+        }
       }
       
       // Auto-hide after a delay
       setTimeout(() => {
-        notification.style.display = 'none';
-      }, 3000);
+        // Only remove if it hasn't been manually closed
+        if (container.contains(notification)) {
+          notification.style.animation = 'slide-out 0.3s forwards';
+          setTimeout(() => {
+            if (container.contains(notification)) {
+              container.removeChild(notification);
+            }
+          }, 300);
+        }
+      }, 5000);
     }
     
     // Social sharing function

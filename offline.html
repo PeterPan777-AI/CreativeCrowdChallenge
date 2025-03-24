@@ -87,12 +87,85 @@
         <p>Loading cached content...</p>
       </div>
     </div>
+    
+    <div id="pending-sync" class="cached-content" style="display: none;">
+      <h2>Pending Uploads</h2>
+      <p>These will be synchronized when you're back online:</p>
+      <div id="pending-votes" class="sync-status">
+        <strong>Votes:</strong> <span id="votes-count">0</span>
+      </div>
+      <div id="pending-submissions" class="sync-status">
+        <strong>Submissions:</strong> <span id="submissions-count">0</span>
+      </div>
+    </div>
   </div>
 
   <script>
     // Try to reconnect
     function tryReconnecting() {
       window.location.href = '/';
+    }
+    
+    // Open IndexedDB
+    async function openDatabase() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('CreativeCrowdChallenge', 1);
+        
+        request.onerror = (event) => {
+          reject('Error opening database');
+        };
+        
+        request.onsuccess = (event) => {
+          resolve(event.target.result);
+        };
+        
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          
+          // Create object stores if they don't exist
+          if (!db.objectStoreNames.contains('pendingVotes')) {
+            db.createObjectStore('pendingVotes', { keyPath: 'id', autoIncrement: true });
+          }
+          
+          if (!db.objectStoreNames.contains('pendingSubmissions')) {
+            db.createObjectStore('pendingSubmissions', { keyPath: 'id', autoIncrement: true });
+          }
+        };
+      });
+    }
+    
+    // Count pending votes
+    async function countPendingVotes(db) {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['pendingVotes'], 'readonly');
+        const store = transaction.objectStore('pendingVotes');
+        const countRequest = store.count();
+        
+        countRequest.onsuccess = () => {
+          resolve(countRequest.result);
+        };
+        
+        countRequest.onerror = (event) => {
+          reject('Error counting pending votes');
+        };
+      });
+    }
+    
+    // Count pending submissions
+    async function countPendingSubmissions(db) {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['pendingSubmissions'], 'readonly');
+        const store = transaction.objectStore('pendingSubmissions');
+        const countRequest = store.count();
+        
+        countRequest.onsuccess = () => {
+          resolve(countRequest.result);
+        };
+        
+        countRequest.onerror = (event) => {
+          reject('Error counting pending submissions');
+        };
+      });
     }
     
     // Show cached competitions if available
@@ -128,6 +201,21 @@
           }
         } else {
           cachedItemsContainer.innerHTML = '<p>No cached competitions available.</p>';
+        }
+        
+        // Check for pending sync items
+        try {
+          const db = await openDatabase();
+          const pendingVotes = await countPendingVotes(db);
+          const pendingSubmissions = await countPendingSubmissions(db);
+          
+          if (pendingVotes > 0 || pendingSubmissions > 0) {
+            document.getElementById('pending-sync').style.display = 'block';
+            document.getElementById('votes-count').textContent = pendingVotes;
+            document.getElementById('submissions-count').textContent = pendingSubmissions;
+          }
+        } catch (dbError) {
+          console.error('Error checking pending items:', dbError);
         }
       } catch (error) {
         document.getElementById('cached-items').innerHTML = 
