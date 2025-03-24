@@ -2438,9 +2438,16 @@
       }
     });
     
-    // PWA Service Worker Registration
+    // PWA Service Worker Registration and Offline Detection
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
+        // Check initial online status and update UI
+        updateOnlineStatus();
+        
+        // Add event listeners for online/offline status changes
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        
         navigator.serviceWorker.register('/service-worker.js')
           .then(function(registration) {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
@@ -2483,6 +2490,21 @@
             console.log('ServiceWorker registration failed: ', error);
           });
       });
+    }
+    
+    // Function to check online status and update the UI
+    function updateOnlineStatus() {
+      const offlineNotification = document.getElementById('offline-notification');
+      
+      if (navigator.onLine) {
+        // User is online
+        offlineNotification.style.display = 'none';
+        console.log('Application is online');
+      } else {
+        // User is offline
+        offlineNotification.style.display = 'block';
+        console.log('Application is offline');
+      }
     }
   </script>
 </body>
