@@ -1670,6 +1670,28 @@
     let timelineChart;
     let analyticsData = null;
     
+    // Helper function to reset canvas for chart reuse
+    function resetCanvasElement(canvasId) {
+      const container = document.getElementById(canvasId);
+      if (!container) return;
+      
+      // Remove any existing canvas
+      const existingCanvas = container.querySelector('canvas');
+      if (existingCanvas) {
+        container.removeChild(existingCanvas);
+      }
+      
+      // Clear any loading text
+      container.innerHTML = '';
+      
+      // Create a fresh canvas element
+      const canvas = document.createElement('canvas');
+      canvas.id = `${canvasId}-canvas`;
+      container.appendChild(canvas);
+      
+      console.log(`Reset canvas for ${canvasId}`);
+    }
+    
     function initializeAnalytics() {
       console.log('Initializing analytics dashboard');
       // Set up event listeners for business selector and export buttons
@@ -1768,10 +1790,21 @@
     }
     
     function createCompetitionsChart(competitions) {
-      const canvas = document.getElementById('competitions-chart');
+      // Try to find canvas by ID with the -canvas suffix first
+      let canvas = document.getElementById('competitions-chart-canvas');
       if (!canvas) {
-        console.error('Competition chart canvas not found!');
-        return;
+        // If not found, check if there's a canvas within the container
+        const container = document.getElementById('competitions-chart');
+        if (!container) {
+          console.error('Competition chart container not found!');
+          return;
+        }
+        
+        canvas = container.querySelector('canvas');
+        if (!canvas) {
+          console.error('No canvas element found in competitions chart container');
+          return;
+        }
       }
       
       const ctx = canvas.getContext('2d');
@@ -1816,10 +1849,21 @@
     }
     
     function createDemographicsChart(demographics) {
-      const canvas = document.getElementById('demographics-chart');
+      // Try to find canvas by ID with the -canvas suffix first
+      let canvas = document.getElementById('demographics-chart-canvas');
       if (!canvas) {
-        console.error('Demographics chart canvas not found!');
-        return;
+        // If not found, check if there's a canvas within the container
+        const container = document.getElementById('demographics-chart');
+        if (!container) {
+          console.error('Demographics chart container not found!');
+          return;
+        }
+        
+        canvas = container.querySelector('canvas');
+        if (!canvas) {
+          console.error('No canvas element found in demographics chart container');
+          return;
+        }
       }
       
       const ctx = canvas.getContext('2d');
@@ -1864,10 +1908,21 @@
     }
     
     function createTimelineChart(timelineData) {
-      const canvas = document.getElementById('timeline-chart');
+      // Try to find canvas by ID with the -canvas suffix first
+      let canvas = document.getElementById('timeline-chart-canvas');
       if (!canvas) {
-        console.error('Timeline chart canvas not found!');
-        return;
+        // If not found, check if there's a canvas within the container
+        const container = document.getElementById('timeline-chart');
+        if (!container) {
+          console.error('Timeline chart container not found!');
+          return;
+        }
+        
+        canvas = container.querySelector('canvas');
+        if (!canvas) {
+          console.error('No canvas element found in timeline chart container');
+          return;
+        }
       }
       
       const ctx = canvas.getContext('2d');
