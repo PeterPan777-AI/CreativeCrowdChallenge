@@ -1092,7 +1092,8 @@
   
   <!-- Include Chart.js for analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <script src="/assets/js/indexedDBHelper.js"></script>
+  
   <script>
     // Global state
     let isLoggedIn = false;
@@ -1845,7 +1846,18 @@
         button.classList.add('disabled');
       });
       
-      // Send vote to API
+      // Check if we're online
+      if (navigator.onLine) {
+        // We're online - send vote to API
+        sendVoteToServer(submissionId);
+      } else {
+        // We're offline - save vote for later sync
+        saveVoteForOfflineSync(submissionId);
+      }
+    }
+    
+    // Function to send vote to server
+    function sendVoteToServer(submissionId) {
       fetch('/api/vote', {
         method: 'POST',
         headers: {
@@ -1861,40 +1873,77 @@
         })
         .then(data => {
           console.log('Vote recorded successfully:', data);
-          
-          // Update the vote count in the UI
-          const votesElement = document.getElementById(`votes-${submissionId}`);
-          if (votesElement) {
-            votesElement.textContent = data.votes;
-            
-            // Add animation class for visual feedback
-            votesElement.classList.add('vote-added');
-            setTimeout(() => {
-              votesElement.classList.remove('vote-added');
-            }, 1000);
-          }
-          
-          // Show success notification
-          showNotification('Your vote has been recorded!', 'success');
-          
-          // Re-enable the vote buttons after a delay
-          setTimeout(() => {
-            voteButtons.forEach(button => {
-              button.disabled = false;
-              button.classList.remove('disabled');
-            });
-          }, 1000);
+          updateVoteUI(submissionId, data.votes);
         })
         .catch(error => {
           console.error('Error recording vote:', error);
-          showNotification('Failed to record your vote. Please try again.', 'error');
-          
-          // Re-enable the vote buttons
-          voteButtons.forEach(button => {
-            button.disabled = false;
-            button.classList.remove('disabled');
-          });
+          // If there's a network error, save for offline sync
+          if (!navigator.onLine || error.message.includes('network')) {
+            saveVoteForOfflineSync(submissionId);
+          } else {
+            showNotification('Failed to record vote: ' + error.message, 'error');
+          }
         });
+    }
+    
+    // Function to save vote for offline sync
+    async function saveVoteForOfflineSync(submissionId) {
+      try {
+        // Create vote object
+        const vote = { 
+          submissionId: submissionId,
+          timestamp: new Date().toISOString()
+        };
+        
+        // Save to IndexedDB
+        await window.dbHelper.saveVoteForSync(vote);
+        
+        // Register for background sync
+        const syncRegistered = await window.dbHelper.registerBackgroundSync('sync-votes');
+        
+        // Update UI with optimistic update
+        updateVoteUI(submissionId, null, true);
+        
+        // Show notification
+        showNotification('You\'re offline. Your vote will be submitted when you\'re back online.', 'info');
+        console.log('Vote saved for background sync, registration success:', syncRegistered);
+      } catch (error) {
+        console.error('Failed to save vote for offline sync:', error);
+        showNotification('Failed to save your vote for later. Please try again when online.', 'error');
+      }
+    }
+    
+    // Update vote UI after voting
+    function updateVoteUI(submissionId, votes, isOffline = false) {
+      const votesElement = document.getElementById(`votes-${submissionId}`);
+      if (votesElement) {
+        if (votes !== null) {
+          // If we have votes count from the server
+          votesElement.textContent = votes;
+        } else if (isOffline) {
+          // If offline, increment locally by 1
+          const currentVotes = parseInt(votesElement.textContent || '0', 10);
+          votesElement.textContent = currentVotes + 1;
+        }
+        
+        // Add animation class for visual feedback
+        votesElement.classList.add('vote-added');
+        setTimeout(() => {
+          votesElement.classList.remove('vote-added');
+        }, 1000);
+      }
+      
+      // Show success notification
+      showNotification('Your vote has been recorded!', 'success');
+      
+      // Re-enable the vote buttons after a delay
+      setTimeout(() => {
+        const voteButtons = document.querySelectorAll('.vote-button');
+        voteButtons.forEach(button => {
+          button.disabled = false;
+          button.classList.remove('disabled');
+        });
+      }, 1000);
     }
     
     function loadCompetitions() {
