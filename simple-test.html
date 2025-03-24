@@ -806,19 +806,60 @@
         return;
       }
       
-      // Simulate login (would connect to Supabase in real app)
-      isLoggedIn = true;
-      currentUser = {
-        name: 'Demo User',
-        email: email,
-        memberSince: 'March 2023',
-        submissions: 5,
-        awards: 2,
-        votesCast: 12
-      };
+      // Show loading state
+      const loginButton = document.querySelector('#login-form button');
+      const originalButtonText = loginButton.textContent;
+      loginButton.textContent = 'Logging in...';
+      loginButton.disabled = true;
       
-      showNotification('Login successful!');
-      updateProfileView();
+      // Call our API
+      fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Login failed');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Login successful', data);
+        isLoggedIn = true;
+        
+        // Extract user data
+        let userName = 'User';
+        if (data.user && data.user.user_metadata && data.user.user_metadata.full_name) {
+          userName = data.user.user_metadata.full_name;
+        }
+        
+        currentUser = {
+          name: userName,
+          email: email,
+          memberSince: 'March 2025',
+          submissions: 5,
+          awards: 2,
+          votesCast: 12
+        };
+        
+        // Save session to localStorage
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        
+        showNotification('Login successful!');
+        updateProfileView();
+      })
+      .catch(error => {
+        console.error('Error during login:', error);
+        showNotification('Login failed: ' + error.message, 'error');
+      })
+      .finally(() => {
+        // Reset button state
+        loginButton.textContent = originalButtonText;
+        loginButton.disabled = false;
+      });
     }
     
     // Register function
@@ -832,19 +873,58 @@
         return;
       }
       
-      // Simulate registration (would connect to Supabase in real app)
-      isLoggedIn = true;
-      currentUser = {
-        name: name,
-        email: email,
-        memberSince: 'March 2025',
-        submissions: 0,
-        awards: 0,
-        votesCast: 0
-      };
+      // Show loading state
+      const registerButton = document.querySelector('#register-form button');
+      const originalButtonText = registerButton.textContent;
+      registerButton.textContent = 'Registering...';
+      registerButton.disabled = true;
       
-      showNotification('Registration successful!');
-      updateProfileView();
+      // Call our API
+      fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          name, 
+          email, 
+          password 
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Registration failed');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Registration successful', data);
+        isLoggedIn = true;
+        
+        currentUser = {
+          name: name,
+          email: email,
+          memberSince: 'March 2025',
+          submissions: 0,
+          awards: 0,
+          votesCast: 0
+        };
+        
+        // Save session to localStorage
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        
+        showNotification('Registration successful!');
+        updateProfileView();
+      })
+      .catch(error => {
+        console.error('Error during registration:', error);
+        showNotification('Registration failed: ' + error.message, 'error');
+      })
+      .finally(() => {
+        // Reset button state
+        registerButton.textContent = originalButtonText;
+        registerButton.disabled = false;
+      });
     }
     
     // Logout function
@@ -886,13 +966,47 @@
         return;
       }
       
-      // Would connect to Supabase in real app
-      showNotification('Category suggestion submitted successfully!');
-      closeCategorySuggestionModal();
+      // Show loading state
+      const submitButton = document.querySelector('#category-form button');
+      const originalButtonText = submitButton.textContent;
+      submitButton.textContent = 'Submitting...';
+      submitButton.disabled = true;
       
-      // Reset form
-      document.getElementById('category-name').value = '';
-      document.getElementById('category-description').value = '';
+      // Call our API
+      fetch('/api/category/suggest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: categoryName,
+          description: description
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to submit category suggestion');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Category suggestion submitted:', data);
+        showNotification('Category suggestion submitted successfully!');
+        closeCategorySuggestionModal();
+        
+        // Reset form
+        document.getElementById('category-name').value = '';
+        document.getElementById('category-description').value = '';
+      })
+      .catch(error => {
+        console.error('Error submitting category:', error);
+        showNotification('Failed to submit category: ' + error.message, 'error');
+      })
+      .finally(() => {
+        // Reset button state
+        submitButton.textContent = originalButtonText;
+        submitButton.disabled = false;
+      });
     }
     
     // Submit entry

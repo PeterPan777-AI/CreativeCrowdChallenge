@@ -82,7 +82,7 @@ const server = http.createServer((req, res) => {
   // Serve static files
   let filePath;
   if (req.url === '/' || req.url === '/index.html') {
-    filePath = path.join(__dirname, 'basic.html');
+    filePath = path.join(__dirname, 'simple-test.html');
   } else {
     filePath = path.join(__dirname, req.url);
   }
