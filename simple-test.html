@@ -611,6 +611,14 @@
     <div id="offline-notification" style="display: none; background-color: #ffe66d; color: #333; padding: 8px; text-align: center; font-weight: bold; margin-top: 10px;">
       You are currently offline. Some features may be limited.
     </div>
+    <!-- Add to Home Screen Prompt -->
+    <div id="install-prompt" style="display: none; background-color: #e6f7ff; color: #333; padding: 10px; text-align: center; font-weight: bold; margin-top: 10px; border-radius: 5px;">
+      <p style="margin: 0 0 8px 0;">📱 Add this app to your home screen for a better experience!</p>
+      <div>
+        <button id="install-button" class="primary" style="margin-right: 10px;">Install App</button>
+        <button id="dismiss-install" class="secondary">Later</button>
+      </div>
+    </div>
   </header>
   
   <div class="container">
@@ -2573,6 +2581,9 @@
               }
             });
             
+            // Push notification setup
+            setupPushNotifications(registration);
+            
             // Add install prompt
             let deferredPrompt;
             window.addEventListener('beforeinstallprompt', (e) => {
@@ -2611,6 +2622,109 @@
             console.log('ServiceWorker registration failed: ', error);
           });
       });
+    }
+    
+    // Push Notification Setup
+    function setupPushNotifications(swRegistration) {
+      // Check if push notifications are supported
+      if (!('PushManager' in window)) {
+        console.log('Push notifications not supported');
+        return;
+      }
+      
+      // Add notification button to profile section
+      const profileSection = document.querySelector('#profile-screen .container');
+      if (profileSection) {
+        const notificationSection = document.createElement('div');
+        notificationSection.className = 'card';
+        notificationSection.innerHTML = `
+          <h3>Notifications</h3>
+          <p>Get notified about new competitions, updates, and results.</p>
+          <button id="notification-permission-btn" class="primary">Enable Notifications</button>
+        `;
+        profileSection.appendChild(notificationSection);
+        
+        // Add event listener to notification permission button
+        const notificationBtn = document.getElementById('notification-permission-btn');
+        notificationBtn.addEventListener('click', () => {
+          requestNotificationPermission(swRegistration);
+        });
+        
+        // Update button text based on current permission
+        updateNotificationButtonState(notificationBtn);
+      }
+    }
+    
+    // Request notification permission
+    function requestNotificationPermission(swRegistration) {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted');
+          showNotification('Notifications enabled!', 'success');
+          
+          // Subscribe to push notifications
+          subscribeToPushNotifications(swRegistration);
+          
+          // Update notification button
+          const notificationBtn = document.getElementById('notification-permission-btn');
+          if (notificationBtn) {
+            updateNotificationButtonState(notificationBtn);
+          }
+          
+          // Send test notification after a short delay
+          setTimeout(() => {
+            showPushNotification('Welcome to CreativeCrowdChallenge!', {
+              body: 'You will now receive updates about new competitions and events.',
+              icon: '/assets/icon-192x192.png',
+              badge: '/assets/icon-192x192.png'
+            });
+          }, 2000);
+        } else {
+          console.log('Notification permission denied');
+          showNotification('Notification permission denied', 'error');
+        }
+      });
+    }
+    
+    // Update notification button state
+    function updateNotificationButtonState(button) {
+      if (Notification.permission === 'granted') {
+        button.textContent = 'Notifications Enabled';
+        button.disabled = true;
+        button.classList.add('success');
+      } else {
+        button.textContent = 'Enable Notifications';
+        button.disabled = false;
+        button.classList.remove('success');
+      }
+    }
+    
+    // Subscribe to push notifications
+    function subscribeToPushNotifications(swRegistration) {
+      // This would typically create a subscription and send to server
+      // For demo purposes, we'll just log it
+      console.log('Would subscribe to push notifications here');
+      
+      // In a real app, you would use:
+      /*
+      swRegistration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array('your-public-key')
+      })
+      .then(subscription => {
+        // Send subscription to your server
+        console.log('User subscribed:', subscription);
+      })
+      */
+    }
+    
+    // Show push notification
+    function showPushNotification(title, options) {
+      if (Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then(registration => {
+          registration.showNotification(title, options);
+        });
+      }
     }
     
     // Function to check online status and update the UI

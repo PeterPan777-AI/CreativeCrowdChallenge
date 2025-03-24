@@ -2,6 +2,7 @@
 const CACHE_NAME = 'ccc-app-v1';
 const DATA_CACHE_NAME = 'ccc-data-v1';
 const SYNC_QUEUE_NAME = 'ccc-sync-queue';
+const NOTIFICATION_BADGE_COUNT = 'ccc-notification-badge-count';
 
 // Files to cache for offline use
 const CACHE_ASSETS = [
@@ -60,6 +61,79 @@ self.addEventListener('sync', (event) => {
     console.log('Service Worker: Processing queued submissions');
     event.waitUntil(processQueuedSubmissions());
   }
+});
+
+// Push event - handle incoming push notifications
+self.addEventListener('push', (event) => {
+  console.log('Service Worker: Push notification received', event);
+  
+  let notificationData = {
+    title: 'New Update',
+    body: 'Something new happened in CreativeCrowdChallenge',
+    icon: '/assets/icon-192x192.png',
+    badge: '/assets/icon-192x192.png',
+    data: {
+      url: '/'
+    }
+  };
+  
+  // Try to parse the push data if available
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      notificationData = { ...notificationData, ...data };
+    } catch (error) {
+      console.error('Service Worker: Error parsing push notification data', error);
+    }
+  }
+  
+  // Show notification and increment badge count
+  event.waitUntil(
+    Promise.all([
+      self.registration.showNotification(notificationData.title, {
+        body: notificationData.body,
+        icon: notificationData.icon,
+        badge: notificationData.badge,
+        data: notificationData.data,
+        vibrate: [200, 100, 200, 100, 200, 100, 200],
+        actions: [
+          {
+            action: 'view',
+            title: 'View'
+          }
+        ]
+      }),
+      updateBadgeCount(1) // Increment badge count by 1
+    ])
+  );
+});
+
+// Notification click event - handle user clicking on a notification
+self.addEventListener('notificationclick', (event) => {
+  console.log('Service Worker: Notification clicked', event);
+  
+  // Close the notification
+  event.notification.close();
+  
+  // Get the notification data
+  const url = event.notification.data?.url || '/';
+  
+  // Open the app and navigate to the specified URL
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then(windowClients => {
+      // Check if there's already a window open
+      for (const client of windowClients) {
+        if (client.url === url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      
+      // If no open window, open a new one
+      if (clients.openWindow) {
+        return clients.openWindow(url).then(() => updateBadgeCount(-1)); // Decrement badge count by 1
+      }
+    })
+  );
 });
 
 // Process queued votes when back online
@@ -221,8 +295,52 @@ async function openDB() {
       if (!db.objectStoreNames.contains('submissions')) {
         db.createObjectStore('submissions', { keyPath: 'id', autoIncrement: true });
       }
+      
+      // Create a store for app metadata (including badge count)
+      if (!db.objectStoreNames.contains('metadata')) {
+        db.createObjectStore('metadata', { keyPath: 'key' });
+      }
     };
   });
+}
+
+// Update badge count for notifications
+async function updateBadgeCount(change) {
+  try {
+    if (!('setAppBadge' in navigator)) {
+      console.log('App Badge API not supported');
+      return;
+    }
+    
+    // Open the metadata store
+    const db = await openDB();
+    const tx = db.transaction('metadata', 'readwrite');
+    const store = tx.objectStore('metadata');
+    
+    // Get current badge count
+    let countRecord = await store.get(NOTIFICATION_BADGE_COUNT);
+    let currentCount = countRecord?.value || 0;
+    
+    // Update count (ensure it's not negative)
+    const newCount = Math.max(0, currentCount + change);
+    
+    // Save updated count
+    await store.put({ key: NOTIFICATION_BADGE_COUNT, value: newCount });
+    await tx.done;
+    
+    // Update the app badge
+    if (newCount > 0) {
+      await navigator.setAppBadge(newCount);
+    } else {
+      await navigator.clearAppBadge();
+    }
+    
+    console.log('App badge updated:', newCount);
+    return newCount;
+  } catch (error) {
+    console.error('Error updating badge count:', error);
+    return null;
+  }
 }
 
 // Fetch event - handle API and static requests differently
