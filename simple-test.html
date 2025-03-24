@@ -3039,8 +3039,31 @@
     }
     
     // Log when page loads
+    // Function to parse URL query parameters
+    function getUrlParameters() {
+      const params = {};
+      const queryString = window.location.search.substring(1);
+      const pairs = queryString.split('&');
+      
+      for (let i = 0; i < pairs.length; i++) {
+        if (!pairs[i]) continue;
+        const pair = pairs[i].split('=');
+        params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+      }
+      
+      return params;
+    }
+    
     window.addEventListener('load', function() {
       console.log('CreativeCrowdChallenge app loaded successfully!');
+      
+      // Parse URL query parameters
+      const urlParams = getUrlParameters();
+      const isAdminAnalytics = urlParams.adminAnalytics === 'true';
+      const isAnalyticsDemo = urlParams.analyticsDemo === 'true';
+      
+      // Store admin access state
+      window.hasAnalyticsAccess = isAdminAnalytics || isAnalyticsDemo;
       
       // Load competitions on page load
       loadCompetitions();
@@ -3055,6 +3078,15 @@
         } catch (e) {
           console.error('Error loading saved user:', e);
           localStorage.removeItem('user');
+        }
+      }
+      
+      // If this is an admin analytics view, automatically show the analytics tab
+      if (isAdminAnalytics || isAnalyticsDemo) {
+        // Select analytics tab and show analytics screen
+        const analyticsTab = document.querySelector('.tab[data-screen="analytics"]');
+        if (analyticsTab) {
+          analyticsTab.click();
         }
       }
       
@@ -3161,6 +3193,13 @@
     }
     
     function loadBusinessAnalytics() {
+      // Check if user has analytics access
+      if (!window.hasAnalyticsAccess && currentUser?.role !== 'admin') {
+        console.log('Unauthorized access attempt to analytics dashboard');
+        showRequestAnalyticsForm();
+        return;
+      }
+      
       const businessId = document.getElementById('business-selector').value;
       const timelinePeriod = document.getElementById('timeline-period')?.value || '30days';
       
