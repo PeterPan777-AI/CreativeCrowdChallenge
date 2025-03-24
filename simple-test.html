@@ -932,7 +932,8 @@
     <!-- Tab Navigation -->
     <div class="tabs">
       <div class="tab active" data-screen="home">Home</div>
-      <div class="tab" data-screen="competitions">Competitions</div>
+      <div class="tab" data-screen="individual">Individual</div>
+      <div class="tab" data-screen="business">Business</div>
       <div class="tab" data-screen="submit">Submit</div>
       <div class="tab" data-screen="profile">Login</div>
     </div>
@@ -942,7 +943,8 @@
       <div class="card">
         <h2>Welcome to CreativeCrowdChallenge!</h2>
         <p>Join exciting creative competitions and showcase your talents.</p>
-        <button onclick="showScreen('competitions')">Explore Competitions</button>
+        <button onclick="showScreen('individual')">Explore Individual Competitions</button>
+        <button onclick="showScreen('business')" class="secondary">Explore Business Competitions</button>
       </div>
       
       <div class="stats-container">
@@ -974,11 +976,12 @@
       </div>
     </div>
     
-    <!-- Competitions Screen -->
-    <div id="competitions-screen" class="screen">
+    <!-- Individual Competitions Screen -->
+    <div id="individual-screen" class="screen">
       <div class="card">
-        <h2>Active Competitions</h2>
-        <div id="competitions-list">
+        <h2>Individual Competitions</h2>
+        <p>Free competitions open to all creative individuals.</p>
+        <div id="individual-competitions-list">
           <div class="card">
             <h3>Summer Photography Contest</h3>
             <div class="competition-meta">
@@ -1022,6 +1025,49 @@
             </div>
             <div style="margin-top: 15px;">
               <button onclick="showCompetitionDetails('music-competition')">View Details</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Business Competitions Screen -->
+    <div id="business-screen" class="screen">
+      <div class="card">
+        <h2>Business Competitions</h2>
+        <p>Premium competitions sponsored by businesses with higher rewards. Requires a business subscription to create competitions.</p>
+        <div id="business-competitions-list">
+          <!-- Business competitions will be loaded here -->
+          <div class="card">
+            <h3>Logo Design Challenge</h3>
+            <div class="competition-meta">
+              <div class="meta-item"><strong>Ends:</strong> Apr 30, 2025</div>
+              <div class="meta-item"><strong>Entries:</strong> 24</div>
+              <div class="meta-item"><strong>Prize:</strong> $500</div>
+            </div>
+            <p>Create a modern logo for a tech startup</p>
+            <div>
+              <span class="badge primary">Design</span>
+              <span class="badge success">Business</span>
+            </div>
+            <div style="margin-top: 15px;">
+              <button onclick="showCompetitionDetails('mock-comp-1')">View Details</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Mobile App UI Challenge</h3>
+            <div class="competition-meta">
+              <div class="meta-item"><strong>Ends:</strong> May 15, 2025</div>
+              <div class="meta-item"><strong>Entries:</strong> 12</div>
+              <div class="meta-item"><strong>Prize:</strong> $750</div>
+            </div>
+            <p>Design an intuitive mobile interface for a fitness app</p>
+            <div>
+              <span class="badge primary">Design</span>
+              <span class="badge success">Business</span>
+            </div>
+            <div style="margin-top: 15px;">
+              <button onclick="showCompetitionDetails('mock-comp-2')">View Details</button>
             </div>
           </div>
         </div>
@@ -2633,8 +2679,17 @@
     }
     
     function loadCompetitions() {
-      const competitionsList = document.getElementById('competitions-list');
-      const loadingHTML = '<div class="card"><p>Loading competitions...</p></div>';
+      // Load both individual and business competitions
+      loadIndividualCompetitions();
+      loadBusinessCompetitions();
+      
+      // Update competition select dropdown for the submission form
+      updateCompetitionDropdown();
+    }
+    
+    function loadIndividualCompetitions() {
+      const competitionsList = document.getElementById('individual-competitions-list');
+      const loadingHTML = '<div class="card"><p>Loading individual competitions...</p></div>';
       competitionsList.innerHTML = loadingHTML;
       
       fetch('/api/competitions')
@@ -2645,18 +2700,20 @@
           return response.json();
         })
         .then(competitions => {
-          console.log('Competitions loaded:', competitions);
+          console.log('All competitions loaded:', competitions);
           
-          if (competitions && competitions.length > 0) {
+          // Filter for individual competitions (those without a business_id or with empty business_id)
+          const individualCompetitions = competitions.filter(comp => 
+            !comp.business_id || comp.business_id === '');
+          
+          console.log('Individual competitions:', individualCompetitions);
+          
+          if (individualCompetitions && individualCompetitions.length > 0) {
             // Clear loading message
             competitionsList.innerHTML = '';
             
-            // Update competition select dropdown
-            const competitionSelect = document.getElementById('competition-select');
-            competitionSelect.innerHTML = '<option value="">-- Select a competition --</option>';
-            
             // Add each competition
-            competitions.forEach(competition => {
+            individualCompetitions.forEach(competition => {
               // Create competition card
               const card = document.createElement('div');
               card.className = 'card';
@@ -2684,6 +2741,7 @@
                 <div>
                   <span class="badge primary">${competition.category || 'General'}</span>
                   <span class="badge success">${competition.status || 'Active'}</span>
+                  <span class="badge info">Individual</span>
                 </div>
                 <div style="margin-top: 15px;">
                   <button onclick="showCompetitionDetails('${competition.id}')">View Details</button>
@@ -2691,20 +2749,117 @@
               `;
               
               competitionsList.appendChild(card);
-              
-              // Add to select dropdown
-              const option = document.createElement('option');
-              option.value = competition.id;
-              option.textContent = competition.title;
-              competitionSelect.appendChild(option);
             });
           } else {
-            competitionsList.innerHTML = '<div class="card"><p>No active competitions found. Check back soon!</p></div>';
+            competitionsList.innerHTML = '<div class="card"><p>No individual competitions found. Check back soon!</p></div>';
           }
         })
         .catch(error => {
-          console.error('Error loading competitions:', error);
+          console.error('Error loading individual competitions:', error);
           competitionsList.innerHTML = `<div class="card"><p>Error loading competitions: ${error.message}</p></div>`;
+        });
+    }
+    
+    function loadBusinessCompetitions() {
+      const competitionsList = document.getElementById('business-competitions-list');
+      const loadingHTML = '<div class="card"><p>Loading business competitions...</p></div>';
+      competitionsList.innerHTML = loadingHTML;
+      
+      fetch('/api/competitions')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch competitions');
+          }
+          return response.json();
+        })
+        .then(competitions => {
+          // Filter for business competitions (those with a business_id)
+          const businessCompetitions = competitions.filter(comp => 
+            comp.business_id && comp.business_id !== '');
+          
+          console.log('Business competitions:', businessCompetitions);
+          
+          if (businessCompetitions && businessCompetitions.length > 0) {
+            // Clear loading message
+            competitionsList.innerHTML = '';
+            
+            // Add each competition
+            businessCompetitions.forEach(competition => {
+              // Create competition card
+              const card = document.createElement('div');
+              card.className = 'card';
+              
+              // Format deadline date if available
+              let deadline = 'Coming soon';
+              if (competition.deadline) {
+                try {
+                  const deadlineDate = new Date(competition.deadline);
+                  deadline = deadlineDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                } catch (e) {
+                  console.error('Error formatting date:', e);
+                  deadline = competition.deadline;
+                }
+              }
+              
+              // Set HTML content for the card
+              card.innerHTML = `
+                <h3>${competition.title}</h3>
+                <div class="competition-meta">
+                  <div class="meta-item"><strong>Ends:</strong> ${deadline}</div>
+                  <div class="meta-item"><strong>Prize:</strong> ${competition.prize || 'TBD'}</div>
+                </div>
+                <p>${competition.description}</p>
+                <div>
+                  <span class="badge primary">${competition.category || 'General'}</span>
+                  <span class="badge success">${competition.status || 'Active'}</span>
+                  <span class="badge warning">Business</span>
+                </div>
+                <div style="margin-top: 15px;">
+                  <button onclick="showCompetitionDetails('${competition.id}')">View Details</button>
+                </div>
+              `;
+              
+              competitionsList.appendChild(card);
+            });
+          } else {
+            competitionsList.innerHTML = '<div class="card"><p>No business competitions found. Check back soon!</p></div>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading business competitions:', error);
+          competitionsList.innerHTML = `<div class="card"><p>Error loading competitions: ${error.message}</p></div>`;
+        });
+    }
+    
+    function updateCompetitionDropdown() {
+      // Update competition select dropdown for the submission form
+      fetch('/api/competitions')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch competitions');
+          }
+          return response.json();
+        })
+        .then(competitions => {
+          const competitionSelect = document.getElementById('competition-select');
+          competitionSelect.innerHTML = '<option value="">-- Select a competition --</option>';
+          
+          if (competitions && competitions.length > 0) {
+            // Add each competition to the dropdown
+            competitions.forEach(competition => {
+              const option = document.createElement('option');
+              option.value = competition.id;
+              
+              // Add a prefix to distinguish between individual and business competitions
+              const prefix = competition.business_id ? '[Business] ' : '[Individual] ';
+              option.textContent = prefix + competition.title;
+              
+              competitionSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error updating competition dropdown:', error);
         });
     }
     
