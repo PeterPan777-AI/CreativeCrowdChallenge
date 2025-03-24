@@ -1673,31 +1673,37 @@
     // Helper function to reset canvas for chart reuse
     function resetCanvasElement(canvasId) {
       const container = document.getElementById(canvasId);
-      if (!container) return;
-      
-      // Remove any existing canvas
-      const existingCanvas = container.querySelector('canvas');
-      if (existingCanvas) {
-        container.removeChild(existingCanvas);
+      if (!container) {
+        console.error(`Container element not found: ${canvasId}`);
+        return;
       }
       
-      // Clear any loading text
+      // Clear the container completely
       container.innerHTML = '';
       
       // Create a fresh canvas element
       const canvas = document.createElement('canvas');
       canvas.id = `${canvasId}-canvas`;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
       container.appendChild(canvas);
       
       console.log(`Reset canvas for ${canvasId}`);
+      return canvas;
     }
     
     function initializeAnalytics() {
       console.log('Initializing analytics dashboard');
+      
       // Set up event listeners for business selector and export buttons
       const businessSelector = document.getElementById('business-selector');
       if (businessSelector) {
         businessSelector.addEventListener('change', loadBusinessAnalytics);
+        // Load initial data after a short delay to ensure DOM is fully ready
+        setTimeout(() => {
+          // Load default business analytics
+          loadBusinessAnalytics();
+        }, 100);
       }
       
       // Connect export buttons
@@ -1727,12 +1733,7 @@
         timelineChart = null;
       }
       
-      // Reset canvas elements first
-      resetCanvasElement('competitions-chart');
-      resetCanvasElement('demographics-chart');
-      resetCanvasElement('timeline-chart');
-      
-      // Show loading state
+      // Show loading state and prepare chart containers
       document.getElementById('competitions-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
       document.getElementById('demographics-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
       document.getElementById('timeline-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
@@ -1783,30 +1784,26 @@
         tableBody.appendChild(row);
       });
       
+      // Prepare canvas elements for the charts
+      const competitionsCanvas = resetCanvasElement('competitions-chart');
+      const demographicsCanvas = resetCanvasElement('demographics-chart');
+      const timelineCanvas = resetCanvasElement('timeline-chart');
+      
       // Create/update charts
-      createCompetitionsChart(data.competitions);
-      createDemographicsChart(data.demographics);
-      createTimelineChart(data.timeline);
+      if (competitionsCanvas) createCompetitionsChart(data.competitions);
+      if (demographicsCanvas) createDemographicsChart(data.demographics);
+      if (timelineCanvas) createTimelineChart(data.timeline);
     }
     
     function createCompetitionsChart(competitions) {
-      // Try to find canvas by ID with the -canvas suffix first
-      let canvas = document.getElementById('competitions-chart-canvas');
+      // Get canvas element
+      const canvas = document.getElementById('competitions-chart-canvas');
       if (!canvas) {
-        // If not found, check if there's a canvas within the container
-        const container = document.getElementById('competitions-chart');
-        if (!container) {
-          console.error('Competition chart container not found!');
-          return;
-        }
-        
-        canvas = container.querySelector('canvas');
-        if (!canvas) {
-          console.error('No canvas element found in competitions chart container');
-          return;
-        }
+        console.error('Competition chart canvas not found');
+        return;
       }
       
+      // Get 2D context
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         console.error('Could not get 2D context for competition chart');
@@ -1849,23 +1846,14 @@
     }
     
     function createDemographicsChart(demographics) {
-      // Try to find canvas by ID with the -canvas suffix first
-      let canvas = document.getElementById('demographics-chart-canvas');
+      // Get canvas element
+      const canvas = document.getElementById('demographics-chart-canvas');
       if (!canvas) {
-        // If not found, check if there's a canvas within the container
-        const container = document.getElementById('demographics-chart');
-        if (!container) {
-          console.error('Demographics chart container not found!');
-          return;
-        }
-        
-        canvas = container.querySelector('canvas');
-        if (!canvas) {
-          console.error('No canvas element found in demographics chart container');
-          return;
-        }
+        console.error('Demographics chart canvas not found');
+        return;
       }
       
+      // Get 2D context
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         console.error('Could not get 2D context for demographics chart');
@@ -1908,23 +1896,14 @@
     }
     
     function createTimelineChart(timelineData) {
-      // Try to find canvas by ID with the -canvas suffix first
-      let canvas = document.getElementById('timeline-chart-canvas');
+      // Get canvas element
+      const canvas = document.getElementById('timeline-chart-canvas');
       if (!canvas) {
-        // If not found, check if there's a canvas within the container
-        const container = document.getElementById('timeline-chart');
-        if (!container) {
-          console.error('Timeline chart container not found!');
-          return;
-        }
-        
-        canvas = container.querySelector('canvas');
-        if (!canvas) {
-          console.error('No canvas element found in timeline chart container');
-          return;
-        }
+        console.error('Timeline chart canvas not found');
+        return;
       }
       
+      // Get 2D context
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         console.error('Could not get 2D context for timeline chart');
