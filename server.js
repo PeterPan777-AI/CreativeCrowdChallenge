@@ -118,14 +118,18 @@ const server = http.createServer((req, res) => {
   }
   
   // Serve static files
+  // Parse URL to separate path from query parameters
+  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+  const pathname = parsedUrl.pathname;
+  
   let filePath;
-  if (req.url === '/' || req.url === '/index.html') {
+  if (pathname === '/' || pathname === '/index.html') {
     filePath = path.join(__dirname, 'simple-test.html');
-  } else if (req.url === '/admin') {
+  } else if (pathname === '/admin') {
     // Serve admin login page
     filePath = path.join(__dirname, 'admin.html');
   } else {
-    filePath = path.join(__dirname, req.url);
+    filePath = path.join(__dirname, pathname);
   }
   
   serveFile(res, filePath);
