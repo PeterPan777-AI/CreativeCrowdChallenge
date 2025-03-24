@@ -2095,7 +2095,21 @@
       loginButton.textContent = 'Logging in...';
       loginButton.disabled = true;
       
-      // Call our API
+      // Check if this is an admin account
+      if (email.includes('admin')) {
+        showNotification('Admin accounts should log in through the admin portal', 'error');
+        loginButton.textContent = originalButtonText;
+        loginButton.disabled = false;
+        
+        // Optionally, redirect to admin login page after a delay
+        setTimeout(() => {
+          window.location.href = '/admin';
+        }, 2000);
+        
+        return;
+      }
+      
+      // Call our API for regular users
       fetch('/api/auth/signin', {
         method: 'POST',
         headers: {
@@ -2119,11 +2133,9 @@
           userName = data.user.user_metadata.full_name;
         }
         
-        // Get user role (in a real app, this would come from server)
-        // For demo, we'll use a simple rule based on email:
-        const isAdmin = email.includes('admin');
+        // Get user role (for regular or business users only)
         const isBusiness = email.includes('business') || email === 'demo@example.com';
-        const userRole = isAdmin ? 'admin' : (isBusiness ? 'business' : 'user');
+        const userRole = isBusiness ? 'business' : 'user';
         
         currentUser = {
           name: userName,
@@ -2163,6 +2175,15 @@
       
       if (!name || !email || !password) {
         showNotification('Please fill in all fields', 'error');
+        return;
+      }
+      
+      // Check if trying to register an admin account
+      if (email.includes('admin')) {
+        showNotification('Admin accounts can only be created through the admin portal', 'error');
+        setTimeout(() => {
+          window.location.href = '/admin';
+        }, 2000);
         return;
       }
       
