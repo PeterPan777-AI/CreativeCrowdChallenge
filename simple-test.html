@@ -1119,7 +1119,71 @@
       </div>
       
       <div class="card">
+        <h3>User Engagement Metrics</h3>
+        <div id="engagement-metrics" class="metrics-container">
+          <!-- Metrics will be populated dynamically -->
+        </div>
+        <div id="engagement-chart" class="chart-container">
+          <!-- Canvas will be created dynamically -->
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>Traffic Sources</h3>
+        <div class="dual-container">
+          <div id="sources-chart" class="chart-container">
+            <!-- Canvas will be created dynamically -->
+          </div>
+          <div class="engagement-stats-container">
+            <div class="engagement-stat">
+              <h4>Most Active Time</h4>
+              <div id="peak-time" class="stat-large">2pm - 6pm</div>
+              <div class="trend-indicator trend-up">+12% from last period</div>
+            </div>
+            <div class="engagement-stat">
+              <h4>Avg. Session Duration</h4>
+              <div id="session-duration" class="stat-large">4.5 min</div>
+              <div class="trend-indicator trend-up">+0.8 min from last period</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>User Behavior Insights</h3>
+        <div class="insights-container">
+          <div class="insight-card">
+            <h4>Returning Users</h4>
+            <div class="insight-value" id="returning-users">68%</div>
+            <div class="insight-trend trend-up">+5% from last period</div>
+          </div>
+          <div class="insight-card">
+            <h4>Avg. Votes per User</h4>
+            <div class="insight-value" id="votes-per-user">8.2</div>
+            <div class="insight-trend trend-up">+1.4 from last period</div>
+          </div>
+          <div class="insight-card">
+            <h4>Submission Quality</h4>
+            <div class="insight-value" id="submission-quality">4.2★</div>
+            <div class="insight-trend trend-up">+0.3 from last period</div>
+          </div>
+          <div class="insight-card">
+            <h4>User Retention</h4>
+            <div class="insight-value" id="user-retention">71%</div>
+            <div class="insight-trend trend-up">+7% from last period</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
         <h3>Engagement Timeline</h3>
+        <div class="timeline-filters">
+          <select id="timeline-period" onchange="loadBusinessAnalytics()">
+            <option value="7days">Last 7 days</option>
+            <option value="30days" selected>Last 30 days</option>
+            <option value="90days">Last 90 days</option>
+          </select>
+        </div>
         <div id="timeline-chart" class="chart-container">
           <!-- Canvas will be created dynamically -->
         </div>
@@ -1134,6 +1198,129 @@
         </div>
       </div>
     </div>
+    
+    <style>
+      /* Enhanced Analytics Styles */
+      .metrics-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+      
+      .metric-card {
+        display: flex;
+        align-items: center;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 15px;
+        flex: 1;
+        min-width: 200px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      
+      .dual-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+      
+      .dual-container .chart-container {
+        flex: 2;
+        min-width: 300px;
+      }
+      
+      .engagement-stats-container {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .engagement-stat {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      
+      .engagement-stat h4 {
+        margin: 0 0 10px 0;
+        color: #64748b;
+        font-size: 14px;
+      }
+      
+      .stat-large {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+      
+      .trend-indicator {
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+      }
+      
+      .insights-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 10px;
+      }
+      
+      .insight-card {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      
+      .insight-card h4 {
+        margin: 0 0 10px 0;
+        color: #64748b;
+        font-size: 14px;
+      }
+      
+      .insight-value {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+      
+      .insight-trend {
+        font-size: 12px;
+      }
+      
+      .timeline-filters {
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      
+      .timeline-filters select {
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+        font-size: 14px;
+      }
+      
+      @media (max-width: 768px) {
+        .dual-container {
+          flex-direction: column;
+        }
+        
+        .metrics-container {
+          flex-direction: column;
+        }
+        
+        .insights-container {
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+      }
+    </style>
     
     <!-- Competition Details Screen (hidden by default) -->
     <div id="competition-details-screen" class="screen">
@@ -2337,6 +2524,8 @@
     let competitionsChart;
     let demographicsChart;
     let timelineChart;
+    let engagementChart;
+    let sourcesChart;
     let analyticsData = null;
     
     // Helper function to reset canvas for chart reuse
