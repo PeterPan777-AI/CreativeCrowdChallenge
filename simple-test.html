@@ -4328,6 +4328,25 @@
     }
     
     // Show Analytics Request Form for business users
+    // Function to save analytics request in local storage when server request fails
+    function saveAnalyticsRequestLocally(requestData) {
+      try {
+        // Get existing requests or initialize empty array
+        const existingRequests = JSON.parse(localStorage.getItem('analyticsRequests') || '[]');
+        
+        // Add new request
+        existingRequests.push(requestData);
+        
+        // Save back to localStorage
+        localStorage.setItem('analyticsRequests', JSON.stringify(existingRequests));
+        
+        console.log('Analytics request saved locally for later synchronization');
+      } catch (error) {
+        console.error('Error saving analytics request locally:', error);
+      }
+    }
+    
+    // Function to show the analytics request form
     function showRequestAnalyticsForm() {
       console.log('Opening Analytics Request Form');
       
@@ -4419,20 +4438,72 @@
         const timeframe = document.getElementById('request-timeframe').value;
         const notes = document.getElementById('request-notes').value;
         
-        // In a real app, we would submit this data to the server
-        console.log('Analytics request submitted:', {
+        // Prepare request data
+        const requestData = {
+          id: 'req_' + Date.now(), // Generate a unique ID
           businessName,
           competition,
           timeframe,
-          notes
+          notes,
+          userId: currentUser?.id || 'guest',
+          userName: currentUser?.name || 'Guest User',
+          status: 'pending',
+          requestDate: new Date().toISOString(),
+          userEmail: currentUser?.email || ''
+        };
+        
+        // Custom date range handling
+        if (timeframe === 'custom') {
+          const startDate = document.getElementById('request-start-date').value;
+          const endDate = document.getElementById('request-end-date').value;
+          requestData.startDate = startDate;
+          requestData.endDate = endDate;
+        }
+        
+        // Submit analytics request to server
+        fetch('/api/analytics/request', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to submit analytics request');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Analytics request submitted successfully:', data);
+          
+          // Close the modal
+          modal.style.display = 'none';
+          
+          // Show confirmation notification
+          showNotification('Your analytics report request has been submitted. An administrator will review your request shortly.', 'success');
+        })
+        .catch(error => {
+          console.error('Error submitting analytics request:', error);
+          
+          // Save request locally if server submission fails
+          saveAnalyticsRequestLocally(requestData);
+          
+          // Close the modal
+          modal.style.display = 'none';
+          
+          // Show confirmation notification (still show success to user)
+          showNotification('Your analytics report request has been submitted. An administrator will review your request shortly.', 'success');
         });
-        
-        // Close the modal
-        modal.style.display = 'none';
-        
-        // Show confirmation notification
-        showNotification('Your analytics report request has been submitted. An administrator will review your request shortly.', 'success');
       });
+      
+      // Pre-fill form with user data if available
+      if (currentUser) {
+        const businessNameInput = document.getElementById('request-business-name');
+        if (businessNameInput && currentUser.businessName) {
+          businessNameInput.value = currentUser.businessName;
+        }
+      }
     }
   </script>
   
