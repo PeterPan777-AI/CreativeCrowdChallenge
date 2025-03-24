@@ -1706,8 +1706,10 @@
       
       // Special case for competition details to add back button
       if (fullScreenName === 'competition-details-screen') {
+        // Get the last screen the user was on (either individual or business)
+        const lastScreen = localStorage.getItem('lastCompetitionScreen') || 'individual';
         document.getElementById('main-header').innerHTML = `
-          <button class="back-button" onclick="showScreen('competitions')">
+          <button class="back-button" onclick="showScreen('${lastScreen}')">
             <span class="back-icon">←</span> Back
           </button>
           <h1>Competition Details</h1>
@@ -1737,6 +1739,12 @@
       if (screenName !== 'competition-details-screen') {
         // Get base screen name without -screen suffix
         const baseScreenName = screenName.replace('-screen', '');
+        
+        // If this is an individual or business screen, remember it for back button purposes
+        if (baseScreenName === 'individual' || baseScreenName === 'business') {
+          localStorage.setItem('lastCompetitionScreen', baseScreenName);
+        }
+        
         document.querySelectorAll('.tab').forEach(tab => {
           if (tab.getAttribute('data-screen') === baseScreenName) {
             tab.classList.add('active');
