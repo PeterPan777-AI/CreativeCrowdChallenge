@@ -6,21 +6,21 @@ const path = require('path');
 const server = http.createServer((req, res) => {
   console.log(`Request received: ${req.url}`);
   
-  // Always serve standalone.html regardless of the URL
-  const filePath = path.join(__dirname, 'standalone.html');
+  // Always serve basic.html regardless of the URL
+  const filePath = path.join(__dirname, 'basic.html');
   
   // Read the HTML file
   fs.readFile(filePath, (err, content) => {
     if (err) {
       console.error(`Error reading file: ${err}`);
       
-      // If file cannot be read, send error response
+      // If file cannot be read, send error response with detailed error
       res.writeHead(500);
-      res.end(`Error: ${err.message}`);
+      res.end(`Error reading file: ${err.message}. Path attempted: ${filePath}`);
       return;
     }
     
-    console.log('Serving standalone.html...');
+    console.log(`Serving basic.html... (File size: ${content.length} bytes)`);
     
     // Set content type and serve the HTML
     res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -34,5 +34,6 @@ const PORT = 5000;
 // Start the server
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${PORT}/`);
-  console.log('Open this URL in your browser to see the standalone page');
+  console.log(`Server base directory: ${__dirname}`);
+  console.log(`Serving basic.html from: ${path.join(__dirname, 'basic.html')}`);
 });
