@@ -254,6 +254,38 @@
     .request-actions {
       display: flex;
       justify-content: flex-end;
+      gap: 8px;
+    }
+    
+    /* Action buttons styling */
+    .approve-btn, .view-btn {
+      background-color: #10B981;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    
+    .approve-btn:hover, .view-btn:hover {
+      background-color: #059669;
+    }
+    
+    .decline-btn, .revoke-btn {
+      background-color: #EF4444;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    
+    .decline-btn:hover, .revoke-btn:hover {
+      background-color: #DC2626;
     }
     
     /* Error and info messages */

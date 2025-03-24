@@ -158,7 +158,44 @@ const parseRequestBody = (req) => {
 
 // Sample mock data for when Supabase is unavailable
 // In-memory storage for analytics requests
-let analyticsRequests = [];
+let analyticsRequests = [
+  {
+    id: 'analytics-req-1',
+    userId: 'mock-user-id-business',
+    userEmail: 'business@example.com',
+    competitionIds: ['mock-comp-1'],
+    timeFrame: 'Last 30 days',
+    description: 'Need insights on participant demographics and engagement metrics',
+    status: 'pending',
+    createdAt: '2025-03-23T10:15:00Z',
+    updatedAt: null,
+    adminNotes: null
+  },
+  {
+    id: 'analytics-req-2',
+    userId: 'mock-user-id-business',
+    userEmail: 'business@example.com',
+    competitionIds: ['mock-comp-2'],
+    timeFrame: 'Last 60 days',
+    description: 'Analyzing conversion rates and participant quality',
+    status: 'approved',
+    createdAt: '2025-03-20T09:30:00Z',
+    updatedAt: '2025-03-21T14:45:00Z',
+    adminNotes: 'Approved by administrator'
+  },
+  {
+    id: 'analytics-req-3',
+    userId: 'mock-user-id-business',
+    userEmail: 'business@example.com',
+    competitionIds: [],
+    timeFrame: 'Last 90 days',
+    description: 'Comprehensive platform performance analysis',
+    status: 'declined',
+    createdAt: '2025-03-18T16:20:00Z',
+    updatedAt: '2025-03-19T11:10:00Z',
+    adminNotes: 'Request too broad, please specify competitions'
+  }
+];
 
 const MOCK_DATA = {
   competitions: [
