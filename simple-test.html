@@ -508,7 +508,6 @@
       <div class="tab" data-screen="competitions">Competitions</div>
       <div class="tab" data-screen="submit">Submit</div>
       <div class="tab" data-screen="profile">Profile</div>
-      <div class="tab" data-screen="analytics">Analytics</div>
     </div>
     
     <!-- Home Screen -->
@@ -770,6 +769,15 @@
             <div style="margin-top: 15px;">
               <button onclick="alert('View submission details')">View Details</button>
             </div>
+          </div>
+        </div>
+        
+        <!-- Back Office Section (only for business/admin) -->
+        <div id="back-office-section" style="display: none;" class="card">
+          <h3>Back Office</h3>
+          <p>Access your business tools and analytics.</p>
+          <div style="margin-top: 15px;">
+            <button onclick="showScreen('analytics-screen')">Analytics Dashboard</button>
           </div>
         </div>
         
@@ -1107,13 +1115,20 @@
           userName = data.user.user_metadata.full_name;
         }
         
+        // Get user role (in a real app, this would come from server)
+        // For demo, we'll use a simple rule based on email:
+        const isAdmin = email.includes('admin');
+        const isBusiness = email.includes('business') || email === 'demo@example.com';
+        const userRole = isAdmin ? 'admin' : (isBusiness ? 'business' : 'user');
+        
         currentUser = {
           name: userName,
           email: email,
           memberSince: 'March 2025',
           submissions: 5,
           awards: 2,
-          votesCast: 12
+          votesCast: 12,
+          role: userRole
         };
         
         // Save session to localStorage
@@ -1172,13 +1187,19 @@
         console.log('Registration successful', data);
         isLoggedIn = true;
         
+        // Determine user role based on email (for demo purposes)
+        const isAdmin = email.includes('admin');
+        const isBusiness = email.includes('business') || email === 'demo@example.com';
+        const userRole = isAdmin ? 'admin' : (isBusiness ? 'business' : 'user');
+        
         currentUser = {
           name: name,
           email: email,
           memberSince: 'March 2025',
           submissions: 0,
           awards: 0,
-          votesCast: 0
+          votesCast: 0,
+          role: userRole
         };
         
         // Save session to localStorage
@@ -1211,9 +1232,25 @@
       if (isLoggedIn) {
         document.getElementById('profile-logged-out').style.display = 'none';
         document.getElementById('profile-logged-in').style.display = 'block';
+        
+        // Show or hide back office based on user role
+        const backOfficeSection = document.getElementById('back-office-section');
+        if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'business')) {
+          backOfficeSection.style.display = 'block';
+          console.log('Showing back office for user role:', currentUser.role);
+        } else {
+          backOfficeSection.style.display = 'none';
+          console.log('Hiding back office for regular user');
+        }
       } else {
         document.getElementById('profile-logged-out').style.display = 'block';
         document.getElementById('profile-logged-in').style.display = 'none';
+        
+        // Hide back office when logged out
+        const backOfficeSection = document.getElementById('back-office-section');
+        if (backOfficeSection) {
+          backOfficeSection.style.display = 'none';
+        }
       }
     }
     
