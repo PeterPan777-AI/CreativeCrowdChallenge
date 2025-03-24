@@ -385,6 +385,81 @@
       font-weight: bold;
     }
 
+    /* Analytics styles */
+    .chart-container {
+      position: relative;
+      margin: 20px 0;
+      height: 300px;
+    }
+    
+    .analytics-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    
+    .analytics-table th, 
+    .analytics-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    
+    .analytics-table th {
+      background-color: #F9FAFB;
+      font-weight: 600;
+    }
+    
+    .analytics-table tr:hover {
+      background-color: #F9FAFB;
+    }
+    
+    .metric-card {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .metric-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #EBF5FF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 20px;
+      color: #3B82F6;
+    }
+    
+    .metric-info {
+      flex: 1;
+    }
+    
+    .metric-label {
+      font-size: 14px;
+      color: #6B7280;
+      margin-bottom: 5px;
+    }
+    
+    .metric-value {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    
+    .trend-up {
+      color: #10B981;
+    }
+    
+    .trend-down {
+      color: #EF4444;
+    }
+    
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .container {
@@ -403,6 +478,19 @@
         min-width: calc(50% - 20px);
         margin-bottom: 10px;
       }
+      
+      .chart-container {
+        height: 250px;
+      }
+      
+      .analytics-table {
+        font-size: 14px;
+      }
+      
+      .analytics-table th, 
+      .analytics-table td {
+        padding: 8px;
+      }
     }
   </style>
 </head>
@@ -420,6 +508,7 @@
       <div class="tab" data-screen="competitions">Competitions</div>
       <div class="tab" data-screen="submit">Submit</div>
       <div class="tab" data-screen="profile">Profile</div>
+      <div class="tab" data-screen="analytics">Analytics</div>
     </div>
     
     <!-- Home Screen -->
@@ -688,6 +777,105 @@
       </div>
     </div>
     
+    <!-- Analytics Screen -->
+    <div id="analytics-screen" class="screen">
+      <div class="card">
+        <h2>Business Analytics</h2>
+        <p>Track engagement and performance for your competitions.</p>
+        
+        <div id="business-selector-container" class="form-group">
+          <label for="business-selector">Select Business</label>
+          <select id="business-selector" onchange="loadBusinessAnalytics()">
+            <option value="mock-business-1">TechCreate Solutions</option>
+            <option value="mock-business-2">EcoDesign Innovations</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="stats-container">
+        <div class="stat-box">
+          <div class="stat-value" id="total-competitions">3</div>
+          <div class="stat-label">Total Competitions</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="total-submissions">42</div>
+          <div class="stat-label">Total Submissions</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="total-views">1.2k</div>
+          <div class="stat-label">Total Views</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="avg-engagement">32%</div>
+          <div class="stat-label">Avg. Engagement</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>Competition Performance</h3>
+        <div class="chart-container">
+          <canvas id="competitions-chart" width="400" height="200"></canvas>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>Demographic Breakdown</h3>
+        <div class="chart-container">
+          <canvas id="demographics-chart" width="400" height="200"></canvas>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>Submission Analytics</h3>
+        <table class="analytics-table">
+          <thead>
+            <tr>
+              <th>Competition</th>
+              <th>Submissions</th>
+              <th>Views</th>
+              <th>Engagement Rate</th>
+            </tr>
+          </thead>
+          <tbody id="analytics-table-body">
+            <tr>
+              <td>Logo Design Challenge</td>
+              <td>24</td>
+              <td>487</td>
+              <td>4.9%</td>
+            </tr>
+            <tr>
+              <td>Mobile App UI Challenge</td>
+              <td>12</td>
+              <td>295</td>
+              <td>4.1%</td>
+            </tr>
+            <tr>
+              <td>Marketing Campaign Concept</td>
+              <td>6</td>
+              <td>218</td>
+              <td>2.8%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="card">
+        <h3>Engagement Timeline</h3>
+        <div class="chart-container">
+          <canvas id="timeline-chart" width="400" height="200"></canvas>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>Export Options</h3>
+        <div style="display: flex; gap: 10px;">
+          <button onclick="exportAnalytics('csv')" class="secondary">Export as CSV</button>
+          <button onclick="exportAnalytics('pdf')" class="secondary">Export as PDF</button>
+          <button onclick="exportAnalytics('json')" class="secondary">Export Raw Data</button>
+        </div>
+      </div>
+    </div>
+    
     <!-- Competition Details Screen (hidden by default) -->
     <div id="competition-details-screen" class="screen">
       <div class="card">
@@ -777,6 +965,9 @@
   
   <!-- Notification -->
   <div id="notification" class="notification"></div>
+  
+  <!-- Include Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
     // Global state
@@ -1461,7 +1652,307 @@
           localStorage.removeItem('user');
         }
       }
+      
+      // Initialize analytics if user visits that tab
+      document.querySelector('.tab[data-screen="analytics"]').addEventListener('click', function() {
+        initializeAnalytics();
+      });
     });
+    
+    // Business Analytics Functions
+    let competitionsChart;
+    let demographicsChart;
+    let timelineChart;
+    let analyticsData = null;
+    
+    function initializeAnalytics() {
+      // Load analytics data
+      loadBusinessAnalytics();
+    }
+    
+    function loadBusinessAnalytics() {
+      const businessId = document.getElementById('business-selector').value;
+      
+      // Show loading state
+      document.getElementById('competitions-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
+      document.getElementById('demographics-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
+      document.getElementById('timeline-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
+      
+      // Call our API
+      fetch(`/api/analytics/business/${businessId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load analytics data');
+          }
+          return response.json();
+        })
+        .then(data => {
+          analyticsData = data;
+          displayAnalyticsData(data);
+        })
+        .catch(error => {
+          console.error('Error loading analytics data:', error);
+          showNotification('Failed to load analytics data. Using sample data.', 'error');
+          
+          // Load mock data if API fails
+          analyticsData = getMockAnalyticsData(businessId);
+          displayAnalyticsData(analyticsData);
+        });
+    }
+    
+    function displayAnalyticsData(data) {
+      // Update summary stats
+      document.getElementById('total-competitions').textContent = data.totalCompetitions;
+      document.getElementById('total-submissions').textContent = data.totalSubmissions;
+      document.getElementById('total-views').textContent = data.totalViews;
+      document.getElementById('avg-engagement').textContent = data.avgEngagement;
+      
+      // Update analytics table
+      const tableBody = document.getElementById('analytics-table-body');
+      tableBody.innerHTML = '';
+      
+      data.competitions.forEach(comp => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${comp.title}</td>
+          <td>${comp.submissions}</td>
+          <td>${comp.views}</td>
+          <td>${comp.engagementRate}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+      
+      // Create/update charts
+      createCompetitionsChart(data.competitions);
+      createDemographicsChart(data.demographics);
+      createTimelineChart(data.timeline);
+    }
+    
+    function createCompetitionsChart(competitions) {
+      const ctx = document.getElementById('competitions-chart').getContext('2d');
+      
+      if (competitionsChart) {
+        competitionsChart.destroy();
+      }
+      
+      competitionsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: competitions.map(comp => comp.title),
+          datasets: [{
+            label: 'Submissions',
+            data: competitions.map(comp => comp.submissions),
+            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 1
+          }, {
+            label: 'Views (divided by 10)',
+            data: competitions.map(comp => comp.views / 10),
+            backgroundColor: 'rgba(16, 185, 129, 0.6)',
+            borderColor: 'rgba(16, 185, 129, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+    
+    function createDemographicsChart(demographics) {
+      const ctx = document.getElementById('demographics-chart').getContext('2d');
+      
+      if (demographicsChart) {
+        demographicsChart.destroy();
+      }
+      
+      demographicsChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(demographics),
+          datasets: [{
+            data: Object.values(demographics),
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.6)',
+              'rgba(16, 185, 129, 0.6)',
+              'rgba(249, 115, 22, 0.6)',
+              'rgba(236, 72, 153, 0.6)',
+              'rgba(139, 92, 246, 0.6)'
+            ],
+            borderColor: [
+              'rgba(59, 130, 246, 1)',
+              'rgba(16, 185, 129, 1)',
+              'rgba(249, 115, 22, 1)',
+              'rgba(236, 72, 153, 1)',
+              'rgba(139, 92, 246, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+        }
+      });
+    }
+    
+    function createTimelineChart(timelineData) {
+      const ctx = document.getElementById('timeline-chart').getContext('2d');
+      
+      if (timelineChart) {
+        timelineChart.destroy();
+      }
+      
+      timelineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timelineData.dates,
+          datasets: [{
+            label: 'Submissions',
+            data: timelineData.submissions,
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 2,
+            tension: 0.4,
+            fill: true
+          }, {
+            label: 'Views',
+            data: timelineData.views,
+            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+            borderColor: 'rgba(16, 185, 129, 1)',
+            borderWidth: 2,
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+    
+    function exportAnalytics(format) {
+      if (!analyticsData) {
+        showNotification('No analytics data available to export', 'error');
+        return;
+      }
+      
+      switch(format) {
+        case 'csv':
+          exportCSV();
+          break;
+        case 'pdf':
+          showNotification('PDF export functionality coming soon!');
+          break;
+        case 'json':
+          exportJSON();
+          break;
+        default:
+          showNotification('Unknown export format', 'error');
+      }
+    }
+    
+    function exportCSV() {
+      // Create CSV content
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Competition,Submissions,Views,Engagement Rate\n";
+      
+      analyticsData.competitions.forEach(comp => {
+        csvContent += `${comp.title},${comp.submissions},${comp.views},${comp.engagementRate}\n`;
+      });
+      
+      // Create download link
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "analytics_export.csv");
+      document.body.appendChild(link);
+      
+      // Trigger download and cleanup
+      link.click();
+      document.body.removeChild(link);
+      
+      showNotification('Analytics exported as CSV');
+    }
+    
+    function exportJSON() {
+      // Create JSON content
+      const jsonContent = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(analyticsData, null, 2));
+      
+      // Create download link
+      const link = document.createElement("a");
+      link.setAttribute("href", jsonContent);
+      link.setAttribute("download", "analytics_export.json");
+      document.body.appendChild(link);
+      
+      // Trigger download and cleanup
+      link.click();
+      document.body.removeChild(link);
+      
+      showNotification('Analytics exported as JSON');
+    }
+    
+    function getMockAnalyticsData(businessId) {
+      // Mock data for business analytics
+      if (businessId === 'mock-business-1') {
+        return {
+          totalCompetitions: 3,
+          totalSubmissions: 42,
+          totalViews: '1.2k',
+          avgEngagement: '32%',
+          competitions: [
+            { title: 'Logo Design Challenge', submissions: 24, views: 487, engagementRate: '4.9%' },
+            { title: 'Marketing Campaign Concept', submissions: 18, views: 378, engagementRate: '4.8%' }
+          ],
+          demographics: {
+            '18-24': 25,
+            '25-34': 42,
+            '35-44': 18,
+            '45-54': 10,
+            '55+': 5
+          },
+          timeline: {
+            dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            submissions: [5, 12, 18, 23, 29, 42],
+            views: [120, 250, 380, 470, 580, 720]
+          }
+        };
+      } else {
+        return {
+          totalCompetitions: 1,
+          totalSubmissions: 12,
+          totalViews: '295',
+          avgEngagement: '24%',
+          competitions: [
+            { title: 'Mobile App UI Challenge', submissions: 12, views: 295, engagementRate: '4.1%' }
+          ],
+          demographics: {
+            '18-24': 32,
+            '25-34': 38,
+            '35-44': 15,
+            '45-54': 10,
+            '55+': 5
+          },
+          timeline: {
+            dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            submissions: [0, 0, 4, 7, 10, 12],
+            views: [0, 0, 90, 152, 217, 295]
+          }
+        };
+      }
+    }
     
     // Close modals when clicking outside
     window.addEventListener('click', function(event) {
