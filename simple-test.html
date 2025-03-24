@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>CreativeCrowdChallenge - Test App</title>
+  <title>CreativeCrowdChallenge - Web App</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
@@ -20,6 +20,7 @@
       color: white;
       padding: 20px;
       text-align: center;
+      position: relative;
     }
     
     /* Container */
@@ -47,10 +48,27 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 16px;
+      transition: background-color 0.2s;
     }
     
     button:hover {
       background-color: #2563EB;
+    }
+
+    button.secondary {
+      background-color: #6B7280;
+    }
+
+    button.secondary:hover {
+      background-color: #4B5563;
+    }
+
+    button.success {
+      background-color: #10B981;
+    }
+
+    button.success:hover {
+      background-color: #059669;
     }
     
     /* Tab navigation */
@@ -58,6 +76,8 @@
       display: flex;
       border-bottom: 1px solid #ddd;
       margin-bottom: 20px;
+      overflow-x: auto;
+      white-space: nowrap;
     }
     
     .tab {
@@ -80,10 +100,264 @@
     .screen.active {
       display: block;
     }
+
+    /* Form styles */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 100px;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 50px;
+      font-size: 12px;
+      background-color: #E5E7EB;
+      margin-right: 5px;
+    }
+
+    .badge.primary {
+      background-color: #DBEAFE;
+      color: #1E40AF;
+    }
+
+    .badge.success {
+      background-color: #D1FAE5;
+      color: #065F46;
+    }
+
+    /* Rating stars */
+    .rating {
+      display: flex;
+      margin: 10px 0;
+    }
+
+    .star {
+      color: #D1D5DB;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .star.filled {
+      color: #F59E0B;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6B7280;
+      padding: 0;
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      background-color: #10B981;
+      color: white;
+      border-radius: 4px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: none;
+      z-index: 1000;
+    }
+
+    /* Profile header */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #3B82F6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 28px;
+      margin-right: 20px;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    /* Competition details */
+    .competition-header {
+      position: relative;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #E5E7EB;
+      margin-bottom: 15px;
+    }
+
+    .competition-meta {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .meta-item {
+      margin-right: 20px;
+      font-size: 14px;
+      color: #6B7280;
+    }
+
+    /* Stats */
+    .stats-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      flex: 1;
+      min-width: 100px;
+      background-color: white;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      margin: 0 5px 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3B82F6;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #6B7280;
+    }
+
+    /* Back button */
+    .back-button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      position: absolute;
+      left: 20px;
+      top: 20px;
+    }
+
+    .back-icon {
+      margin-right: 5px;
+    }
+
+    /* Tab content */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Login form */
+    .auth-options {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .auth-option {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 2px solid #E5E7EB;
+    }
+
+    .auth-option.active {
+      border-bottom: 2px solid #3B82F6;
+      color: #3B82F6;
+      font-weight: bold;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .card {
+        padding: 15px;
+      }
+      
+      .tabs {
+        padding: 0 10px;
+      }
+      
+      .stat-box {
+        min-width: calc(50% - 20px);
+        margin-bottom: 10px;
+      }
+    }
   </style>
 </head>
 <body>
-  <header>
+  <header id="main-header">
     <h1>CreativeCrowdChallenge</h1>
     <p>Connect with creative competitions</p>
   </header>
@@ -94,6 +368,7 @@
     <div class="tabs">
       <div class="tab active" data-screen="home">Home</div>
       <div class="tab" data-screen="competitions">Competitions</div>
+      <div class="tab" data-screen="submit">Submit</div>
       <div class="tab" data-screen="profile">Profile</div>
     </div>
     
@@ -105,14 +380,32 @@
         <button onclick="showScreen('competitions')">Explore Competitions</button>
       </div>
       
+      <div class="stats-container">
+        <div class="stat-box">
+          <div class="stat-value">15</div>
+          <div class="stat-label">Active Competitions</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">256</div>
+          <div class="stat-label">Participants</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">42</div>
+          <div class="stat-label">Winners Crowned</div>
+        </div>
+      </div>
+      
       <div class="card">
         <h3>Popular Categories</h3>
-        <ul id="categories-list">
-          <li>Photography</li>
-          <li>Digital Art</li>
-          <li>Writing</li>
-          <li>Music</li>
-        </ul>
+        <div style="margin: 15px 0;">
+          <span class="badge primary">Photography</span>
+          <span class="badge primary">Digital Art</span>
+          <span class="badge primary">Writing</span>
+          <span class="badge primary">Music</span>
+          <span class="badge primary">Video</span>
+          <span class="badge primary">Graphic Design</span>
+        </div>
+        <button onclick="showCategorySuggestionModal()" class="secondary">Suggest a Category</button>
       </div>
     </div>
     
@@ -123,44 +416,334 @@
         <div id="competitions-list">
           <div class="card">
             <h3>Summer Photography Contest</h3>
+            <div class="competition-meta">
+              <div class="meta-item"><strong>Ends:</strong> Apr 15, 2025</div>
+              <div class="meta-item"><strong>Entries:</strong> 24</div>
+            </div>
             <p>Show your best summer shots and win prizes!</p>
-            <button onclick="alert('Competition details would open here')">View Details</button>
+            <div>
+              <span class="badge primary">Photography</span>
+              <span class="badge success">Cash Prize</span>
+            </div>
+            <div style="margin-top: 15px;">
+              <button onclick="showCompetitionDetails('photo-contest')">View Details</button>
+            </div>
           </div>
           <div class="card">
             <h3>Creative Writing Challenge</h3>
+            <div class="competition-meta">
+              <div class="meta-item"><strong>Ends:</strong> Apr 30, 2025</div>
+              <div class="meta-item"><strong>Entries:</strong> 18</div>
+            </div>
             <p>Write a short story on the theme "New Beginnings"</p>
-            <button onclick="alert('Competition details would open here')">View Details</button>
+            <div>
+              <span class="badge primary">Writing</span>
+              <span class="badge success">Featured Publication</span>
+            </div>
+            <div style="margin-top: 15px;">
+              <button onclick="showCompetitionDetails('writing-challenge')">View Details</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Melody Makers Music Competition</h3>
+            <div class="competition-meta">
+              <div class="meta-item"><strong>Ends:</strong> May 10, 2025</div>
+              <div class="meta-item"><strong>Entries:</strong> 7</div>
+            </div>
+            <p>Compose an original 2-minute piece in any genre</p>
+            <div>
+              <span class="badge primary">Music</span>
+              <span class="badge success">Studio Time</span>
+            </div>
+            <div style="margin-top: 15px;">
+              <button onclick="showCompetitionDetails('music-competition')">View Details</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
     
+    <!-- Submit Screen -->
+    <div id="submit-screen" class="screen">
+      <div class="card">
+        <h2>Submit Your Entry</h2>
+        <p>Select a competition and submit your creative work.</p>
+        
+        <form id="submission-form">
+          <div class="form-group">
+            <label for="competition-select">Select Competition</label>
+            <select id="competition-select" required>
+              <option value="">-- Select a competition --</option>
+              <option value="photo-contest">Summer Photography Contest</option>
+              <option value="writing-challenge">Creative Writing Challenge</option>
+              <option value="music-competition">Melody Makers Music Competition</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="submission-title">Title of Your Work</label>
+            <input type="text" id="submission-title" placeholder="Give your submission a title" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="submission-description">Description</label>
+            <textarea id="submission-description" placeholder="Tell us about your work..." required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="submission-file">Upload Your Work</label>
+            <input type="file" id="submission-file">
+            <p style="font-size: 14px; color: #6B7280; margin-top: 5px;">Max file size: 10MB. Supported formats depend on the competition category.</p>
+          </div>
+          
+          <div class="form-group">
+            <button type="button" onclick="submitEntry()" class="success">Submit Entry</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
     <!-- Profile Screen -->
     <div id="profile-screen" class="screen">
+      <div id="profile-logged-out">
+        <div class="card">
+          <h2>Login or Register</h2>
+          
+          <div class="auth-options">
+            <div class="auth-option active" onclick="showAuthTab('login')">Login</div>
+            <div class="auth-option" onclick="showAuthTab('register')">Register</div>
+          </div>
+          
+          <div id="login-tab" class="tab-content active">
+            <form id="login-form">
+              <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" placeholder="your@email.com" required>
+              </div>
+              <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Your password" required>
+              </div>
+              <div class="form-group">
+                <button type="button" onclick="login()">Login</button>
+              </div>
+            </form>
+          </div>
+          
+          <div id="register-tab" class="tab-content">
+            <form id="register-form">
+              <div class="form-group">
+                <label for="register-name">Full Name</label>
+                <input type="text" id="register-name" placeholder="Your name" required>
+              </div>
+              <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" placeholder="your@email.com" required>
+              </div>
+              <div class="form-group">
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password" placeholder="Choose a password" required>
+              </div>
+              <div class="form-group">
+                <button type="button" onclick="register()">Register</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <div id="profile-logged-in" style="display: none;">
+        <div class="profile-header">
+          <div class="profile-avatar">DU</div>
+          <div class="profile-info">
+            <h2>Demo User</h2>
+            <p>Member since March 2023</p>
+          </div>
+        </div>
+        
+        <div class="stats-container">
+          <div class="stat-box">
+            <div class="stat-value">5</div>
+            <div class="stat-label">Submissions</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">2</div>
+            <div class="stat-label">Awards</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">12</div>
+            <div class="stat-label">Votes Cast</div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h3>My Submissions</h3>
+          <div class="card">
+            <h4>Sunset at the Beach</h4>
+            <div class="competition-meta">
+              <div class="meta-item"><strong>Competition:</strong> Summer Photography Contest</div>
+              <div class="meta-item"><strong>Status:</strong> Under Review</div>
+            </div>
+            <button onclick="alert('View submission details')">View Details</button>
+          </div>
+          <div class="card">
+            <h4>New Day Rising</h4>
+            <div class="competition-meta">
+              <div class="meta-item"><strong>Competition:</strong> Creative Writing Challenge</div>
+              <div class="meta-item"><strong>Status:</strong> Runner-up</div>
+            </div>
+            <button onclick="alert('View submission details')">View Details</button>
+          </div>
+        </div>
+        
+        <button onclick="logout()" class="secondary">Logout</button>
+      </div>
+    </div>
+    
+    <!-- Competition Details Screen (hidden by default) -->
+    <div id="competition-details-screen" class="screen">
       <div class="card">
-        <h2>User Profile</h2>
-        <p><strong>Name:</strong> Demo User</p>
-        <p><strong>Member Since:</strong> March 2023</p>
-        <p><strong>Competitions Entered:</strong> 5</p>
-        <p><strong>Achievements:</strong> 2 Runner-up awards</p>
-        <button onclick="alert('Login functionality would be here')">Login/Register</button>
+        <div class="competition-header">
+          <h2 id="competition-title">Competition Title</h2>
+          <div class="competition-meta">
+            <div class="meta-item"><strong>Deadline:</strong> <span id="competition-deadline">April 15, 2025</span></div>
+            <div class="meta-item"><strong>Entries:</strong> <span id="competition-entries">24</span></div>
+          </div>
+          <div id="competition-categories">
+            <span class="badge primary">Category</span>
+          </div>
+        </div>
+        
+        <div id="competition-description">
+          <p>Competition description will appear here.</p>
+        </div>
+        
+        <h3>Prizes</h3>
+        <ul id="competition-prizes">
+          <li>First place: $100</li>
+          <li>Runner-up: $50</li>
+        </ul>
+        
+        <h3>Rules</h3>
+        <ul id="competition-rules">
+          <li>All submissions must be original work</li>
+          <li>One submission per participant</li>
+        </ul>
+        
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+          <button onclick="showScreen('submit')">Submit Entry</button>
+          <button onclick="showScreen('competitions')" class="secondary">Back to List</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>Top Submissions</h3>
+        <div id="submissions-list">
+          <p>Submissions will be displayed once the competition has ended.</p>
+        </div>
       </div>
     </div>
   </div>
+  
+  <!-- Modals -->
+  <div id="category-suggestion-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Suggest a Category</h3>
+        <button class="close-modal" onclick="closeCategorySuggestionModal()">&times;</button>
+      </div>
+      <form id="category-suggestion-form">
+        <div class="form-group">
+          <label for="category-name">Category Name</label>
+          <input type="text" id="category-name" placeholder="e.g., Animation" required>
+        </div>
+        <div class="form-group">
+          <label for="category-description">Why should we add this category?</label>
+          <textarea id="category-description" placeholder="Tell us about this creative category..." required></textarea>
+        </div>
+        <div class="form-group">
+          <button type="button" onclick="submitCategorySuggestion()">Submit Suggestion</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Notification -->
+  <div id="notification" class="notification"></div>
 
   <script>
+    // Global state
+    let isLoggedIn = false;
+    let currentUser = null;
+    
+    // Competitions data (mock)
+    const competitions = {
+      'photo-contest': {
+        title: 'Summer Photography Contest',
+        deadline: 'April 15, 2025',
+        entries: 24,
+        categories: ['Photography'],
+        description: 'Capture the essence of summer in a single photograph. We\'re looking for vibrant colors, creative compositions, and images that tell a story about summer activities, nature, or emotions.',
+        prizes: [
+          'First place: $250 + Featured exhibition',
+          'Second place: $100',
+          'Third place: $50',
+          'People\'s Choice: Professional camera accessory kit'
+        ],
+        rules: [
+          'Images must be taken within the last 12 months',
+          'Basic editing allowed (color correction, cropping)',
+          'No AI-generated images or extensive compositing',
+          'Maximum file size: 8MB, formats: JPG, PNG',
+          'One submission per participant'
+        ]
+      },
+      'writing-challenge': {
+        title: 'Creative Writing Challenge',
+        deadline: 'April 30, 2025',
+        entries: 18,
+        categories: ['Writing'],
+        description: 'Write a short story on the theme "New Beginnings." Explore what new beginnings mean to you or your characters. This could be about starting a new chapter in life, rebirth, transformation, or any interpretation that inspires you.',
+        prizes: [
+          'First place: Publication in Literary Magazine + $150',
+          'Second place: $75',
+          'Third place: $25',
+          'All finalists: Online anthology inclusion'
+        ],
+        rules: [
+          'Word count: 1,500-3,000 words',
+          'Must be original and unpublished work',
+          'Plain text or PDF submissions only',
+          'One submission per participant',
+          'Judging based on creativity, writing quality, and theme interpretation'
+        ]
+      },
+      'music-competition': {
+        title: 'Melody Makers Music Competition',
+        deadline: 'May 10, 2025',
+        entries: 7,
+        categories: ['Music'],
+        description: 'Compose an original 2-minute piece in any genre. Show your musical creativity without boundaries - whether you prefer classical compositions, electronic beats, folk tunes, or experimental soundscapes.',
+        prizes: [
+          'First place: 8 hours of professional studio time + $200',
+          'Second place: $100 + Professional mixing of your track',
+          'Third place: $50 + Online feature',
+          'All finalists: Inclusion in competition playlist'
+        ],
+        rules: [
+          'Composition must be original',
+          'Duration: 1-3 minutes',
+          'All genres accepted',
+          'MP3 or WAV format only',
+          'No copyrighted samples unless you have rights',
+          'One submission per participant'
+        ]
+      }
+    };
+    
     // Tab functionality
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', function() {
-        // Remove active class from all tabs
-        document.querySelectorAll('.tab').forEach(t => {
-          t.classList.remove('active');
-        });
-        
-        // Add active class to clicked tab
-        this.classList.add('active');
-        
-        // Show corresponding screen
         const screenName = this.getAttribute('data-screen');
         showScreen(screenName);
       });
@@ -168,6 +751,21 @@
     
     // Function to show a specific screen
     function showScreen(screenName) {
+      // Special case for competition details to add back button
+      if (screenName === 'competition-details') {
+        document.getElementById('main-header').innerHTML = `
+          <button class="back-button" onclick="showScreen('competitions')">
+            <span class="back-icon">←</span> Back
+          </button>
+          <h1>Competition Details</h1>
+        `;
+      } else {
+        document.getElementById('main-header').innerHTML = `
+          <h1>CreativeCrowdChallenge</h1>
+          <p>Connect with creative competitions</p>
+        `;
+      }
+    
       // Hide all screens
       document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
@@ -176,21 +774,245 @@
       // Show the requested screen
       document.getElementById(screenName + '-screen').classList.add('active');
       
-      // Update the active tab
-      document.querySelectorAll('.tab').forEach(tab => {
-        if (tab.getAttribute('data-screen') === screenName) {
+      // Update the active tab (except for competition details which isn't a tab)
+      if (screenName !== 'competition-details') {
+        document.querySelectorAll('.tab').forEach(tab => {
+          if (tab.getAttribute('data-screen') === screenName) {
+            tab.classList.add('active');
+          } else {
+            tab.classList.remove('active');
+          }
+        });
+      }
+      
+      // Special handling for profile screen
+      if (screenName === 'profile') {
+        updateProfileView();
+      }
+      
+      console.log('Showing screen:', screenName);
+    }
+    
+    // Function to show competition details
+    function showCompetitionDetails(competitionId) {
+      const competition = competitions[competitionId];
+      
+      if (!competition) {
+        showNotification('Competition not found', 'error');
+        return;
+      }
+      
+      // Fill in competition details
+      document.getElementById('competition-title').textContent = competition.title;
+      document.getElementById('competition-deadline').textContent = competition.deadline;
+      document.getElementById('competition-entries').textContent = competition.entries;
+      
+      // Categories
+      const categoriesContainer = document.getElementById('competition-categories');
+      categoriesContainer.innerHTML = '';
+      competition.categories.forEach(category => {
+        const badge = document.createElement('span');
+        badge.className = 'badge primary';
+        badge.textContent = category;
+        categoriesContainer.appendChild(badge);
+      });
+      
+      // Description
+      document.getElementById('competition-description').innerHTML = `<p>${competition.description}</p>`;
+      
+      // Prizes
+      const prizesList = document.getElementById('competition-prizes');
+      prizesList.innerHTML = '';
+      competition.prizes.forEach(prize => {
+        const li = document.createElement('li');
+        li.textContent = prize;
+        prizesList.appendChild(li);
+      });
+      
+      // Rules
+      const rulesList = document.getElementById('competition-rules');
+      rulesList.innerHTML = '';
+      competition.rules.forEach(rule => {
+        const li = document.createElement('li');
+        li.textContent = rule;
+        rulesList.appendChild(li);
+      });
+      
+      // Show the screen
+      showScreen('competition-details');
+    }
+    
+    // Auth tab functionality
+    function showAuthTab(tabName) {
+      document.querySelectorAll('.auth-option').forEach(tab => {
+        if (tab.textContent.toLowerCase() === tabName) {
           tab.classList.add('active');
         } else {
           tab.classList.remove('active');
         }
       });
       
-      console.log('Showing screen:', screenName);
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      document.getElementById(tabName + '-tab').classList.add('active');
+    }
+    
+    // Login function
+    function login() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      
+      if (!email || !password) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+      }
+      
+      // Simulate login (would connect to Supabase in real app)
+      isLoggedIn = true;
+      currentUser = {
+        name: 'Demo User',
+        email: email,
+        memberSince: 'March 2023',
+        submissions: 5,
+        awards: 2,
+        votesCast: 12
+      };
+      
+      showNotification('Login successful!');
+      updateProfileView();
+    }
+    
+    // Register function
+    function register() {
+      const name = document.getElementById('register-name').value;
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+      
+      if (!name || !email || !password) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+      }
+      
+      // Simulate registration (would connect to Supabase in real app)
+      isLoggedIn = true;
+      currentUser = {
+        name: name,
+        email: email,
+        memberSince: 'March 2025',
+        submissions: 0,
+        awards: 0,
+        votesCast: 0
+      };
+      
+      showNotification('Registration successful!');
+      updateProfileView();
+    }
+    
+    // Logout function
+    function logout() {
+      isLoggedIn = false;
+      currentUser = null;
+      updateProfileView();
+      showNotification('Logged out successfully');
+    }
+    
+    // Update profile view based on auth state
+    function updateProfileView() {
+      if (isLoggedIn) {
+        document.getElementById('profile-logged-out').style.display = 'none';
+        document.getElementById('profile-logged-in').style.display = 'block';
+      } else {
+        document.getElementById('profile-logged-out').style.display = 'block';
+        document.getElementById('profile-logged-in').style.display = 'none';
+      }
+    }
+    
+    // Show category suggestion modal
+    function showCategorySuggestionModal() {
+      document.getElementById('category-suggestion-modal').style.display = 'flex';
+    }
+    
+    // Close category suggestion modal
+    function closeCategorySuggestionModal() {
+      document.getElementById('category-suggestion-modal').style.display = 'none';
+    }
+    
+    // Submit category suggestion
+    function submitCategorySuggestion() {
+      const categoryName = document.getElementById('category-name').value;
+      const description = document.getElementById('category-description').value;
+      
+      if (!categoryName || !description) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+      }
+      
+      // Would connect to Supabase in real app
+      showNotification('Category suggestion submitted successfully!');
+      closeCategorySuggestionModal();
+      
+      // Reset form
+      document.getElementById('category-name').value = '';
+      document.getElementById('category-description').value = '';
+    }
+    
+    // Submit entry
+    function submitEntry() {
+      const competitionId = document.getElementById('competition-select').value;
+      const title = document.getElementById('submission-title').value;
+      const description = document.getElementById('submission-description').value;
+      const file = document.getElementById('submission-file').files[0];
+      
+      if (!competitionId || !title || !description) {
+        showNotification('Please fill in all required fields', 'error');
+        return;
+      }
+      
+      if (!isLoggedIn) {
+        showNotification('Please log in to submit your entry', 'error');
+        showScreen('profile');
+        return;
+      }
+      
+      // Would connect to Supabase in real app
+      showNotification('Entry submitted successfully!');
+      
+      // Reset form
+      document.getElementById('competition-select').value = '';
+      document.getElementById('submission-title').value = '';
+      document.getElementById('submission-description').value = '';
+      document.getElementById('submission-file').value = '';
+    }
+    
+    // Show notification
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.style.display = 'block';
+      
+      if (type === 'error') {
+        notification.style.backgroundColor = '#EF4444';
+      } else {
+        notification.style.backgroundColor = '#10B981';
+      }
+      
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 3000);
     }
     
     // Log when page loads
     window.addEventListener('load', function() {
-      console.log('Test app loaded successfully!');
+      console.log('CreativeCrowdChallenge app loaded successfully!');
+    });
+    
+    // Close modals when clicking outside
+    window.addEventListener('click', function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+      }
     });
   </script>
 </body>
