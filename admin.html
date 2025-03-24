@@ -615,10 +615,11 @@
           // Group requests by status
           const pendingRequests = requests.filter(req => req.status === 'pending');
           const approvedRequests = requests.filter(req => req.status === 'approved');
+          const declinedRequests = requests.filter(req => req.status === 'declined');
           
           // Update badges
           pendingHeader.innerHTML = `New Requests <span class="badge">${pendingRequests.length}</span>`;
-          approvedHeader.innerHTML = `Approved Requests <span class="badge">${approvedRequests.length}</span>`;
+          approvedHeader.innerHTML = `Approved & Declined Requests <span class="badge">${approvedRequests.length + declinedRequests.length}</span>`;
           
           // No pending requests message
           if (pendingRequests.length === 0) {
@@ -647,6 +648,12 @@
             approvedContainer.appendChild(requestCard);
           });
           
+          // Display declined requests
+          declinedRequests.forEach(request => {
+            const requestCard = createRequestCard(request, 'declined');
+            approvedContainer.appendChild(requestCard);
+          });
+          
         } catch (error) {
           console.error('Error loading analytics requests:', error);
           showNotification('Failed to load analytics requests: ' + error.message, 'error');
@@ -662,7 +669,14 @@
       // Create a request card element
       function createRequestCard(request, type) {
         const requestCard = document.createElement('div');
-        requestCard.className = 'request-card' + (type === 'approved' ? ' approved' : '');
+        // Add appropriate class based on status
+        if (type === 'approved') {
+          requestCard.className = 'request-card approved';
+        } else if (request.status === 'declined') {
+          requestCard.className = 'request-card declined';
+        } else {
+          requestCard.className = 'request-card';
+        }
         requestCard.id = `request-card-${request.id}`;
         
         // Format date
@@ -680,7 +694,18 @@
           competitionInfo = request.competitionIds[0];
         }
         
-        // Different content based on type (pending or approved)
+        // Format update date if available
+        let updateDate = 'Unknown date';
+        if (request.updatedAt) {
+          const date = new Date(request.updatedAt);
+          updateDate = date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+          });
+        }
+        
+        // Different content based on status
         if (type === 'pending') {
           requestCard.innerHTML = `
             <div class="request-header">
@@ -690,25 +715,14 @@
             <div class="request-details">
               <p><strong>Competition:</strong> ${competitionInfo}</p>
               <p><strong>Time Period:</strong> ${request.timeFrame}</p>
-              <p><strong>Notes:</strong> ${request.description}</p>
+              <p><strong>Notes:</strong> ${request.description || 'No additional notes'}</p>
             </div>
             <div class="request-actions">
               <button class="approve-btn" onclick="approveAnalyticsRequest('${request.id}')">Approve</button>
               <button class="decline-btn" onclick="declineAnalyticsRequest('${request.id}')">Decline</button>
             </div>
           `;
-        } else {
-          // Format approval date if available
-          let approvalDate = 'Unknown date';
-          if (request.updatedAt) {
-            const updateDate = new Date(request.updatedAt);
-            approvalDate = updateDate.toLocaleDateString('en-US', {
-              month: 'long',
-              day: 'numeric',
-              year: 'numeric'
-            });
-          }
-          
+        } else if (request.status === 'approved') {
           requestCard.innerHTML = `
             <div class="request-header">
               <h4>${request.userEmail || 'Unknown User'}</h4>
@@ -717,12 +731,28 @@
             <div class="request-details">
               <p><strong>Competition:</strong> ${competitionInfo}</p>
               <p><strong>Time Period:</strong> ${request.timeFrame}</p>
-              <p><strong>Status:</strong> Approved on ${approvalDate}</p>
+              <p><strong>Status:</strong> <span class="status-approved">Approved</span> on ${updateDate}</p>
               ${request.adminNotes ? `<p><strong>Admin Notes:</strong> ${request.adminNotes}</p>` : ''}
             </div>
             <div class="request-actions">
               <button class="view-btn" onclick="viewAnalyticsReport('${request.id}')">View Report</button>
               <button class="revoke-btn" onclick="revokeAnalyticsAccess('${request.id}')">Revoke Access</button>
+            </div>
+          `;
+        } else if (request.status === 'declined') {
+          requestCard.innerHTML = `
+            <div class="request-header">
+              <h4>${request.userEmail || 'Unknown User'}</h4>
+              <span class="request-date">${formattedDate}</span>
+            </div>
+            <div class="request-details">
+              <p><strong>Competition:</strong> ${competitionInfo}</p>
+              <p><strong>Time Period:</strong> ${request.timeFrame}</p>
+              <p><strong>Status:</strong> <span class="status-declined">Declined</span> on ${updateDate}</p>
+              ${request.adminNotes ? `<p><strong>Admin Notes:</strong> ${request.adminNotes}</p>` : ''}
+            </div>
+            <div class="request-actions">
+              <button class="reconsider-btn" onclick="reconsiderAnalyticsRequest('${request.id}')">Reconsider</button>
             </div>
           `;
         }
@@ -972,6 +1002,9 @@
         const analyticsRequestsStats = document.querySelector('.stat-card:nth-of-type(4) .stat-value');
         analyticsRequestsStats.textContent = newRequestCards.length + approvedRequestCards.length;
       }
+      
+      // Make sure to use the window.approveAnalyticsRequest and window.declineAnalyticsRequest
+      // functions defined below
       
       // Show notification function
       function showNotification(message, type) {
