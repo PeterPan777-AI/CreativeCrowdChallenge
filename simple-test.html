@@ -688,8 +688,11 @@
     
     // Function to show a specific screen
     function showScreen(screenName) {
+      // Ensure screen name has proper suffix
+      const fullScreenName = screenName.endsWith('-screen') ? screenName : screenName + '-screen';
+      
       // Special case for competition details to add back button
-      if (screenName === 'competition-details-screen') {
+      if (fullScreenName === 'competition-details-screen') {
         document.getElementById('main-header').innerHTML = `
           <button class="back-button" onclick="showScreen('competitions')">
             <span class="back-icon">←</span> Back
@@ -709,12 +712,12 @@
       });
       
       // Show the requested screen
-      const screenElement = document.getElementById(screenName);
+      const screenElement = document.getElementById(fullScreenName);
       if (screenElement) {
         screenElement.style.display = 'block';
-        console.log("Showing screen:", screenName);
+        console.log("Showing screen:", fullScreenName);
       } else {
-        console.error("Screen not found:", screenName);
+        console.error("Screen not found:", fullScreenName);
       }
       
       // Update the active tab (except for competition details which isn't a tab)
@@ -736,54 +739,8 @@
       console.log('Showing screen:', screenName);
     }
     
-    // Function to show competition details
-    function showCompetitionDetails(competitionId) {
-      const competition = competitions[competitionId];
-      
-      if (!competition) {
-        showNotification('Competition not found', 'error');
-        return;
-      }
-      
-      // Fill in competition details
-      document.getElementById('competition-title').textContent = competition.title;
-      document.getElementById('competition-deadline').textContent = competition.deadline;
-      document.getElementById('competition-entries').textContent = competition.entries;
-      
-      // Categories
-      const categoriesContainer = document.getElementById('competition-categories');
-      categoriesContainer.innerHTML = '';
-      competition.categories.forEach(category => {
-        const badge = document.createElement('span');
-        badge.className = 'badge primary';
-        badge.textContent = category;
-        categoriesContainer.appendChild(badge);
-      });
-      
-      // Description
-      document.getElementById('competition-description').innerHTML = `<p>${competition.description}</p>`;
-      
-      // Prizes
-      const prizesList = document.getElementById('competition-prizes');
-      prizesList.innerHTML = '';
-      competition.prizes.forEach(prize => {
-        const li = document.createElement('li');
-        li.textContent = prize;
-        prizesList.appendChild(li);
-      });
-      
-      // Rules
-      const rulesList = document.getElementById('competition-rules');
-      rulesList.innerHTML = '';
-      competition.rules.forEach(rule => {
-        const li = document.createElement('li');
-        li.textContent = rule;
-        rulesList.appendChild(li);
-      });
-      
-      // Show the screen
-      showScreen('competition-details');
-    }
+    // This is a legacy function, replaced by the one below
+    // function showCompetitionDetails(competitionId) { ... }
     
     // Auth tab functionality
     function showAuthTab(tabName) {
