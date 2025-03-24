@@ -457,6 +457,75 @@ async function handleApiRequest(req, res) {
   
   res.setHeader('Content-Type', 'application/json');
   
+  // POST /api/auth/google - Google OAuth authentication
+  if (endpoint === '/auth/google' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { token } = body;
+      
+      if (!token) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Google token is required' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log('Supabase not available, using simulated Google authentication');
+        // Simulate authentication for demo purposes
+        const mockUser = {
+          user: {
+            id: 'google-user-123',
+            email: 'google-user@example.com',
+            user_metadata: {
+              full_name: 'Google User',
+              role: 'user'
+            },
+            app_metadata: {
+              provider: 'google'
+            }
+          },
+          session: {
+            access_token: 'mock-google-token',
+            expires_at: Date.now() + 3600000
+          }
+        };
+        
+        console.log('Demo Google login successful');
+        res.writeHead(200);
+        res.end(JSON.stringify(mockUser));
+        return;
+      }
+      
+      // Use Supabase to verify the Google token
+      try {
+        const { data, error } = await supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: token
+        });
+        
+        if (error) {
+          console.error('Google authentication error:', error);
+          res.writeHead(401);
+          res.end(JSON.stringify({ error: error.message }));
+          return;
+        }
+        
+        console.log('User authenticated successfully with Google');
+        res.writeHead(200);
+        res.end(JSON.stringify(data));
+      } catch (supabaseError) {
+        console.error('Supabase error during Google auth:', supabaseError);
+        res.writeHead(401);
+        res.end(JSON.stringify({ error: 'Authentication service unavailable' }));
+      }
+    } catch (error) {
+      console.error('Error during Google auth:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Google authentication failed' }));
+    }
+    return;
+  }
+  
   // GET /api/competitions
   if (endpoint === '/competitions' && req.method === 'GET') {
     if (!supabase) {
