@@ -128,28 +128,25 @@ async function processQueuedSubmissions() {
     
     for (const submission of submissions) {
       try {
-        // Create FormData for file uploads
-        const formData = new FormData();
-        
-        // Add all submission data to formData
-        for (const [key, value] of Object.entries(submission.data)) {
-          formData.append(key, value);
-        }
-        
-        // Add file if it exists
-        if (submission.file) {
-          formData.append('file', submission.file);
-        }
-        
-        // Attempt to send the submission to the server
-        const response = await fetch('/api/submissions', {
+        // In a real production app, we would handle file uploads using FormData,
+        // but for simplicity in this demo, we'll send the JSON directly
+        // since our server endpoint is set up to handle JSON submissions
+
+        // Send the submission data to the server
+        const response = await fetch('/api/submission', {
           method: 'POST',
-          body: formData
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(submission.data)
         });
         
         if (response.ok) {
           console.log('Service Worker: Successfully processed submission for competition:', submission.data.competitionId);
           successfulSubmissions.push(submission.id);
+        } else {
+          const responseData = await response.json();
+          console.error('Service Worker: Server rejected submission:', responseData.error);
         }
       } catch (error) {
         console.error('Service Worker: Failed to process submission:', error);
@@ -165,7 +162,21 @@ async function processQueuedSubmissions() {
     }
     
     await tx.done;
-    console.log('Service Worker: Removed processed submissions from queue');
+    console.log('Service Worker: Removed processed submissions from queue:', successfulSubmissions.length);
+    
+    // Notify the client if available
+    if (successfulSubmissions.length > 0) {
+      const clients = await self.clients.matchAll({ type: 'window' });
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SYNC_COMPLETED',
+          data: {
+            type: 'submissions',
+            count: successfulSubmissions.length
+          }
+        });
+      });
+    }
     
     return true;
   } catch (error) {

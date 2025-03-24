@@ -1496,17 +1496,33 @@
       submitButton.textContent = 'Submitting...';
       submitButton.disabled = true;
       
-      // Call our API
+      // Create submission data object
+      const submissionData = {
+        competitionId: competitionId,
+        title: title,
+        description: description,
+        userId: currentUser?.id || 'anonymous',
+        timestamp: new Date().toISOString()
+      };
+      
+      // Check if we're online
+      if (navigator.onLine) {
+        // We're online - send submission to API
+        sendSubmissionToServer(submissionData, file, submitButton, originalButtonText);
+      } else {
+        // We're offline - save submission for later sync
+        saveSubmissionForOfflineSync(submissionData, file, submitButton, originalButtonText);
+      }
+    }
+    
+    // Function to send submission to server
+    function sendSubmissionToServer(submissionData, file, submitButton, originalButtonText) {
       fetch('/api/submission', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          competitionId: competitionId,
-          title: title,
-          description: description
-        })
+        body: JSON.stringify(submissionData)
       })
       .then(response => {
         if (!response.ok) {
@@ -1519,20 +1535,54 @@
         showNotification('Entry submitted successfully!');
         
         // Reset form
-        document.getElementById('competition-select').value = '';
-        document.getElementById('submission-title').value = '';
-        document.getElementById('submission-description').value = '';
-        document.getElementById('submission-file').value = '';
+        resetSubmissionForm();
       })
       .catch(error => {
         console.error('Error submitting entry:', error);
-        showNotification('Failed to submit entry: ' + error.message, 'error');
-      })
-      .finally(() => {
+        
+        // If there's a network error, save for offline sync
+        if (!navigator.onLine || error.message.includes('network')) {
+          saveSubmissionForOfflineSync(submissionData, file, submitButton, originalButtonText);
+        } else {
+          showNotification('Failed to submit entry: ' + error.message, 'error');
+          
+          // Reset button state
+          submitButton.textContent = originalButtonText;
+          submitButton.disabled = false;
+        }
+      });
+    }
+    
+    // Function to save submission for offline sync
+    async function saveSubmissionForOfflineSync(submissionData, file, submitButton, originalButtonText) {
+      try {
+        // Save to IndexedDB
+        await window.dbHelper.saveSubmissionForSync(submissionData, file);
+        
+        // Register for background sync
+        const syncRegistered = await window.dbHelper.registerBackgroundSync('sync-submissions');
+        
+        console.log('Submission saved for background sync, registration success:', syncRegistered);
+        showNotification('You\'re offline. Your submission will be uploaded when you\'re back online.', 'info');
+        
+        // Reset form
+        resetSubmissionForm();
+      } catch (error) {
+        console.error('Failed to save submission for offline sync:', error);
+        showNotification('Failed to save your submission for later. Please try again when online.', 'error');
+      } finally {
         // Reset button state
         submitButton.textContent = originalButtonText;
         submitButton.disabled = false;
-      });
+      }
+    }
+    
+    // Helper function to reset submission form
+    function resetSubmissionForm() {
+      document.getElementById('competition-select').value = '';
+      document.getElementById('submission-title').value = '';
+      document.getElementById('submission-description').value = '';
+      document.getElementById('submission-file').value = '';
     }
     
     // Show notification

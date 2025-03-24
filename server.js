@@ -722,12 +722,17 @@ async function handleApiRequest(req, res) {
   if (endpoint === '/submission' && req.method === 'POST') {
     try {
       const body = await parseRequestBody(req);
-      const { competitionId, title, description } = body;
+      const { competitionId, title, description, userId, timestamp } = body;
       
       if (!competitionId || !title || !description) {
         res.writeHead(400);
         res.end(JSON.stringify({ error: 'Competition ID, title, and description are required' }));
         return;
+      }
+      
+      // Additional logging for offline sync requests
+      if (timestamp) {
+        console.log(`Processing submission from offline queue, timestamp: ${timestamp}`);
       }
       
       if (!supabase) {
@@ -739,7 +744,8 @@ async function handleApiRequest(req, res) {
           competition_id: competitionId,
           title: title,
           description: description,
-          created_at: new Date().toISOString(),
+          user_id: userId || 'anonymous',
+          created_at: timestamp || new Date().toISOString(),
           status: 'submitted',
           votes: 0
         }));
@@ -754,6 +760,8 @@ async function handleApiRequest(req, res) {
             competition_id: competitionId,
             title: title,
             description: description,
+            user_id: userId || null,
+            created_at: timestamp || new Date().toISOString(),
             status: 'submitted',
             votes: 0
           }])
