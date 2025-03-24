@@ -546,66 +546,322 @@
       });
       
       // Analytics request management functions
-      window.approveAnalyticsRequest = function(requestId) {
-        // In a real app, this would make an API call to approve the request
-        console.log(`Approving analytics request: ${requestId}`);
+      // Load analytics requests from the API
+      async function loadAnalyticsRequests() {
+        const pendingContainer = document.querySelector('.request-section:nth-of-type(1)');
+        const approvedContainer = document.querySelector('.request-section:nth-of-type(2)');
         
-        // Determine which request card we're working with
-        const requestCard = document.querySelector(`.request-card:has(button[onclick*="${requestId}"])`);
-        if (requestCard) {
-          // Get business name from card
-          const businessName = requestCard.querySelector('h4').textContent;
-          const competitionName = requestCard.querySelector('p:first-of-type').textContent.split('Competition:')[1].trim();
+        if (!pendingContainer || !approvedContainer) {
+          console.error('Request containers not found');
+          return;
+        }
+        
+        // Clear existing requests (except headers)
+        const pendingHeader = pendingContainer.querySelector('h3');
+        const approvedHeader = approvedContainer.querySelector('h3');
+        
+        pendingContainer.innerHTML = '';
+        approvedContainer.innerHTML = '';
+        
+        // Re-add headers
+        pendingContainer.appendChild(pendingHeader);
+        approvedContainer.appendChild(approvedHeader);
+        
+        try {
+          // Get current user info
+          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (!currentUser || !currentUser.id || currentUser.role !== 'admin') {
+            showNotification('Admin access required', 'error');
+            return;
+          }
           
-          // Generate an approved version of the request card
-          const approvedCard = document.createElement('div');
-          approvedCard.className = 'request-card approved';
-          approvedCard.innerHTML = `
-            <div class="request-header">
-              <h4>${businessName}</h4>
-              <span class="request-date">${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-            </div>
-            <div class="request-details">
-              <p><strong>Competition:</strong> ${competitionName}</p>
-              <p><strong>Status:</strong> Approved on ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-            </div>
-            <div class="request-actions">
-              <button class="view-btn" onclick="viewAnalyticsReport('${requestId}-report')">View Report</button>
-              <button class="revoke-btn" onclick="revokeAnalyticsAccess('${requestId}-report')">Revoke Access</button>
-            </div>
-          `;
+          // Add loading indicator
+          const pendingLoading = document.createElement('div');
+          pendingLoading.className = 'message info';
+          pendingLoading.textContent = 'Loading analytics requests...';
+          pendingContainer.appendChild(pendingLoading);
           
-          // Add to approved section
-          document.querySelector('.request-section:nth-of-type(2)').appendChild(approvedCard);
+          // Call the API to get all analytics requests (admins can see all requests)
+          const response = await fetch('/api/analytics/requests', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            }
+          });
           
-          // Remove from new requests section
-          requestCard.remove();
+          if (!response.ok) {
+            throw new Error('Failed to load analytics requests');
+          }
+          
+          const requests = await response.json();
+          console.log('Loaded analytics requests:', requests);
+          
+          // Remove loading indicator
+          pendingContainer.removeChild(pendingLoading);
+          
+          // Group requests by status
+          const pendingRequests = requests.filter(req => req.status === 'pending');
+          const approvedRequests = requests.filter(req => req.status === 'approved');
           
           // Update badges
-          updateRequestCounts();
+          pendingHeader.innerHTML = `New Requests <span class="badge">${pendingRequests.length}</span>`;
+          approvedHeader.innerHTML = `Approved Requests <span class="badge">${approvedRequests.length}</span>`;
           
-          // Show notification
-          showNotification(`Analytics access approved for ${businessName}.`, 'success');
+          // No pending requests message
+          if (pendingRequests.length === 0) {
+            const noRequests = document.createElement('div');
+            noRequests.className = 'message info';
+            noRequests.textContent = 'No pending analytics requests.';
+            pendingContainer.appendChild(noRequests);
+          }
+          
+          // No approved requests message
+          if (approvedRequests.length === 0) {
+            const noApproved = document.createElement('div');
+            noApproved.className = 'message info';
+            noApproved.textContent = 'No approved analytics requests.';
+            approvedContainer.appendChild(noApproved);
+          }
+          
+          // Create request cards
+          pendingRequests.forEach(request => {
+            const requestCard = createRequestCard(request, 'pending');
+            pendingContainer.appendChild(requestCard);
+          });
+          
+          approvedRequests.forEach(request => {
+            const requestCard = createRequestCard(request, 'approved');
+            approvedContainer.appendChild(requestCard);
+          });
+          
+        } catch (error) {
+          console.error('Error loading analytics requests:', error);
+          showNotification('Failed to load analytics requests: ' + error.message, 'error');
+          
+          // Display error message in containers
+          const errorMessage = document.createElement('div');
+          errorMessage.className = 'message error';
+          errorMessage.textContent = 'Failed to load analytics requests. Please try again later.';
+          pendingContainer.appendChild(errorMessage.cloneNode(true));
+        }
+      }
+      
+      // Create a request card element
+      function createRequestCard(request, type) {
+        const requestCard = document.createElement('div');
+        requestCard.className = 'request-card' + (type === 'approved' ? ' approved' : '');
+        requestCard.id = `request-card-${request.id}`;
+        
+        // Format date
+        const requestDate = new Date(request.createdAt);
+        const formattedDate = requestDate.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+        
+        // Get competition info if available
+        let competitionInfo = 'All competitions';
+        if (request.competitionIds && request.competitionIds.length > 0) {
+          // In a real app, we would look up the competition name from the ID
+          competitionInfo = request.competitionIds[0];
+        }
+        
+        // Different content based on type (pending or approved)
+        if (type === 'pending') {
+          requestCard.innerHTML = `
+            <div class="request-header">
+              <h4>${request.userEmail || 'Unknown User'}</h4>
+              <span class="request-date">${formattedDate}</span>
+            </div>
+            <div class="request-details">
+              <p><strong>Competition:</strong> ${competitionInfo}</p>
+              <p><strong>Time Period:</strong> ${request.timeFrame}</p>
+              <p><strong>Notes:</strong> ${request.description}</p>
+            </div>
+            <div class="request-actions">
+              <button class="approve-btn" onclick="approveAnalyticsRequest('${request.id}')">Approve</button>
+              <button class="decline-btn" onclick="declineAnalyticsRequest('${request.id}')">Decline</button>
+            </div>
+          `;
+        } else {
+          // Format approval date if available
+          let approvalDate = 'Unknown date';
+          if (request.updatedAt) {
+            const updateDate = new Date(request.updatedAt);
+            approvalDate = updateDate.toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric'
+            });
+          }
+          
+          requestCard.innerHTML = `
+            <div class="request-header">
+              <h4>${request.userEmail || 'Unknown User'}</h4>
+              <span class="request-date">${formattedDate}</span>
+            </div>
+            <div class="request-details">
+              <p><strong>Competition:</strong> ${competitionInfo}</p>
+              <p><strong>Time Period:</strong> ${request.timeFrame}</p>
+              <p><strong>Status:</strong> Approved on ${approvalDate}</p>
+              ${request.adminNotes ? `<p><strong>Admin Notes:</strong> ${request.adminNotes}</p>` : ''}
+            </div>
+            <div class="request-actions">
+              <button class="view-btn" onclick="viewAnalyticsReport('${request.id}')">View Report</button>
+              <button class="revoke-btn" onclick="revokeAnalyticsAccess('${request.id}')">Revoke Access</button>
+            </div>
+          `;
+        }
+        
+        return requestCard;
+      }
+      
+      // Approve an analytics request
+      window.approveAnalyticsRequest = async function(requestId) {
+        console.log(`Approving analytics request: ${requestId}`);
+        
+        try {
+          // Get current user for admin validation
+          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (!currentUser || currentUser.role !== 'admin') {
+            showNotification('Admin access required', 'error');
+            return;
+          }
+          
+          // Find the request card
+          const requestCard = document.getElementById(`request-card-${requestId}`);
+          if (!requestCard) {
+            showNotification('Request not found', 'error');
+            return;
+          }
+          
+          // Show loading state
+          const actionButtons = requestCard.querySelector('.request-actions');
+          const originalButtons = actionButtons.innerHTML;
+          actionButtons.innerHTML = '<div class="message">Processing...</div>';
+          
+          // Get admin notes (in a real app, we would prompt for notes)
+          const adminNotes = "Approved by administrator";
+          
+          // Call the API to update the request status
+          const response = await fetch(`/api/analytics/request/${requestId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            },
+            body: JSON.stringify({
+              status: 'approved',
+              adminNotes
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to approve request');
+          }
+          
+          const result = await response.json();
+          console.log('Request approved:', result);
+          
+          // Show success notification
+          showNotification('Analytics request approved successfully', 'success');
+          
+          // Reload all requests to reflect the changes
+          loadAnalyticsRequests();
+          
+        } catch (error) {
+          console.error('Error approving request:', error);
+          showNotification('Failed to approve request: ' + error.message, 'error');
+          
+          // Restore the original buttons if we can find the card
+          const requestCard = document.getElementById(`request-card-${requestId}`);
+          if (requestCard) {
+            const actionButtons = requestCard.querySelector('.request-actions');
+            if (actionButtons) {
+              actionButtons.innerHTML = `
+                <button class="approve-btn" onclick="approveAnalyticsRequest('${requestId}')">Approve</button>
+                <button class="decline-btn" onclick="declineAnalyticsRequest('${requestId}')">Decline</button>
+              `;
+            }
+          }
         }
       };
       
-      window.declineAnalyticsRequest = function(requestId) {
-        // In a real app, this would make an API call to decline the request
+      // Decline an analytics request
+      window.declineAnalyticsRequest = async function(requestId) {
         console.log(`Declining analytics request: ${requestId}`);
         
-        // Determine which request card we're working with
-        const requestCard = document.querySelector(`.request-card:has(button[onclick*="${requestId}"])`);
-        if (requestCard) {
-          const businessName = requestCard.querySelector('h4').textContent;
+        try {
+          // Get current user for admin validation
+          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (!currentUser || currentUser.role !== 'admin') {
+            showNotification('Admin access required', 'error');
+            return;
+          }
           
-          // Remove the request card
-          requestCard.remove();
+          // Find the request card
+          const requestCard = document.getElementById(`request-card-${requestId}`);
+          if (!requestCard) {
+            showNotification('Request not found', 'error');
+            return;
+          }
           
-          // Update badges
-          updateRequestCounts();
+          // Show loading state
+          const actionButtons = requestCard.querySelector('.request-actions');
+          const originalButtons = actionButtons.innerHTML;
+          actionButtons.innerHTML = '<div class="message">Processing...</div>';
           
-          // Show notification
-          showNotification(`Analytics request from ${businessName} has been declined.`, 'success');
+          // Get admin notes (in a real app, we would prompt for the reason)
+          const adminNotes = "Declined by administrator";
+          
+          // Call the API to update the request status
+          const response = await fetch(`/api/analytics/request/${requestId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            },
+            body: JSON.stringify({
+              status: 'declined',
+              adminNotes
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to decline request');
+          }
+          
+          const result = await response.json();
+          console.log('Request declined:', result);
+          
+          // Show success notification
+          showNotification('Analytics request declined', 'success');
+          
+          // Reload all requests to reflect the changes
+          loadAnalyticsRequests();
+          
+        } catch (error) {
+          console.error('Error declining request:', error);
+          showNotification('Failed to decline request: ' + error.message, 'error');
+          
+          // Restore the original buttons if we can find the card
+          const requestCard = document.getElementById(`request-card-${requestId}`);
+          if (requestCard) {
+            const actionButtons = requestCard.querySelector('.request-actions');
+            if (actionButtons) {
+              actionButtons.innerHTML = `
+                <button class="approve-btn" onclick="approveAnalyticsRequest('${requestId}')">Approve</button>
+                <button class="decline-btn" onclick="declineAnalyticsRequest('${requestId}')">Decline</button>
+              `;
+            }
+          }
         }
       };
       
