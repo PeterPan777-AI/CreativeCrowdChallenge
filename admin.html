@@ -445,7 +445,7 @@
       
       // Check if already logged in
       const checkAdminLogin = () => {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         if (currentUser && currentUser.email && currentUser.role === 'admin') {
           // Show admin dashboard
           loginSection.style.display = 'none';
@@ -501,8 +501,8 @@
             if (data.user && (data.user.role === 'admin' || data.user.email.includes('admin'))) {
               showNotification('Login successful!', 'success');
               
-              // Store user data in localStorage
-              localStorage.setItem('currentUser', JSON.stringify({
+              // Store user data in localStorage using key 'user' to maintain consistency with main app
+              localStorage.setItem('user', JSON.stringify({
                 ...data.user,
                 role: 'admin' // Ensure role is set properly
               }));
@@ -537,7 +537,7 @@
                 avatar: null
               };
               
-              localStorage.setItem('currentUser', JSON.stringify(mockAdminUser));
+              localStorage.setItem('user', JSON.stringify(mockAdminUser));
               
               showNotification('Demo mode: Admin login successful!', 'success');
               setTimeout(() => {
