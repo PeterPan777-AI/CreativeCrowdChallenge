@@ -168,6 +168,80 @@ const MOCK_DATA = {
     }
   ],
   
+  // Mock submissions data
+  submissions: [
+    {
+      id: 'submission-1',
+      competition_id: 'mock-comp-1',
+      user_id: 'user-1',
+      title: 'Modern Tech Logo',
+      description: 'A sleek, minimalist logo representing innovation',
+      image_url: 'https://via.placeholder.com/300',
+      created_at: '2025-03-18',
+      votes: 12
+    },
+    {
+      id: 'submission-2',
+      competition_id: 'mock-comp-1',
+      user_id: 'user-2',
+      title: 'Geometric Startup Brand',
+      description: 'A geometric approach to modern branding',
+      image_url: 'https://via.placeholder.com/300',
+      created_at: '2025-03-19',
+      votes: 8
+    },
+    {
+      id: 'submission-3',
+      competition_id: 'mock-comp-1',
+      user_id: 'user-3',
+      title: 'Colorful Tech Identity',
+      description: 'Vibrant colors representing diverse technology',
+      image_url: 'https://via.placeholder.com/300',
+      created_at: '2025-03-20',
+      votes: 15
+    },
+    {
+      id: 'submission-4',
+      competition_id: 'mock-comp-2',
+      user_id: 'user-1',
+      title: 'Clean Fitness App UI',
+      description: 'Intuitive interface for workout tracking',
+      image_url: 'https://via.placeholder.com/300',
+      created_at: '2025-03-15',
+      votes: 6
+    },
+    {
+      id: 'submission-5',
+      competition_id: 'mock-comp-2',
+      user_id: 'user-4',
+      title: 'Energetic Exercise Tracker',
+      description: 'Bold and motivational fitness interface',
+      image_url: 'https://via.placeholder.com/300',
+      created_at: '2025-03-16',
+      votes: 9
+    },
+    {
+      id: 'submission-6',
+      competition_id: 'mock-comp-3',
+      user_id: 'user-2',
+      title: 'Eco-Friendly Brand Campaign',
+      description: 'Green marketing strategy emphasizing sustainability',
+      image_url: 'https://via.placeholder.com/300',
+      created_at: '2025-03-10',
+      votes: 11
+    },
+    {
+      id: 'submission-7',
+      competition_id: 'mock-comp-3',
+      user_id: 'user-5',
+      title: 'Natural World Connection',
+      description: 'Connecting product with environmental values',
+      image_url: 'https://via.placeholder.com/300',
+      created_at: '2025-03-12',
+      votes: 7
+    }
+  ],
+  
   // Mock analytics data for business users
   analytics: {
     'mock-business-1': {
@@ -320,6 +394,68 @@ async function handleApiRequest(req, res) {
       
       res.writeHead(200);
       res.end(JSON.stringify(competition));
+    }
+    return;
+  }
+  
+  // GET /api/competitions/:id/submissions
+  if (endpoint.match(/^\/competitions\/[\w-]+\/submissions$/) && req.method === 'GET') {
+    const competitionId = endpoint.split('/')[2];
+    console.log(`Fetching submissions for competition: ${competitionId}`);
+    
+    if (!supabase) {
+      console.log('Supabase not available, using mock submission data');
+      // Filter submissions for this competition from mock data
+      const submissions = MOCK_DATA.submissions.filter(s => s.competition_id === competitionId);
+      
+      if (submissions.length === 0) {
+        res.writeHead(200);
+        res.end(JSON.stringify([]));
+        return;
+      }
+      
+      // Sort by votes (highest first)
+      submissions.sort((a, b) => b.votes - a.votes);
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(submissions));
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('competition_id', competitionId)
+        .order('votes', { ascending: false });
+        
+      if (error) {
+        console.error('Supabase error fetching submissions:', error);
+        // Fallback to mock data
+        const submissions = MOCK_DATA.submissions.filter(s => s.competition_id === competitionId);
+        submissions.sort((a, b) => b.votes - a.votes);
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(submissions));
+        return;
+      }
+      
+      if (!data || data.length === 0) {
+        res.writeHead(200);
+        res.end(JSON.stringify([]));
+        return;
+      }
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(data));
+    } catch (error) {
+      console.error('Error fetching submissions:', error);
+      // Fallback to mock data
+      const submissions = MOCK_DATA.submissions.filter(s => s.competition_id === competitionId);
+      submissions.sort((a, b) => b.votes - a.votes);
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(submissions));
     }
     return;
   }
