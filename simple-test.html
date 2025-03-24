@@ -689,7 +689,7 @@
     // Function to show a specific screen
     function showScreen(screenName) {
       // Special case for competition details to add back button
-      if (screenName === 'competition-details') {
+      if (screenName === 'competition-details-screen') {
         document.getElementById('main-header').innerHTML = `
           <button class="back-button" onclick="showScreen('competitions')">
             <span class="back-icon">←</span> Back
@@ -705,14 +705,20 @@
     
       // Hide all screens
       document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
+        screen.style.display = 'none';
       });
       
       // Show the requested screen
-      document.getElementById(screenName + '-screen').classList.add('active');
+      const screenElement = document.getElementById(screenName);
+      if (screenElement) {
+        screenElement.style.display = 'block';
+        console.log("Showing screen:", screenName);
+      } else {
+        console.error("Screen not found:", screenName);
+      }
       
       // Update the active tab (except for competition details which isn't a tab)
-      if (screenName !== 'competition-details') {
+      if (screenName !== 'competition-details-screen') {
         document.querySelectorAll('.tab').forEach(tab => {
           if (tab.getAttribute('data-screen') === screenName) {
             tab.classList.add('active');
@@ -1093,60 +1099,107 @@
     function showCompetitionDetails(competitionId) {
       console.log('Showing details for competition:', competitionId);
       
-      // Find the competition in our loaded competitions data
-      let competition = null;
-      
-      // Get the competition details from our API
-      fetch('/api/competitions')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to fetch competitions');
-          }
-          return response.json();
-        })
-        .then(competitions => {
-          competition = competitions.find(comp => comp.id === competitionId);
-          
-          if (!competition) {
-            throw new Error('Competition not found');
-          }
-          
-          // Format deadline date if available
-          let deadline = 'Coming soon';
-          if (competition.deadline) {
-            try {
-              const deadlineDate = new Date(competition.deadline);
-              deadline = deadlineDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            } catch (e) {
-              console.error('Error formatting date:', e);
-              deadline = competition.deadline;
-            }
-          }
-          
-          // Update competition details in the UI
-          document.getElementById('competition-title').textContent = competition.title;
-          document.getElementById('competition-deadline').textContent = deadline;
-          document.getElementById('competition-entries').textContent = '0'; // This would come from API in real app
-          
-          // Set the category badge
-          const categoriesContainer = document.getElementById('competition-categories');
-          categoriesContainer.innerHTML = `<span class="badge primary">${competition.category || 'General'}</span>`;
-          
-          // Set description
-          document.getElementById('competition-description').innerHTML = `<p>${competition.description}</p>`;
-          
-          // Set prizes
-          document.getElementById('competition-prizes').innerHTML = 
-            `<li>${competition.prize || 'Prizes to be announced'}</li>`;
-          
-          // Show the competition details screen
-          showScreen('competition-details-screen');
-        })
-        .catch(error => {
-          console.error('Error loading competition details:', error);
-          alert('Error loading competition details: ' + error.message);
-          // Stay on the current screen
+      try {
+        // Show loading message
+        document.querySelectorAll('.screen').forEach(screen => {
+          screen.style.display = 'none';
         });
+        
+        const detailsScreen = document.getElementById('competition-details-screen');
+        detailsScreen.style.display = 'block';
+        detailsScreen.innerHTML = '<div class="container"><div class="card">Loading competition details...</div></div>';
+        
+        // Update header to show a back button
+        document.getElementById('main-header').innerHTML = `
+          <button class="back-button" onclick="showScreen('competitions')">
+            <span class="back-icon">←</span> Back
+          </button>
+          <h1>Competition Details</h1>
+        `;
+        
+        // Get the competition details from our API
+        fetch(`/api/competitions/${competitionId}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch competition details');
+            }
+            return response.json();
+          })
+          .then(competition => {
+            // Format deadline date if available
+            let deadline = 'Coming soon';
+            if (competition.deadline) {
+              try {
+                const deadlineDate = new Date(competition.deadline);
+                deadline = deadlineDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+              } catch (e) {
+                console.error('Error formatting date:', e);
+                deadline = competition.deadline;
+              }
+            }
+            
+            // Create competition details HTML
+            detailsScreen.innerHTML = `
+              <div class="container">
+                <div class="card">
+                  <div class="competition-header">
+                    <h2 id="competition-title">${competition.title}</h2>
+                    <div class="competition-meta">
+                      <div class="meta-item"><strong>Deadline:</strong> <span id="competition-deadline">${deadline}</span></div>
+                      <div class="meta-item"><strong>Entries:</strong> <span id="competition-entries">0</span></div>
+                    </div>
+                    <div id="competition-categories">
+                      <span class="badge primary">${competition.category || 'General'}</span>
+                    </div>
+                  </div>
+                  
+                  <div id="competition-description">
+                    <p>${competition.description}</p>
+                  </div>
+                  
+                  <h3>Prizes</h3>
+                  <ul id="competition-prizes">
+                    <li>${competition.prize || 'Prizes to be announced'}</li>
+                  </ul>
+                  
+                  <h3>Rules</h3>
+                  <ul id="competition-rules">
+                    <li>All submissions must be original work</li>
+                    <li>One submission per participant</li>
+                  </ul>
+                  
+                  <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button onclick="showScreen('submit'); document.getElementById('competition-select').value = '${competition.id}';">Submit Entry</button>
+                    <button onclick="showScreen('competitions')" class="secondary">Back to List</button>
+                  </div>
+                </div>
+                
+                <div class="card">
+                  <h3>Top Submissions</h3>
+                  <div id="submissions-list">
+                    <p>Submissions will be displayed once the competition has ended.</p>
+                  </div>
+                </div>
+              </div>
+            `;
+          })
+          .catch(error => {
+            console.error('Error loading competition details:', error);
+            detailsScreen.innerHTML = `
+              <div class="container">
+                <div class="card">
+                  <h2>Error</h2>
+                  <p>Error loading competition details: ${error.message}</p>
+                  <button onclick="showScreen('competitions')" class="secondary">Back to Competitions</button>
+                </div>
+              </div>
+            `;
+          });
+      } catch (error) {
+        console.error('Error in showCompetitionDetails function:', error);
+        showNotification('An unexpected error occurred', 'error');
+        showScreen('competitions');
+      }
     }
     
     // Load competitions from API
