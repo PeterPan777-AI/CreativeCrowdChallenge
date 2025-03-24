@@ -46,7 +46,7 @@
     
     /* Container */
     .container {
-      max-width: 500px;
+      max-width: 800px;
       margin: 40px auto;
       padding: 20px;
       flex: 1;
@@ -79,6 +79,35 @@
       background-color: #1E40AF;
     }
     
+    /* Specialized button styles */
+    .approve-btn, .view-btn, .action-button {
+      background-color: #059669;
+      width: auto;
+      margin-right: 10px;
+    }
+    
+    .approve-btn:hover, .view-btn:hover, .action-button:hover {
+      background-color: #047857;
+    }
+    
+    .decline-btn, .revoke-btn {
+      background-color: #DC2626;
+      width: auto;
+    }
+    
+    .decline-btn:hover, .revoke-btn:hover {
+      background-color: #B91C1C;
+    }
+    
+    .logout-button {
+      background-color: #6B7280;
+      width: auto;
+    }
+    
+    .logout-button:hover {
+      background-color: #4B5563;
+    }
+    
     /* Form styles */
     .form-group {
       margin-bottom: 15px;
@@ -97,6 +126,105 @@
       border-radius: 4px;
       font-size: 16px;
       box-sizing: border-box;
+    }
+    
+    /* Admin dashboard stats */
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .stat-card {
+      background-color: #f8fafc;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-left: 4px solid #3B82F6;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1E40AF;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      color: #64748b;
+      font-size: 14px;
+    }
+    
+    /* Analytics request cards */
+    .request-section {
+      margin-bottom: 30px;
+    }
+    
+    .request-section h3 {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .badge {
+      background-color: #3B82F6;
+      color: white;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    
+    .request-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      transition: all 0.2s;
+    }
+    
+    .request-card:hover {
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transform: translateY(-2px);
+    }
+    
+    .request-card.approved {
+      border-left: 4px solid #10B981;
+    }
+    
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .request-header h4 {
+      margin: 0;
+      color: #1E40AF;
+    }
+    
+    .request-date {
+      color: #6B7280;
+      font-size: 14px;
+    }
+    
+    .request-details {
+      margin-bottom: 15px;
+    }
+    
+    .request-details p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    
+    .request-actions {
+      display: flex;
+      justify-content: flex-end;
     }
     
     /* Error and info messages */
@@ -169,7 +297,8 @@
   </header>
   
   <div class="container">
-    <div class="card">
+    <!-- Login Form - Shown by default -->
+    <div id="login-section" class="card">
       <div class="admin-logo">Creative<span>CC</span> Admin</div>
       <p style="color: #6B7280; margin-bottom: 20px;">
         Please enter your administrator credentials to access the management console.
@@ -191,6 +320,111 @@
         <button type="submit" id="admin-login-button">Log In</button>
       </form>
     </div>
+    
+    <!-- Admin Dashboard - Hidden by default -->
+    <div id="admin-dashboard" style="display: none;">
+      <div class="card">
+        <h2>Admin Dashboard</h2>
+        <p>Welcome to the administrator dashboard. Manage platform operations from here.</p>
+        
+        <div class="admin-stats">
+          <div class="stat-card">
+            <div class="stat-value">42</div>
+            <div class="stat-label">Active Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">18</div>
+            <div class="stat-label">Competitions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">7</div>
+            <div class="stat-label">Business Accounts</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Analytics Requests</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Analytics Requests Management -->
+      <div class="card">
+        <h2>Analytics Requests</h2>
+        <p>Review and manage analytics requests from business users.</p>
+        
+        <div id="analytics-requests-container">
+          <!-- New Requests Section -->
+          <div class="request-section">
+            <h3>New Requests <span class="badge">2</span></h3>
+            
+            <div class="request-card">
+              <div class="request-header">
+                <h4>TechCreate Solutions</h4>
+                <span class="request-date">March 23, 2025</span>
+              </div>
+              <div class="request-details">
+                <p><strong>Competition:</strong> Logo Design Challenge</p>
+                <p><strong>Time Period:</strong> Last 30 days</p>
+                <p><strong>Notes:</strong> Looking for detailed engagement metrics and participant demographics.</p>
+              </div>
+              <div class="request-actions">
+                <button class="approve-btn" onclick="approveAnalyticsRequest('request-1')">Approve</button>
+                <button class="decline-btn" onclick="declineAnalyticsRequest('request-1')">Decline</button>
+              </div>
+            </div>
+            
+            <div class="request-card">
+              <div class="request-header">
+                <h4>EcoDesign Innovations</h4>
+                <span class="request-date">March 22, 2025</span>
+              </div>
+              <div class="request-details">
+                <p><strong>Competition:</strong> All competitions</p>
+                <p><strong>Time Period:</strong> Last 90 days</p>
+                <p><strong>Notes:</strong> Need comprehensive performance data for quarterly business review.</p>
+              </div>
+              <div class="request-actions">
+                <button class="approve-btn" onclick="approveAnalyticsRequest('request-2')">Approve</button>
+                <button class="decline-btn" onclick="declineAnalyticsRequest('request-2')">Decline</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Approved Requests Section -->
+          <div class="request-section">
+            <h3>Approved Requests <span class="badge">1</span></h3>
+            
+            <div class="request-card approved">
+              <div class="request-header">
+                <h4>DigitalFusion Group</h4>
+                <span class="request-date">March 20, 2025</span>
+              </div>
+              <div class="request-details">
+                <p><strong>Competition:</strong> Mobile App UI Challenge</p>
+                <p><strong>Time Period:</strong> Last 30 days</p>
+                <p><strong>Status:</strong> Approved on March 21, 2025</p>
+              </div>
+              <div class="request-actions">
+                <button class="view-btn" onclick="viewAnalyticsReport('report-1')">View Report</button>
+                <button class="revoke-btn" onclick="revokeAnalyticsAccess('report-1')">Revoke Access</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Main Analytics Dashboard -->
+      <div class="card">
+        <h2>Platform Analytics</h2>
+        <p>Monitor and analyze platform-wide metrics and performance data.</p>
+        <button onclick="viewPlatformAnalytics()" class="action-button">View Full Analytics Dashboard</button>
+      </div>
+      
+      <div class="card">
+        <h2>Account Management</h2>
+        <button onclick="logout()" class="logout-button">Logout</button>
+      </div>
+    </div>
   </div>
   
   <footer>
@@ -206,6 +440,26 @@
     document.addEventListener('DOMContentLoaded', () => {
       const adminLoginForm = document.getElementById('admin-login-form');
       const notification = document.getElementById('notification');
+      const loginSection = document.getElementById('login-section');
+      const adminDashboard = document.getElementById('admin-dashboard');
+      
+      // Check if already logged in
+      const checkAdminLogin = () => {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        if (currentUser && currentUser.email && currentUser.role === 'admin') {
+          // Show admin dashboard
+          loginSection.style.display = 'none';
+          adminDashboard.style.display = 'block';
+          return true;
+        }
+        return false;
+      };
+      
+      // Try to load dashboard if logged in
+      if (checkAdminLogin()) {
+        // Already logged in, so no need for further login actions
+        console.log('Admin already logged in');
+      }
       
       // Handle admin login form submission
       adminLoginForm.addEventListener('submit', async (event) => {
@@ -240,15 +494,19 @@
           if (response.ok) {
             // Check if the logged-in user is an admin
             if (data.user && (data.user.role === 'admin' || data.user.email.includes('admin'))) {
-              showNotification('Login successful! Redirecting to admin dashboard...', 'success');
+              showNotification('Login successful!', 'success');
               
               // Store user data in localStorage
-              localStorage.setItem('currentUser', JSON.stringify(data.user));
+              localStorage.setItem('currentUser', JSON.stringify({
+                ...data.user,
+                role: 'admin' // Ensure role is set properly
+              }));
               
-              // Redirect to main app with admin dashboard
+              // Show admin dashboard
               setTimeout(() => {
-                window.location.href = '/simple-test.html?admin=true';
-              }, 1500);
+                loginSection.style.display = 'none';
+                adminDashboard.style.display = 'block';
+              }, 1000);
             } else {
               showNotification('This account does not have admin privileges.', 'error');
             }
@@ -273,10 +531,11 @@
               
               localStorage.setItem('currentUser', JSON.stringify(mockAdminUser));
               
-              showNotification('Demo mode: Admin login successful! Redirecting...', 'success');
+              showNotification('Demo mode: Admin login successful!', 'success');
               setTimeout(() => {
-                window.location.href = '/simple-test.html?admin=true';
-              }, 1500);
+                loginSection.style.display = 'none';
+                adminDashboard.style.display = 'block';
+              }, 1000);
             } else {
               showNotification('Please use an admin account (containing "admin" in the email).', 'error');
             }
@@ -285,6 +544,167 @@
           }
         }
       });
+      
+      // Analytics request management functions
+      window.approveAnalyticsRequest = function(requestId) {
+        // In a real app, this would make an API call to approve the request
+        console.log(`Approving analytics request: ${requestId}`);
+        
+        // Determine which request card we're working with
+        const requestCard = document.querySelector(`.request-card:has(button[onclick*="${requestId}"])`);
+        if (requestCard) {
+          // Get business name from card
+          const businessName = requestCard.querySelector('h4').textContent;
+          const competitionName = requestCard.querySelector('p:first-of-type').textContent.split('Competition:')[1].trim();
+          
+          // Generate an approved version of the request card
+          const approvedCard = document.createElement('div');
+          approvedCard.className = 'request-card approved';
+          approvedCard.innerHTML = `
+            <div class="request-header">
+              <h4>${businessName}</h4>
+              <span class="request-date">${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+            </div>
+            <div class="request-details">
+              <p><strong>Competition:</strong> ${competitionName}</p>
+              <p><strong>Status:</strong> Approved on ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            </div>
+            <div class="request-actions">
+              <button class="view-btn" onclick="viewAnalyticsReport('${requestId}-report')">View Report</button>
+              <button class="revoke-btn" onclick="revokeAnalyticsAccess('${requestId}-report')">Revoke Access</button>
+            </div>
+          `;
+          
+          // Add to approved section
+          document.querySelector('.request-section:nth-of-type(2)').appendChild(approvedCard);
+          
+          // Remove from new requests section
+          requestCard.remove();
+          
+          // Update badges
+          updateRequestCounts();
+          
+          // Show notification
+          showNotification(`Analytics access approved for ${businessName}.`, 'success');
+        }
+      };
+      
+      window.declineAnalyticsRequest = function(requestId) {
+        // In a real app, this would make an API call to decline the request
+        console.log(`Declining analytics request: ${requestId}`);
+        
+        // Determine which request card we're working with
+        const requestCard = document.querySelector(`.request-card:has(button[onclick*="${requestId}"])`);
+        if (requestCard) {
+          const businessName = requestCard.querySelector('h4').textContent;
+          
+          // Remove the request card
+          requestCard.remove();
+          
+          // Update badges
+          updateRequestCounts();
+          
+          // Show notification
+          showNotification(`Analytics request from ${businessName} has been declined.`, 'success');
+        }
+      };
+      
+      window.viewAnalyticsReport = function(reportId) {
+        // In a real app, this would navigate to the report or open a modal
+        console.log(`Viewing analytics report: ${reportId}`);
+        
+        // Find the business name from the card
+        const requestCard = document.querySelector(`.request-card:has(button[onclick*="${reportId}"])`);
+        if (requestCard) {
+          const businessName = requestCard.querySelector('h4').textContent;
+          
+          // Create an analytics dashboard modal
+          const modal = document.createElement('div');
+          modal.style.position = 'fixed';
+          modal.style.top = '0';
+          modal.style.left = '0';
+          modal.style.width = '100%';
+          modal.style.height = '100%';
+          modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+          modal.style.zIndex = '1000';
+          modal.style.display = 'flex';
+          modal.style.justifyContent = 'center';
+          modal.style.alignItems = 'center';
+          
+          modal.innerHTML = `
+            <div style="background: white; border-radius: 8px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 20px; position: relative;">
+              <button style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer;" onclick="this.parentElement.parentElement.remove()">×</button>
+              <h2>Analytics Report: ${businessName}</h2>
+              <p>This is a preview of the analytics dashboard that will be shared with the business.</p>
+              <div style="background-color: #f8fafc; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                <h3>Report Details</h3>
+                <p><strong>Business:</strong> ${businessName}</p>
+                <p><strong>Status:</strong> Active</p>
+                <p><strong>Generated On:</strong> ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+              </div>
+              <button onclick="window.open('/simple-test.html?analyticsDemo=true', '_blank')" style="background-color: #1E3A8A; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Open Full Analytics Dashboard</button>
+            </div>
+          `;
+          
+          document.body.appendChild(modal);
+        }
+      };
+      
+      window.revokeAnalyticsAccess = function(reportId) {
+        // In a real app, this would make an API call to revoke access
+        console.log(`Revoking analytics access: ${reportId}`);
+        
+        // Find the card
+        const requestCard = document.querySelector(`.request-card:has(button[onclick*="${reportId}"])`);
+        if (requestCard) {
+          const businessName = requestCard.querySelector('h4').textContent;
+          
+          // Remove the card
+          requestCard.remove();
+          
+          // Update badges
+          updateRequestCounts();
+          
+          // Show notification
+          showNotification(`Analytics access for ${businessName} has been revoked.`, 'success');
+        }
+      };
+      
+      window.viewPlatformAnalytics = function() {
+        // Navigate to the platform-wide analytics dashboard
+        window.location.href = '/simple-test.html?adminAnalytics=true';
+      };
+      
+      window.logout = function() {
+        // Clear user data from localStorage
+        localStorage.removeItem('currentUser');
+        
+        // Show login form
+        loginSection.style.display = 'block';
+        adminDashboard.style.display = 'none';
+        
+        // Show notification
+        showNotification('You have been logged out.', 'success');
+      };
+      
+      // Helper function to update request count badges
+      function updateRequestCounts() {
+        // Update new requests badge
+        const newRequestsSection = document.querySelector('.request-section:first-of-type');
+        const newRequestCards = newRequestsSection.querySelectorAll('.request-card');
+        const newRequestsBadge = newRequestsSection.querySelector('.badge');
+        newRequestsBadge.textContent = newRequestCards.length;
+        
+        // Update approved requests badge
+        const approvedRequestsSection = document.querySelector('.request-section:nth-of-type(2)');
+        const approvedRequestCards = approvedRequestsSection.querySelectorAll('.request-card');
+        const approvedRequestsBadge = approvedRequestsSection.querySelector('.badge');
+        approvedRequestsBadge.textContent = approvedRequestCards.length;
+        
+        // Update total count in admin stats
+        const analyticsRequestsStats = document.querySelector('.stat-card:nth-of-type(4) .stat-value');
+        analyticsRequestsStats.textContent = newRequestCards.length + approvedRequestCards.length;
+      }
       
       // Show notification function
       function showNotification(message, type) {
