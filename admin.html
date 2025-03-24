@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login - CreativeCrowdChallenge</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
+  <!-- PWA Meta Tags -->
+  <meta name="description" content="Admin access for CreativeCrowdChallenge platform">
+  <meta name="theme-color" content="#3b82f6">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- iOS PWA Support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CreativeCC Admin">
+  <link rel="apple-touch-icon" href="/assets/icon-192x192.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/icon-192x192.png">
+  
+  <style>
+    /* Base styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    header {
+      background-color: #1E3A8A;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    
+    /* Container */
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+      flex: 1;
+    }
+    
+    /* Card styles */
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    /* Button styles */
+    button {
+      background-color: #1E3A8A;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.2s;
+      width: 100%;
+      margin-top: 20px;
+    }
+    
+    button:hover {
+      background-color: #1E40AF;
+    }
+    
+    /* Form styles */
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    
+    /* Error and info messages */
+    .message {
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    
+    .error {
+      background-color: #FEE2E2;
+      border: 1px solid #EF4444;
+      color: #B91C1C;
+    }
+    
+    .info {
+      background-color: #DBEAFE;
+      border: 1px solid #3B82F6;
+      color: #1E40AF;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #6B7280;
+      font-size: 14px;
+      border-top: 1px solid #E5E7EB;
+      margin-top: auto;
+    }
+    
+    /* Logo */
+    .admin-logo {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .admin-logo span {
+      color: #3B82F6;
+    }
+    
+    /* Notification styling */
+    #notification {
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    #notification.success {
+      background-color: #D1FAE5;
+      border: 1px solid #10B981;
+      color: #065F46;
+    }
+    
+    #notification.error {
+      background-color: #FEE2E2;
+      border: 1px solid #EF4444;
+      color: #B91C1C;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Portal</h1>
+    <a href="/" class="back-button" style="color: white; text-decoration: none; position: absolute; left: 20px; top: 50%; transform: translateY(-50%);">
+      &larr; Back to Site
+    </a>
+  </header>
+  
+  <div class="container">
+    <div class="card">
+      <div class="admin-logo">Creative<span>CC</span> Admin</div>
+      <p style="color: #6B7280; margin-bottom: 20px;">
+        Please enter your administrator credentials to access the management console.
+      </p>
+      
+      <div id="notification"></div>
+      
+      <form id="admin-login-form">
+        <div class="form-group">
+          <label for="admin-email">Email</label>
+          <input type="email" id="admin-email" required placeholder="admin@example.com">
+        </div>
+        
+        <div class="form-group">
+          <label for="admin-password">Password</label>
+          <input type="password" id="admin-password" required placeholder="•••••••••••">
+        </div>
+        
+        <button type="submit" id="admin-login-button">Log In</button>
+      </form>
+    </div>
+  </div>
+  
+  <footer>
+    <p>© 2025 CreativeCrowdChallenge. All rights reserved.</p>
+    <p style="margin-top: 10px; font-size: 12px;">
+      <a href="/" style="color: #6B7280; margin: 0 10px;">Home</a>
+      <a href="#" id="privacy-link" style="color: #6B7280; margin: 0 10px;">Privacy Policy</a>
+      <a href="#" id="terms-link" style="color: #6B7280; margin: 0 10px;">Terms of Service</a>
+    </p>
+  </footer>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const adminLoginForm = document.getElementById('admin-login-form');
+      const notification = document.getElementById('notification');
+      
+      // Handle admin login form submission
+      adminLoginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const email = document.getElementById('admin-email').value;
+        const password = document.getElementById('admin-password').value;
+        
+        if (!email || !password) {
+          showNotification('Please enter both email and password.', 'error');
+          return;
+        }
+        
+        try {
+          // Check if email contains 'admin' to determine if it's an admin account
+          if (!email.includes('admin')) {
+            showNotification('Invalid admin credentials. Please use an admin account.', 'error');
+            return;
+          }
+          
+          // Make the login request to the server
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            // Check if the logged-in user is an admin
+            if (data.user && (data.user.role === 'admin' || data.user.email.includes('admin'))) {
+              showNotification('Login successful! Redirecting to admin dashboard...', 'success');
+              
+              // Store user data in localStorage
+              localStorage.setItem('currentUser', JSON.stringify(data.user));
+              
+              // Redirect to main app with admin dashboard
+              setTimeout(() => {
+                window.location.href = '/simple-test.html?admin=true';
+              }, 1500);
+            } else {
+              showNotification('This account does not have admin privileges.', 'error');
+            }
+          } else {
+            showNotification(data.message || 'Login failed. Please check your credentials.', 'error');
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          
+          // Handle offline case (demo mode)
+          if (!navigator.onLine) {
+            // For demo purposes, check if using admin credentials
+            if (email.includes('admin')) {
+              // Create a mock admin user for demo
+              const mockAdminUser = {
+                id: 'admin-123',
+                email: email,
+                role: 'admin',
+                name: 'Admin User',
+                avatar: null
+              };
+              
+              localStorage.setItem('currentUser', JSON.stringify(mockAdminUser));
+              
+              showNotification('Demo mode: Admin login successful! Redirecting...', 'success');
+              setTimeout(() => {
+                window.location.href = '/simple-test.html?admin=true';
+              }, 1500);
+            } else {
+              showNotification('Please use an admin account (containing "admin" in the email).', 'error');
+            }
+          } else {
+            showNotification('Login failed. Please try again later.', 'error');
+          }
+        }
+      });
+      
+      // Show notification function
+      function showNotification(message, type) {
+        notification.textContent = message;
+        notification.className = type;
+        notification.style.display = 'block';
+        
+        // Hide notification after 5 seconds
+        setTimeout(() => {
+          notification.style.display = 'none';
+        }, 5000);
+      }
+    });
+  </script>
+</body>
+</html>
