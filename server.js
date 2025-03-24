@@ -1155,6 +1155,303 @@ async function handleApiRequest(req, res) {
     return;
   }
 
+  // POST /api/analytics/request
+  if (endpoint === '/analytics/request' && req.method === 'POST') {
+    console.log('Received analytics request');
+    
+    try {
+      const body = await parseRequestBody(req);
+      const { businessId, competitionIds, timeFrame, description, userId, userEmail, requestType } = body;
+      
+      if (!businessId || !timeFrame || !description || !userId || !userEmail || !requestType) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Missing required fields for analytics request' }));
+        return;
+      }
+      
+      console.log(`Processing analytics request from ${userEmail} for business ${businessId}`);
+      
+      // Create a new request object
+      const requestId = 'req-' + Date.now();
+      const newRequest = {
+        id: requestId,
+        businessId,
+        competitionIds: competitionIds || [],
+        timeFrame,
+        description,
+        userId,
+        userEmail,
+        requestType,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      if (!supabase) {
+        console.log('Supabase not available, storing request in memory');
+        // Add to in-memory storage for demo mode
+        analyticsRequests.push(newRequest);
+        
+        console.log('Analytics request stored in memory:', newRequest);
+        res.writeHead(201);
+        res.end(JSON.stringify({ 
+          success: true, 
+          message: 'Analytics request submitted', 
+          requestId 
+        }));
+        return;
+      }
+      
+      // Store in Supabase if available
+      try {
+        console.log('Storing analytics request in Supabase');
+        const { data, error } = await supabase
+          .from('analytics_requests')
+          .insert([newRequest])
+          .select();
+          
+        if (error) {
+          console.error('Error storing analytics request in Supabase:', error);
+          // Fallback to in-memory storage
+          analyticsRequests.push(newRequest);
+          
+          res.writeHead(201);
+          res.end(JSON.stringify({ 
+            success: true, 
+            message: 'Analytics request submitted (fallback storage)', 
+            requestId 
+          }));
+          return;
+        }
+        
+        console.log('Analytics request stored in Supabase:', data);
+        res.writeHead(201);
+        res.end(JSON.stringify({ 
+          success: true, 
+          message: 'Analytics request submitted', 
+          requestId: data[0].id 
+        }));
+      } catch (supabaseError) {
+        console.error('Supabase error:', supabaseError);
+        // Fallback to in-memory storage
+        analyticsRequests.push(newRequest);
+        
+        res.writeHead(201);
+        res.end(JSON.stringify({ 
+          success: true, 
+          message: 'Analytics request submitted (fallback storage)', 
+          requestId 
+        }));
+      }
+    } catch (error) {
+      console.error('Error processing analytics request:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to process analytics request' }));
+    }
+    return;
+  }
+  
+  // GET /api/analytics/requests
+  if (endpoint === '/analytics/requests' && req.method === 'GET') {
+    const isAdmin = req.headers['x-user-role'] === 'admin';
+    const userId = req.headers['x-user-id'];
+    
+    if (!isAdmin && !userId) {
+      res.writeHead(403);
+      res.end(JSON.stringify({ error: 'Unauthorized access to analytics requests' }));
+      return;
+    }
+    
+    console.log(`Fetching analytics requests for ${isAdmin ? 'admin' : 'user ' + userId}`);
+    
+    if (!supabase) {
+      console.log('Supabase not available, using in-memory analytics requests');
+      
+      let filteredRequests = analyticsRequests;
+      if (!isAdmin) {
+        // Filter requests for this specific user
+        filteredRequests = analyticsRequests.filter(req => req.userId === userId);
+      }
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(filteredRequests));
+      return;
+    }
+    
+    try {
+      console.log('Fetching analytics requests from Supabase');
+      let query = supabase.from('analytics_requests').select('*');
+      
+      if (!isAdmin) {
+        // Filter requests for this specific user
+        query = query.eq('userId', userId);
+      }
+      
+      const { data, error } = await query.order('createdAt', { ascending: false });
+          
+      if (error) {
+        console.error('Error fetching analytics requests from Supabase:', error);
+        // Fallback to in-memory storage
+        let filteredRequests = analyticsRequests;
+        if (!isAdmin) {
+          filteredRequests = analyticsRequests.filter(req => req.userId === userId);
+        }
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(filteredRequests));
+        return;
+      }
+      
+      console.log(`Found ${data.length} analytics requests`);
+      res.writeHead(200);
+      res.end(JSON.stringify(data));
+    } catch (error) {
+      console.error('Error fetching analytics requests:', error);
+      // Fallback to in-memory storage
+      let filteredRequests = analyticsRequests;
+      if (!isAdmin) {
+        filteredRequests = analyticsRequests.filter(req => req.userId === userId);
+      }
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(filteredRequests));
+    }
+    return;
+  }
+  
+  // PATCH /api/analytics/request/:id
+  if (endpoint.match(/^\/analytics\/request\/[\w-]+$/) && req.method === 'PATCH') {
+    const isAdmin = req.headers['x-user-role'] === 'admin';
+    
+    if (!isAdmin) {
+      res.writeHead(403);
+      res.end(JSON.stringify({ error: 'Only admins can update analytics request status' }));
+      return;
+    }
+    
+    const requestId = endpoint.split('/').pop();
+    console.log(`Updating analytics request ${requestId}`);
+    
+    try {
+      const body = await parseRequestBody(req);
+      const { status, adminNotes } = body;
+      
+      if (!status) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Status is required' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log('Supabase not available, updating in-memory analytics request');
+        
+        const requestIndex = analyticsRequests.findIndex(req => req.id === requestId);
+        if (requestIndex === -1) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Analytics request not found' }));
+          return;
+        }
+        
+        // Update the request
+        analyticsRequests[requestIndex] = {
+          ...analyticsRequests[requestIndex],
+          status,
+          adminNotes: adminNotes || analyticsRequests[requestIndex].adminNotes,
+          updatedAt: new Date().toISOString()
+        };
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          success: true, 
+          message: 'Analytics request updated',
+          request: analyticsRequests[requestIndex]
+        }));
+        return;
+      }
+      
+      // Update in Supabase
+      try {
+        const { data, error } = await supabase
+          .from('analytics_requests')
+          .update({ 
+            status, 
+            adminNotes: adminNotes || null,
+            updatedAt: new Date().toISOString()
+          })
+          .eq('id', requestId)
+          .select();
+          
+        if (error) {
+          console.error('Error updating analytics request in Supabase:', error);
+          // Try fallback
+          const requestIndex = analyticsRequests.findIndex(req => req.id === requestId);
+          if (requestIndex !== -1) {
+            analyticsRequests[requestIndex] = {
+              ...analyticsRequests[requestIndex],
+              status,
+              adminNotes: adminNotes || analyticsRequests[requestIndex].adminNotes,
+              updatedAt: new Date().toISOString()
+            };
+            
+            res.writeHead(200);
+            res.end(JSON.stringify({ 
+              success: true, 
+              message: 'Analytics request updated (fallback storage)',
+              request: analyticsRequests[requestIndex]
+            }));
+            return;
+          }
+          
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Analytics request not found' }));
+          return;
+        }
+        
+        if (!data || data.length === 0) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Analytics request not found' }));
+          return;
+        }
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          success: true, 
+          message: 'Analytics request updated',
+          request: data[0]
+        }));
+      } catch (supabaseError) {
+        console.error('Supabase error:', supabaseError);
+        
+        // Try fallback
+        const requestIndex = analyticsRequests.findIndex(req => req.id === requestId);
+        if (requestIndex !== -1) {
+          analyticsRequests[requestIndex] = {
+            ...analyticsRequests[requestIndex],
+            status,
+            adminNotes: adminNotes || analyticsRequests[requestIndex].adminNotes,
+            updatedAt: new Date().toISOString()
+          };
+          
+          res.writeHead(200);
+          res.end(JSON.stringify({ 
+            success: true, 
+            message: 'Analytics request updated (fallback storage)',
+            request: analyticsRequests[requestIndex]
+          }));
+          return;
+        }
+        
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Failed to update analytics request' }));
+      }
+    } catch (error) {
+      console.error('Error processing update to analytics request:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to process update to analytics request' }));
+    }
+    return;
+  }
+
   // POST /api/submission/:id/vote
   if (endpoint.match(/^\/submission\/[\w-]+\/vote$/) && req.method === 'POST') {
     const submissionId = endpoint.split('/')[2];
