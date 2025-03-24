@@ -138,6 +138,56 @@
       background-color: #DBEAFE;
       color: #1E40AF;
     }
+    
+    /* Social sharing styles */
+    .share-buttons {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .share-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #f5f5f5;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border: none;
+      font-size: 18px;
+    }
+    
+    .share-button:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .share-button.twitter {
+      background-color: #1DA1F2;
+      color: white;
+    }
+    
+    .share-button.facebook {
+      background-color: #4267B2;
+      color: white;
+    }
+    
+    .share-button.linkedin {
+      background-color: #0077B5;
+      color: white;
+    }
+    
+    .share-button.email {
+      background-color: #D44638;
+      color: white;
+    }
+    
+    .share-button.clipboard {
+      background-color: #6e6e6e;
+      color: white;
+    }
 
     .badge.success {
       background-color: #D1FAE5;
@@ -630,6 +680,25 @@
           <li>One submission per participant</li>
         </ul>
         
+        <h3>Share This Competition</h3>
+        <div class="share-buttons">
+          <button class="share-button twitter" title="Share on Twitter" onclick="shareContent('twitter', 'Competition Title', 'Check out this creative competition')">
+            T
+          </button>
+          <button class="share-button facebook" title="Share on Facebook" onclick="shareContent('facebook', 'Competition Title', 'Join this creative competition')">
+            f
+          </button>
+          <button class="share-button linkedin" title="Share on LinkedIn" onclick="shareContent('linkedin', 'Competition Title', 'Participate in this competition')">
+            in
+          </button>
+          <button class="share-button email" title="Share via Email" onclick="shareContent('email', 'Competition Title', 'I thought you might be interested in this competition')">
+            ✉
+          </button>
+          <button class="share-button clipboard" title="Copy Link" onclick="shareContent('clipboard', 'Competition Title', 'Check out this competition')">
+            📋
+          </button>
+        </div>
+        
         <div style="margin-top: 20px; display: flex; gap: 10px;">
           <button onclick="showScreen('submit')">Submit Entry</button>
           <button onclick="showScreen('competitions')" class="secondary">Back to List</button>
@@ -1054,6 +1123,84 @@
       }, 3000);
     }
     
+    // Social sharing function
+    function shareContent(platform, title, text, url) {
+      // If Web Share API is available and the platform is 'native'
+      if (navigator.share && platform === 'native') {
+        navigator.share({
+          title: title,
+          text: text,
+          url: url || window.location.href
+        })
+        .then(() => {
+          console.log('Successfully shared');
+          showNotification('Successfully shared!');
+        })
+        .catch((error) => {
+          console.error('Error sharing:', error);
+          showNotification('Could not share content', 'error');
+          // Fallback to copy to clipboard
+          copyToClipboard(url || window.location.href);
+        });
+        return;
+      }
+      
+      // Platform specific sharing
+      let shareUrl;
+      
+      switch(platform) {
+        case 'twitter':
+          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url || window.location.href)}`;
+          break;
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url || window.location.href)}`;
+          break;
+        case 'linkedin':
+          shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url || window.location.href)}`;
+          break;
+        case 'email':
+          shareUrl = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text + '\n\n' + (url || window.location.href))}`;
+          break;
+        case 'clipboard':
+          copyToClipboard(url || window.location.href);
+          return;
+        default:
+          showNotification('Sharing not available for this platform', 'error');
+          return;
+      }
+      
+      // Open a popup window for sharing (except for email)
+      if (platform !== 'email') {
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+      } else {
+        window.location.href = shareUrl;
+      }
+      
+      showNotification('Content shared successfully!');
+    }
+    
+    // Helper function to copy URL to clipboard
+    function copyToClipboard(text) {
+      // Create temporary input
+      const input = document.createElement('input');
+      input.style.position = 'fixed';
+      input.style.opacity = 0;
+      input.value = text;
+      document.body.appendChild(input);
+      input.select();
+      
+      // Copy and clean up
+      try {
+        document.execCommand('copy');
+        showNotification('Link copied to clipboard!');
+      } catch (err) {
+        console.error('Could not copy text: ', err);
+        showNotification('Failed to copy link', 'error');
+      }
+      
+      document.body.removeChild(input);
+    }
+    
     // Show competition details
     function showCompetitionDetails(competitionId) {
       console.log('Showing details for competition:', competitionId);
@@ -1126,6 +1273,25 @@
                     <li>All submissions must be original work</li>
                     <li>One submission per participant</li>
                   </ul>
+                  
+                  <h3>Share This Competition</h3>
+                  <div class="share-buttons">
+                    <button class="share-button twitter" title="Share on Twitter" onclick="shareContent('twitter', '${competition.title}', 'Check out this creative competition: ${competition.title}')">
+                      T
+                    </button>
+                    <button class="share-button facebook" title="Share on Facebook" onclick="shareContent('facebook', '${competition.title}', 'Join this creative competition')">
+                      f
+                    </button>
+                    <button class="share-button linkedin" title="Share on LinkedIn" onclick="shareContent('linkedin', '${competition.title}', 'Participate in ${competition.title}')">
+                      in
+                    </button>
+                    <button class="share-button email" title="Share via Email" onclick="shareContent('email', '${competition.title}', 'I thought you might be interested in this competition: ${competition.title}')">
+                      ✉
+                    </button>
+                    <button class="share-button clipboard" title="Copy Link" onclick="shareContent('clipboard', '${competition.title}', 'Check out this competition')">
+                      📋
+                    </button>
+                  </div>
                   
                   <div style="margin-top: 20px; display: flex; gap: 10px;">
                     <button onclick="showScreen('submit'); document.getElementById('competition-select').value = '${competition.id}';">Submit Entry</button>
