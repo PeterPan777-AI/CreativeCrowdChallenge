@@ -166,7 +166,54 @@ const MOCK_DATA = {
       created_at: '2025-03-05',
       status: 'active'
     }
-  ]
+  ],
+  
+  // Mock analytics data for business users
+  analytics: {
+    'mock-business-1': {
+      totalCompetitions: 2,
+      totalSubmissions: 42,
+      totalViews: '865',
+      avgEngagement: '32%',
+      competitions: [
+        { title: 'Logo Design Challenge', submissions: 24, views: 487, engagementRate: '4.9%' },
+        { title: 'Marketing Campaign Concept', submissions: 18, views: 378, engagementRate: '4.8%' }
+      ],
+      demographics: {
+        '18-24': 25,
+        '25-34': 42,
+        '35-44': 18,
+        '45-54': 10,
+        '55+': 5
+      },
+      timeline: {
+        dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        submissions: [5, 12, 18, 23, 29, 42],
+        views: [120, 250, 380, 470, 580, 865]
+      }
+    },
+    'mock-business-2': {
+      totalCompetitions: 1,
+      totalSubmissions: 12,
+      totalViews: '295',
+      avgEngagement: '24%',
+      competitions: [
+        { title: 'Mobile App UI Challenge', submissions: 12, views: 295, engagementRate: '4.1%' }
+      ],
+      demographics: {
+        '18-24': 32,
+        '25-34': 38,
+        '35-44': 15,
+        '45-54': 10,
+        '55+': 5
+      },
+      timeline: {
+        dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        submissions: [0, 0, 4, 7, 10, 12],
+        views: [0, 0, 90, 152, 217, 295]
+      }
+    }
+  }
 };
 
 // Handle API requests
@@ -547,6 +594,114 @@ async function handleApiRequest(req, res) {
       console.error('Error submitting entry:', error);
       res.writeHead(500);
       res.end(JSON.stringify({ error: 'Submission failed' }));
+    }
+    return;
+  }
+
+  // GET /api/analytics/business/:id
+  if (endpoint.match(/^\/analytics\/business\/[\w-]+$/) && req.method === 'GET') {
+    const businessId = endpoint.split('/').pop();
+    console.log(`Fetching analytics for business: ${businessId}`);
+    
+    if (!supabase) {
+      console.log('Supabase not available, using mock analytics data');
+      const analytics = MOCK_DATA.analytics[businessId];
+      
+      if (!analytics) {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Business analytics not found' }));
+        return;
+      }
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(analytics));
+      return;
+    }
+    
+    try {
+      // In a real implementation, we would query Supabase for analytics data
+      // For example, competitions count, submissions, user interactions, etc.
+      // This would require multiple queries to build the complete analytics dataset
+      
+      // 1. Get competitions for this business
+      const { data: competitions, error: competitionsError } = await supabase
+        .from('competitions')
+        .select('*')
+        .eq('business_id', businessId);
+        
+      if (competitionsError) {
+        console.error('Supabase error fetching business competitions:', competitionsError);
+        // Fall back to mock data
+        const mockAnalytics = MOCK_DATA.analytics[businessId];
+        if (mockAnalytics) {
+          res.writeHead(200);
+          res.end(JSON.stringify(mockAnalytics));
+        } else {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Business analytics not found' }));
+        }
+        return;
+      }
+      
+      // 2. If we have competitions data, we could get submissions for those competitions
+      // This is a simplified version - in a real app we would do more complex queries
+      
+      // For now, if no real data is available, fall back to mock data
+      if (!competitions || competitions.length === 0) {
+        const mockAnalytics = MOCK_DATA.analytics[businessId];
+        if (mockAnalytics) {
+          res.writeHead(200);
+          res.end(JSON.stringify(mockAnalytics));
+        } else {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Business analytics not found' }));
+        }
+        return;
+      }
+      
+      // If we got this far, we have real competition data
+      // In a real app, we would build analytics based on this data
+      // For simplicity in this example, we'll use mock data structure with real competition titles
+      
+      const analyticsData = {
+        totalCompetitions: competitions.length,
+        totalSubmissions: Math.floor(Math.random() * 50) + 10, // Mock value
+        totalViews: Math.floor(Math.random() * 1000) + 200, // Mock value
+        avgEngagement: Math.floor(Math.random() * 30) + 10 + '%', // Mock value
+        competitions: competitions.map(comp => ({
+          title: comp.title,
+          submissions: Math.floor(Math.random() * 30) + 5,
+          views: Math.floor(Math.random() * 500) + 100,
+          engagementRate: (Math.random() * 5 + 1).toFixed(1) + '%'
+        })),
+        demographics: {
+          '18-24': Math.floor(Math.random() * 30) + 10,
+          '25-34': Math.floor(Math.random() * 30) + 20,
+          '35-44': Math.floor(Math.random() * 20) + 10,
+          '45-54': Math.floor(Math.random() * 15) + 5,
+          '55+': Math.floor(Math.random() * 10) + 5
+        },
+        timeline: {
+          dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          submissions: [5, 12, 18, 23, 29, 42].map(v => Math.floor(v * (Math.random() * 0.5 + 0.75))),
+          views: [120, 250, 380, 470, 580, 720].map(v => Math.floor(v * (Math.random() * 0.5 + 0.75)))
+        }
+      };
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(analyticsData));
+    } catch (error) {
+      console.error('Error fetching business analytics:', error);
+      // Try mock data as fallback
+      const mockAnalytics = MOCK_DATA.analytics[businessId];
+      
+      if (mockAnalytics) {
+        res.writeHead(200);
+        res.end(JSON.stringify(mockAnalytics));
+      } else {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Business analytics not found' }));
+      }
     }
     return;
   }
