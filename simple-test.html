@@ -1691,10 +1691,31 @@
     function loadBusinessAnalytics() {
       const businessId = document.getElementById('business-selector').value;
       
+      // Clear existing charts if they exist
+      if (competitionsChart) {
+        competitionsChart.destroy();
+        competitionsChart = null;
+      }
+      if (demographicsChart) {
+        demographicsChart.destroy();
+        demographicsChart = null;
+      }
+      if (timelineChart) {
+        timelineChart.destroy();
+        timelineChart = null;
+      }
+      
+      // Reset canvas elements first
+      resetCanvasElement('competitions-chart');
+      resetCanvasElement('demographics-chart');
+      resetCanvasElement('timeline-chart');
+      
       // Show loading state
       document.getElementById('competitions-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
       document.getElementById('demographics-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
       document.getElementById('timeline-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
+      
+      console.log(`Loading analytics data for business ID: ${businessId}`);
       
       // Call our API
       fetch(`/api/analytics/business/${businessId}`)
