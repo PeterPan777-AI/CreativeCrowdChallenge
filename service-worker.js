@@ -89,6 +89,9 @@ async function processQueuedVotes() {
         if (response.ok) {
           console.log('Service Worker: Successfully processed vote for submission:', vote.submissionId);
           successfulVotes.push(vote.id);
+        } else {
+          const responseData = await response.json();
+          console.error('Service Worker: Server rejected vote:', responseData.error);
         }
       } catch (error) {
         console.error('Service Worker: Failed to process vote:', error);
@@ -104,7 +107,21 @@ async function processQueuedVotes() {
     }
     
     await tx.done;
-    console.log('Service Worker: Removed processed votes from queue');
+    console.log('Service Worker: Removed processed votes from queue:', successfulVotes.length);
+    
+    // Notify the client if available
+    if (successfulVotes.length > 0) {
+      const clients = await self.clients.matchAll({ type: 'window' });
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SYNC_COMPLETED',
+          data: {
+            type: 'votes',
+            count: successfulVotes.length
+          }
+        });
+      });
+    }
     
     return true;
   } catch (error) {

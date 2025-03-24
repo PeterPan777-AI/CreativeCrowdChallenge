@@ -1591,12 +1591,18 @@
       notification.textContent = message;
       notification.style.display = 'block';
       
+      // Set background color based on notification type
       if (type === 'error') {
-        notification.style.backgroundColor = '#EF4444';
+        notification.style.backgroundColor = '#EF4444'; // Red
+      } else if (type === 'info') {
+        notification.style.backgroundColor = '#3B82F6'; // Blue
+      } else if (type === 'warning') {
+        notification.style.backgroundColor = '#F59E0B'; // Amber
       } else {
-        notification.style.backgroundColor = '#10B981';
+        notification.style.backgroundColor = '#10B981'; // Green for success
       }
       
+      // Auto-hide after a delay
       setTimeout(() => {
         notification.style.display = 'none';
       }, 3000);
@@ -2550,6 +2556,22 @@
         navigator.serviceWorker.register('/service-worker.js')
           .then(function(registration) {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            
+            // Listen for messages from service worker (e.g., sync completed)
+            navigator.serviceWorker.addEventListener('message', function(event) {
+              console.log('Received message from service worker:', event.data);
+              
+              // Handle background sync completed messages
+              if (event.data.type === 'SYNC_COMPLETED') {
+                const { type, count } = event.data.data;
+                
+                if (type === 'votes') {
+                  showNotification(`${count} vote(s) successfully synchronized!`, 'success');
+                } else if (type === 'submissions') {
+                  showNotification(`${count} submission(s) successfully uploaded!`, 'success');
+                }
+              }
+            });
             
             // Add install prompt
             let deferredPrompt;
