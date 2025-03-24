@@ -5087,6 +5087,210 @@
         }
       }
     }
+    
+    // ====================================
+    // AI Recommendation Functions
+    // ====================================
+    
+    let previewMode = false;
+    
+    // Load AI-powered recommendations
+    function loadRecommendations() {
+      const recommendationsContainer = document.getElementById('recommendations-container');
+      const recommendationsList = document.getElementById('recommendations-list');
+      const loadingIndicator = document.getElementById('recommendations-loading');
+      
+      // Show recommendations container and loading indicator
+      recommendationsContainer.style.display = 'block';
+      loadingIndicator.style.display = 'block';
+      recommendationsList.innerHTML = '';
+      
+      // Get interests from input
+      const interestsInput = document.getElementById('interests-input');
+      const interests = interestsInput.value
+        .split(',')
+        .map(interest => interest.trim())
+        .filter(interest => interest.length > 0);
+      
+      // Get current user ID (or use anonymous if not logged in)
+      const userId = currentUser ? currentUser.id : 'anonymous';
+      
+      // Build API URL with parameters
+      let apiUrl = `/api/recommendations?userId=${userId}`;
+      
+      if (interests.length > 0) {
+        apiUrl += `&interests=${encodeURIComponent(interests.join(','))}`;
+      }
+      
+      if (previewMode) {
+        apiUrl += '&preview=true';
+      }
+      
+      console.log('Fetching recommendations from:', apiUrl);
+      
+      // Fetch recommendations from API
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch recommendations');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Hide loading indicator
+          loadingIndicator.style.display = 'none';
+          
+          if (!data || !data.recommendations || data.recommendations.length === 0) {
+            recommendationsList.innerHTML = '<p class="text-center">No recommendations available. Try adding more interests.</p>';
+            return;
+          }
+          
+          console.log('Received recommendations:', data);
+          
+          // Render recommendations
+          renderRecommendations(data.recommendations, recommendationsList);
+        })
+        .catch(error => {
+          console.error('Error loading recommendations:', error);
+          loadingIndicator.style.display = 'none';
+          recommendationsList.innerHTML = '<p class="text-center">Failed to load recommendations. Please try again later.</p>';
+        });
+    }
+    
+    // Toggle between preview mode and normal mode
+    function toggleRecommendationsPreview() {
+      previewMode = !previewMode;
+      
+      // Update button text
+      const toggleButton = document.getElementById('preview-toggle-btn');
+      toggleButton.textContent = previewMode ? 'Show Normal Mode' : 'Show Preview';
+      
+      // If recommendations container is visible, reload recommendations
+      const recommendationsContainer = document.getElementById('recommendations-container');
+      if (recommendationsContainer.style.display === 'block') {
+        loadRecommendations();
+      }
+    }
+    
+    // Render recommendation cards
+    function renderRecommendations(recommendations, container) {
+      // Clear container
+      container.innerHTML = '';
+      
+      recommendations.forEach(recommendation => {
+        // Create recommendation card
+        const card = document.createElement('div');
+        card.className = 'card recommendation-card';
+        card.style.marginBottom = '15px';
+        card.style.borderLeft = recommendation.isPreview ? '3px solid #8B5CF6' : '';
+        
+        // Competition title
+        const title = document.createElement('h4');
+        title.textContent = recommendation.title;
+        title.style.margin = '0 0 10px 0';
+        title.style.color = '#4B5563';
+        
+        // Competition details
+        const meta = document.createElement('div');
+        meta.className = 'competition-meta';
+        meta.style.marginBottom = '10px';
+        meta.style.fontSize = '0.85rem';
+        
+        // Deadline
+        const deadline = document.createElement('div');
+        deadline.className = 'meta-item';
+        deadline.innerHTML = `<strong>Ends:</strong> ${recommendation.deadline}`;
+        meta.appendChild(deadline);
+        
+        // Prize if available
+        if (recommendation.prize) {
+          const prize = document.createElement('div');
+          prize.className = 'meta-item';
+          prize.innerHTML = `<strong>Prize:</strong> ${recommendation.prize}`;
+          meta.appendChild(prize);
+        }
+        
+        // Competition description
+        const description = document.createElement('p');
+        description.textContent = recommendation.description;
+        description.style.marginBottom = '10px';
+        
+        // AI explanation
+        const explanation = document.createElement('div');
+        explanation.style.backgroundColor = '#F3F4F6';
+        explanation.style.padding = '10px';
+        explanation.style.borderRadius = '4px';
+        explanation.style.marginBottom = '10px';
+        explanation.style.fontSize = '0.85rem';
+        
+        const aiTitle = document.createElement('div');
+        aiTitle.style.fontWeight = 'bold';
+        aiTitle.style.marginBottom = '5px';
+        aiTitle.style.color = '#6D28D9';
+        aiTitle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; position: relative; top: 2px; margin-right: 5px;"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M20 2a10 10 0 0 1 0 20"></path><path d="M2 12h10"></path><path d="M12 2v10"></path></svg>AI Recommendation Reason:';
+        
+        const aiExplanationText = document.createElement('div');
+        const explanationText = recommendation.explanation || recommendation.ai_explanation || 'Recommended based on your profile';
+        aiExplanationText.innerHTML = explanationText;
+        
+        explanation.appendChild(aiTitle);
+        explanation.appendChild(aiExplanationText);
+        
+        // Badges container
+        const badges = document.createElement('div');
+        badges.style.marginBottom = '15px';
+        
+        // Category badge
+        if (recommendation.category) {
+          const categoryBadge = document.createElement('span');
+          categoryBadge.className = 'badge primary';
+          categoryBadge.textContent = recommendation.category.charAt(0).toUpperCase() + recommendation.category.slice(1);
+          badges.appendChild(categoryBadge);
+        }
+        
+        // Business badge if from a business competition
+        if (recommendation.business_id) {
+          const businessBadge = document.createElement('span');
+          businessBadge.className = 'badge success';
+          businessBadge.textContent = 'Business';
+          badges.appendChild(businessBadge);
+        }
+        
+        // Preview badge if this is a preview
+        if (recommendation.isPreview) {
+          const previewBadge = document.createElement('span');
+          previewBadge.className = 'badge';
+          previewBadge.style.backgroundColor = '#8B5CF6';
+          previewBadge.textContent = 'AI Preview';
+          badges.appendChild(previewBadge);
+        }
+        
+        // Button container
+        const buttonContainer = document.createElement('div');
+        
+        // View details button
+        const viewButton = document.createElement('button');
+        viewButton.textContent = 'View Details';
+        viewButton.onclick = function() {
+          // Use the competition ID for details, or a fallback if it's a preview
+          const compId = recommendation.id || `preview-${Date.now()}`;
+          showCompetitionDetails(compId);
+        };
+        
+        buttonContainer.appendChild(viewButton);
+        
+        // Assemble card
+        card.appendChild(title);
+        card.appendChild(meta);
+        card.appendChild(description);
+        card.appendChild(explanation);
+        card.appendChild(badges);
+        card.appendChild(buttonContainer);
+        
+        // Add to container
+        container.appendChild(card);
+      });
+    }
   </script>
   
   <!-- Footer -->
