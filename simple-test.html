@@ -1,66 +1,197 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CreativeCrowdChallenge - Basic Test</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            height: 100%;
-            width: 100%;
-        }
-        #app {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #3B82F6;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 {
-            font-size: 28px;
-            margin-bottom: 16px;
-        }
-        p {
-            font-size: 18px;
-            margin-bottom: 24px;
-        }
-        .info {
-            font-size: 14px;
-            color: #E5E7EB;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: white;
-            color: #3B82F6;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-    </style>
+  <title>CreativeCrowdChallenge - Test App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Base styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    
+    /* Header */
+    header {
+      background-color: #3B82F6;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    /* Container */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    /* Card styles */
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    /* Button styles */
+    button {
+      background-color: #3B82F6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    button:hover {
+      background-color: #2563EB;
+    }
+    
+    /* Tab navigation */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    
+    .tab.active {
+      border-bottom: 3px solid #3B82F6;
+      color: #3B82F6;
+      font-weight: bold;
+    }
+    
+    /* Screens */
+    .screen {
+      display: none;
+    }
+    
+    .screen.active {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <div id="app">
-        <h1>CreativeCrowdChallenge</h1>
-        <p>Welcome to the app!</p>
-        <div class="info">Basic HTML test page</div>
-        <button onclick="alert('Button clicked!')">Get Started</button>
+  <header>
+    <h1>CreativeCrowdChallenge</h1>
+    <p>Connect with creative competitions</p>
+  </header>
+  
+  <div class="container">
+    
+    <!-- Tab Navigation -->
+    <div class="tabs">
+      <div class="tab active" data-screen="home">Home</div>
+      <div class="tab" data-screen="competitions">Competitions</div>
+      <div class="tab" data-screen="profile">Profile</div>
     </div>
+    
+    <!-- Home Screen -->
+    <div id="home-screen" class="screen active">
+      <div class="card">
+        <h2>Welcome to CreativeCrowdChallenge!</h2>
+        <p>Join exciting creative competitions and showcase your talents.</p>
+        <button onclick="showScreen('competitions')">Explore Competitions</button>
+      </div>
+      
+      <div class="card">
+        <h3>Popular Categories</h3>
+        <ul id="categories-list">
+          <li>Photography</li>
+          <li>Digital Art</li>
+          <li>Writing</li>
+          <li>Music</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Competitions Screen -->
+    <div id="competitions-screen" class="screen">
+      <div class="card">
+        <h2>Active Competitions</h2>
+        <div id="competitions-list">
+          <div class="card">
+            <h3>Summer Photography Contest</h3>
+            <p>Show your best summer shots and win prizes!</p>
+            <button onclick="alert('Competition details would open here')">View Details</button>
+          </div>
+          <div class="card">
+            <h3>Creative Writing Challenge</h3>
+            <p>Write a short story on the theme "New Beginnings"</p>
+            <button onclick="alert('Competition details would open here')">View Details</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Profile Screen -->
+    <div id="profile-screen" class="screen">
+      <div class="card">
+        <h2>User Profile</h2>
+        <p><strong>Name:</strong> Demo User</p>
+        <p><strong>Member Since:</strong> March 2023</p>
+        <p><strong>Competitions Entered:</strong> 5</p>
+        <p><strong>Achievements:</strong> 2 Runner-up awards</p>
+        <button onclick="alert('Login functionality would be here')">Login/Register</button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        // Simple script to verify JavaScript works
-        console.log('Simple test page loaded successfully');
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM fully loaded');
+  <script>
+    // Tab functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab').forEach(t => {
+          t.classList.remove('active');
         });
-    </script>
+        
+        // Add active class to clicked tab
+        this.classList.add('active');
+        
+        // Show corresponding screen
+        const screenName = this.getAttribute('data-screen');
+        showScreen(screenName);
+      });
+    });
+    
+    // Function to show a specific screen
+    function showScreen(screenName) {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      
+      // Show the requested screen
+      document.getElementById(screenName + '-screen').classList.add('active');
+      
+      // Update the active tab
+      document.querySelectorAll('.tab').forEach(tab => {
+        if (tab.getAttribute('data-screen') === screenName) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+      
+      console.log('Showing screen:', screenName);
+    }
+    
+    // Log when page loads
+    window.addEventListener('load', function() {
+      console.log('Test app loaded successfully!');
+    });
+  </script>
 </body>
 </html>

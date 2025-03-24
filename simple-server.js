@@ -6,8 +6,8 @@ const path = require('path');
 const server = http.createServer((req, res) => {
   console.log(`Request received: ${req.url}`);
   
-  // Always serve basic.html regardless of the URL
-  const filePath = path.join(__dirname, 'basic.html');
+  // Always serve simple-test.html regardless of the URL
+  const filePath = path.join(__dirname, 'simple-test.html');
   
   // Read the HTML file
   fs.readFile(filePath, (err, content) => {
@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
       return;
     }
     
-    console.log(`Serving basic.html... (File size: ${content.length} bytes)`);
+    console.log(`Serving simple-test.html... (File size: ${content.length} bytes)`);
     
     // Set content type and serve the HTML
     res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -35,5 +35,6 @@ const PORT = 5000;
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${PORT}/`);
   console.log(`Server base directory: ${__dirname}`);
-  console.log(`Serving basic.html from: ${path.join(__dirname, 'basic.html')}`);
+  console.log(`Now serving simple-test.html from: ${path.join(__dirname, 'simple-test.html')}`);
+  console.log(`This is a more feature-rich page with tabs and basic app functionality`);
 });
