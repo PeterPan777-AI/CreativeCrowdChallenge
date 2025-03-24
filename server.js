@@ -339,13 +339,23 @@ async function handleApiRequest(req, res) {
       if (!supabase) {
         console.log('Supabase not available, using simulated authentication');
         // Simulate authentication for demo purposes
-        if (email === 'demo@example.com' && password === 'password') {
+        // Allow several test accounts with different roles
+        const validUsers = {
+          'demo@example.com': { name: 'Demo User', role: 'business' },
+          'admin@example.com': { name: 'Admin User', role: 'admin' },
+          'business@example.com': { name: 'Business User', role: 'business' },
+          'user@example.com': { name: 'Regular User', role: 'user' }
+        };
+        
+        if (validUsers[email]) {
+          const userInfo = validUsers[email];
           const mockUser = {
             user: {
-              id: 'mock-user-id',
+              id: `mock-user-id-${email.split('@')[0]}`,
               email: email,
               user_metadata: {
-                full_name: 'Demo User'
+                full_name: userInfo.name,
+                role: userInfo.role
               }
             },
             session: {
@@ -353,9 +363,11 @@ async function handleApiRequest(req, res) {
               expires_at: Date.now() + 3600000
             }
           };
+          console.log(`Demo login successful for ${email} with role ${userInfo.role}`);
           res.writeHead(200);
           res.end(JSON.stringify(mockUser));
         } else {
+          console.log(`Demo login failed for ${email}`);
           res.writeHead(401);
           res.end(JSON.stringify({ error: 'Invalid email or password' }));
         }
@@ -406,13 +418,20 @@ async function handleApiRequest(req, res) {
       
       if (!supabase) {
         console.log('Supabase not available, using simulated registration');
+        
+        // Determine user role based on email
+        const isAdmin = email.includes('admin');
+        const isBusiness = email.includes('business') || email === 'demo@example.com';
+        const userRole = isAdmin ? 'admin' : (isBusiness ? 'business' : 'user');
+        
         // Simulate registration for demo purposes
         const mockUser = {
           user: {
-            id: 'mock-user-id-' + Date.now(),
+            id: `mock-user-id-${email.split('@')[0]}-${Date.now()}`,
             email: email,
             user_metadata: {
-              full_name: name
+              full_name: name,
+              role: userRole
             }
           },
           session: {
@@ -420,19 +439,27 @@ async function handleApiRequest(req, res) {
             expires_at: Date.now() + 3600000
           }
         };
+        
+        console.log(`Demo registration successful for ${email} with role ${userRole}`);
         res.writeHead(200);
         res.end(JSON.stringify(mockUser));
         return;
       }
       
       try {
-        console.log(`Attempting to register user: ${email}`);
+        // Determine user role based on email
+        const isAdmin = email.includes('admin');
+        const isBusiness = email.includes('business') || email === 'demo@example.com';
+        const userRole = isAdmin ? 'admin' : (isBusiness ? 'business' : 'user');
+        
+        console.log(`Attempting to register user: ${email} with role: ${userRole}`);
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
-              full_name: name
+              full_name: name,
+              role: userRole
             }
           }
         });

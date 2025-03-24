@@ -694,23 +694,33 @@
         <div class="profile-header">
           <div class="profile-avatar">DU</div>
           <div class="profile-info">
-            <h2>Demo User</h2>
-            <p>Member since March 2023</p>
+            <h2 id="profile-user-name">Demo User</h2>
+            <p id="profile-member-since">Member since March 2023</p>
+            <p id="profile-user-role" style="font-style: italic; color: #6B7280;">Regular User</p>
           </div>
         </div>
         
         <div class="stats-container">
           <div class="stat-box">
-            <div class="stat-value">5</div>
+            <div class="stat-value" id="profile-submissions">5</div>
             <div class="stat-label">Submissions</div>
           </div>
           <div class="stat-box">
-            <div class="stat-value">2</div>
+            <div class="stat-value" id="profile-awards">2</div>
             <div class="stat-label">Awards</div>
           </div>
           <div class="stat-box">
-            <div class="stat-value">12</div>
+            <div class="stat-value" id="profile-votes">12</div>
             <div class="stat-label">Votes Cast</div>
+          </div>
+        </div>
+        
+        <!-- Back Office section for admin and business users -->
+        <div id="back-office-section" class="card" style="display: none; margin-bottom: 20px; background-color: #F8FAFC; border-left: 4px solid #3B82F6;">
+          <h3 style="color: #1E40AF;">Back Office</h3>
+          <p>Access special features for businesses and administrators.</p>
+          <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button onclick="showAnalyticsDashboard()" style="background-color: #1E40AF;">Analytics Dashboard</button>
           </div>
         </div>
         
