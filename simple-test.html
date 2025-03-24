@@ -1089,6 +1089,66 @@
       }, 3000);
     }
     
+    // Show competition details
+    function showCompetitionDetails(competitionId) {
+      console.log('Showing details for competition:', competitionId);
+      
+      // Find the competition in our loaded competitions data
+      let competition = null;
+      
+      // Get the competition details from our API
+      fetch('/api/competitions')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch competitions');
+          }
+          return response.json();
+        })
+        .then(competitions => {
+          competition = competitions.find(comp => comp.id === competitionId);
+          
+          if (!competition) {
+            throw new Error('Competition not found');
+          }
+          
+          // Format deadline date if available
+          let deadline = 'Coming soon';
+          if (competition.deadline) {
+            try {
+              const deadlineDate = new Date(competition.deadline);
+              deadline = deadlineDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch (e) {
+              console.error('Error formatting date:', e);
+              deadline = competition.deadline;
+            }
+          }
+          
+          // Update competition details in the UI
+          document.getElementById('competition-title').textContent = competition.title;
+          document.getElementById('competition-deadline').textContent = deadline;
+          document.getElementById('competition-entries').textContent = '0'; // This would come from API in real app
+          
+          // Set the category badge
+          const categoriesContainer = document.getElementById('competition-categories');
+          categoriesContainer.innerHTML = `<span class="badge primary">${competition.category || 'General'}</span>`;
+          
+          // Set description
+          document.getElementById('competition-description').innerHTML = `<p>${competition.description}</p>`;
+          
+          // Set prizes
+          document.getElementById('competition-prizes').innerHTML = 
+            `<li>${competition.prize || 'Prizes to be announced'}</li>`;
+          
+          // Show the competition details screen
+          showScreen('competition-details-screen');
+        })
+        .catch(error => {
+          console.error('Error loading competition details:', error);
+          alert('Error loading competition details: ' + error.message);
+          // Stay on the current screen
+        });
+    }
+    
     // Load competitions from API
     function loadCompetitions() {
       const competitionsList = document.getElementById('competitions-list');

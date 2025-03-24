@@ -29,8 +29,27 @@ if (createClient && supabaseUrl && supabaseAnonKey) {
   try {
     supabase = createClient(supabaseUrl, supabaseAnonKey);
     console.log('Supabase client initialized successfully');
+    
+    // Test the connection to see if we can actually connect
+    (async () => {
+      try {
+        const { data, error } = await supabase.from('competitions').select('count');
+        if (error) {
+          console.error('Supabase connection test failed:', error);
+          console.warn('Using application in demo mode due to connection issues');
+          supabase = null;
+        } else {
+          console.log('Supabase connection test successful');
+        }
+      } catch (testError) {
+        console.error('Supabase connection test exception:', testError);
+        console.warn('Using application in demo mode due to connection issues');
+        supabase = null;
+      }
+    })();
   } catch (error) {
     console.error('Error initializing Supabase client:', error.message);
+    supabase = null;
   }
 } else {
   console.warn('Using application without Supabase connection - demo mode active');
@@ -186,6 +205,74 @@ async function handleApiRequest(req, res) {
       // Fallback to mock data
       res.writeHead(200);
       res.end(JSON.stringify(MOCK_DATA.competitions));
+    }
+    return;
+  }
+  
+  // GET /api/competitions/:id
+  if (endpoint.match(/^\/competitions\/[\w-]+$/) && req.method === 'GET') {
+    const competitionId = endpoint.split('/').pop();
+    console.log(`Fetching details for competition: ${competitionId}`);
+    
+    if (!supabase) {
+      console.log('Supabase not available, using mock competition data');
+      const competition = MOCK_DATA.competitions.find(c => c.id === competitionId);
+      
+      if (!competition) {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Competition not found' }));
+        return;
+      }
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(competition));
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('competitions')
+        .select('*')
+        .eq('id', competitionId)
+        .single();
+        
+      if (error) {
+        console.error('Supabase error fetching competition:', error);
+        // Try to find in mock data as fallback
+        const competition = MOCK_DATA.competitions.find(c => c.id === competitionId);
+        
+        if (!competition) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Competition not found' }));
+          return;
+        }
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(competition));
+        return;
+      }
+      
+      if (!data) {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Competition not found' }));
+        return;
+      }
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(data));
+    } catch (error) {
+      console.error('Error fetching competition details:', error);
+      // Try mock data as fallback
+      const competition = MOCK_DATA.competitions.find(c => c.id === competitionId);
+      
+      if (!competition) {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Competition not found' }));
+        return;
+      }
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(competition));
     }
     return;
   }
