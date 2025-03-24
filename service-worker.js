@@ -1,6 +1,6 @@
 // Service Worker for CreativeCrowdChallenge PWA
-const CACHE_NAME = 'ccc-app-v1';
-const DATA_CACHE_NAME = 'ccc-data-v1';
+const CACHE_NAME = 'ccc-app-v2';
+const DATA_CACHE_NAME = 'ccc-data-v2';
 const SYNC_QUEUE_NAME = 'ccc-sync-queue';
 const NOTIFICATION_BADGE_COUNT = 'ccc-notification-badge-count';
 
