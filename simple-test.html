@@ -1656,6 +1656,11 @@
       // Initialize analytics if user visits that tab
       document.querySelector('.tab[data-screen="analytics"]').addEventListener('click', function() {
         initializeAnalytics();
+        
+        // Add a little delay to ensure the screen is fully shown before rendering charts
+        setTimeout(() => {
+          loadBusinessAnalytics();
+        }, 100);
       });
     });
     
@@ -1666,8 +1671,21 @@
     let analyticsData = null;
     
     function initializeAnalytics() {
-      // Load analytics data
-      loadBusinessAnalytics();
+      console.log('Initializing analytics dashboard');
+      // Set up event listeners for business selector and export buttons
+      const businessSelector = document.getElementById('business-selector');
+      if (businessSelector) {
+        businessSelector.addEventListener('change', loadBusinessAnalytics);
+      }
+      
+      // Connect export buttons
+      const exportButtons = document.querySelectorAll('.export-button');
+      exportButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const format = this.getAttribute('data-format');
+          exportAnalytics(format);
+        });
+      });
     }
     
     function loadBusinessAnalytics() {
@@ -1729,12 +1747,23 @@
     }
     
     function createCompetitionsChart(competitions) {
-      const ctx = document.getElementById('competitions-chart').getContext('2d');
+      const canvas = document.getElementById('competitions-chart');
+      if (!canvas) {
+        console.error('Competition chart canvas not found!');
+        return;
+      }
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Could not get 2D context for competition chart');
+        return;
+      }
       
       if (competitionsChart) {
         competitionsChart.destroy();
       }
       
+      console.log('Creating competitions chart with data:', competitions);
       competitionsChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -1766,12 +1795,23 @@
     }
     
     function createDemographicsChart(demographics) {
-      const ctx = document.getElementById('demographics-chart').getContext('2d');
+      const canvas = document.getElementById('demographics-chart');
+      if (!canvas) {
+        console.error('Demographics chart canvas not found!');
+        return;
+      }
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Could not get 2D context for demographics chart');
+        return;
+      }
       
       if (demographicsChart) {
         demographicsChart.destroy();
       }
       
+      console.log('Creating demographics chart with data:', demographics);
       demographicsChart = new Chart(ctx, {
         type: 'pie',
         data: {
@@ -1803,12 +1843,23 @@
     }
     
     function createTimelineChart(timelineData) {
-      const ctx = document.getElementById('timeline-chart').getContext('2d');
+      const canvas = document.getElementById('timeline-chart');
+      if (!canvas) {
+        console.error('Timeline chart canvas not found!');
+        return;
+      }
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Could not get 2D context for timeline chart');
+        return;
+      }
       
       if (timelineChart) {
         timelineChart.destroy();
       }
       
+      console.log('Creating timeline chart with data:', timelineData);
       timelineChart = new Chart(ctx, {
         type: 'line',
         data: {
