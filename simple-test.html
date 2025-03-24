@@ -1036,6 +1036,14 @@
         updateProfileView();
       }
       
+      // Special handling for analytics screen
+      if (screenName === 'analytics-screen' || screenName === 'analytics') {
+        console.log('Initializing analytics dashboard on screen change');
+        setTimeout(() => {
+          initializeAnalytics();
+        }, 100);
+      }
+      
       console.log('Showing screen:', screenName);
     }
     
