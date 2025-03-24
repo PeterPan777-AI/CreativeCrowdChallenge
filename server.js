@@ -283,7 +283,28 @@ const MOCK_DATA = {
         dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
         submissions: [5, 12, 18, 23, 29, 42],
         views: [120, 250, 380, 470, 580, 865]
-      }
+      },
+      // Enhanced engagement analytics data
+      engagement: {
+        daily: [15, 22, 18, 25, 30, 28, 32],
+        weeklyTrend: 15,
+        conversionRate: 3.8,
+        avgTimeSpent: 4.5
+      },
+      trafficSources: [
+        { name: 'Organic Search', percentage: 45 },
+        { name: 'Direct', percentage: 25 },
+        { name: 'Social Media', percentage: 20 },
+        { name: 'Referral', percentage: 10 }
+      ],
+      userBehavior: {
+        returningUsers: '68%',
+        votesPerUser: '8.2',
+        submissionQuality: '4.2★',
+        userRetention: '71%'
+      },
+      peakActivity: '2pm - 6pm',
+      sessionDuration: '4.5 min'
     },
     'mock-business-2': {
       totalCompetitions: 1,
@@ -304,7 +325,28 @@ const MOCK_DATA = {
         dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
         submissions: [0, 0, 4, 7, 10, 12],
         views: [0, 0, 90, 152, 217, 295]
-      }
+      },
+      // Enhanced engagement analytics data
+      engagement: {
+        daily: [8, 12, 10, 14, 17, 15, 18],
+        weeklyTrend: 9,
+        conversionRate: 2.5,
+        avgTimeSpent: 3.2
+      },
+      trafficSources: [
+        { name: 'Organic Search', percentage: 35 },
+        { name: 'Direct', percentage: 30 },
+        { name: 'Social Media', percentage: 25 },
+        { name: 'Referral', percentage: 10 }
+      ],
+      userBehavior: {
+        returningUsers: '52%',
+        votesPerUser: '5.1',
+        submissionQuality: '3.8★',
+        userRetention: '62%'
+      },
+      peakActivity: '3pm - 7pm',
+      sessionDuration: '3.8 min'
     }
   }
 };
