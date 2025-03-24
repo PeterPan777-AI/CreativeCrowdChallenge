@@ -290,9 +290,13 @@ const MOCK_DATA = {
       // Enhanced engagement analytics data
       engagement: {
         daily: [15, 22, 18, 25, 30, 28, 32],
+        weekly: [105, 129, 154, 178, 210],
+        monthly: [410, 485, 560, 620],
         weeklyTrend: 15,
         conversionRate: 3.8,
-        avgTimeSpent: 4.5
+        avgTimeSpent: 4.5,
+        bounceRate: 25,
+        interactionRate: 68
       },
       trafficSources: [
         { name: 'Organic Search', percentage: 45 },
@@ -304,10 +308,32 @@ const MOCK_DATA = {
         returningUsers: '68%',
         votesPerUser: '8.2',
         submissionQuality: '4.2★',
-        userRetention: '71%'
+        userRetention: '71%',
+        userGrowth: '12%',
+        activeDays: 4,
+        commentFrequency: '2.7'
       },
       peakActivity: '2pm - 6pm',
-      sessionDuration: '4.5 min'
+      sessionDuration: '4.5 min',
+      geographicData: {
+        regions: [
+          { name: 'North America', percentage: 55 },
+          { name: 'Europe', percentage: 30 },
+          { name: 'Asia', percentage: 10 },
+          { name: 'Other', percentage: 5 }
+        ]
+      },
+      competitionPerformance: {
+        averageSubmissionsPerCompetition: '21.0',
+        submissionCompletionRate: '85%',
+        averageCompetitionDuration: '24 days',
+        topPerformingCategory: 'Design'
+      },
+      deviceData: {
+        mobile: 65,
+        desktop: 30,
+        tablet: 5
+      }
     },
     'mock-business-2': {
       totalCompetitions: 1,
@@ -332,9 +358,13 @@ const MOCK_DATA = {
       // Enhanced engagement analytics data
       engagement: {
         daily: [8, 12, 10, 14, 17, 15, 18],
+        weekly: [60, 75, 85, 95, 110],
+        monthly: [180, 240, 290, 340],
         weeklyTrend: 9,
         conversionRate: 2.5,
-        avgTimeSpent: 3.2
+        avgTimeSpent: 3.2,
+        bounceRate: 32,
+        interactionRate: 57
       },
       trafficSources: [
         { name: 'Organic Search', percentage: 35 },
@@ -346,10 +376,32 @@ const MOCK_DATA = {
         returningUsers: '52%',
         votesPerUser: '5.1',
         submissionQuality: '3.8★',
-        userRetention: '62%'
+        userRetention: '62%',
+        userGrowth: '8%',
+        activeDays: 3,
+        commentFrequency: '1.5'
       },
       peakActivity: '3pm - 7pm',
-      sessionDuration: '3.8 min'
+      sessionDuration: '3.8 min',
+      geographicData: {
+        regions: [
+          { name: 'North America', percentage: 50 },
+          { name: 'Europe', percentage: 25 },
+          { name: 'Asia', percentage: 15 },
+          { name: 'Other', percentage: 10 }
+        ]
+      },
+      competitionPerformance: {
+        averageSubmissionsPerCompetition: '12.0',
+        submissionCompletionRate: '72%',
+        averageCompetitionDuration: '20 days',
+        topPerformingCategory: 'Technology'
+      },
+      deviceData: {
+        mobile: 70,
+        desktop: 22,
+        tablet: 8
+      }
     }
   }
 };
@@ -1028,6 +1080,54 @@ async function handleApiRequest(req, res) {
           dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
           submissions: [5, 12, 18, 23, 29, totalSubmissions].map(v => Math.floor(v * (Math.random() * 0.5 + 0.75))),
           views: [120, 250, 380, 470, 580, totalViews].map(v => Math.floor(v * (Math.random() * 0.5 + 0.75)))
+        },
+        // Enhanced engagement analytics data
+        engagement: {
+          daily: [15, 22, 18, 25, 30, 28, 32].map(v => Math.floor(v * (Math.random() * 0.5 + 0.75))),
+          weekly: [105, 129, 154, 178, 210].map(v => Math.floor(v * (Math.random() * 0.3 + 0.85))),
+          monthly: [410, 485, 560, 620].map(v => Math.floor(v * (Math.random() * 0.2 + 0.9))),
+          weeklyTrend: Math.floor(Math.random() * 10) + 5,
+          conversionRate: (Math.random() * 2 + 2).toFixed(1),
+          avgTimeSpent: (Math.random() * 2 + 3).toFixed(1),
+          bounceRate: Math.floor(Math.random() * 10) + 20,
+          interactionRate: Math.floor(Math.random() * 15) + 55
+        },
+        trafficSources: [
+          { name: 'Organic Search', percentage: Math.floor(Math.random() * 20) + 30 },
+          { name: 'Direct', percentage: Math.floor(Math.random() * 15) + 20 },
+          { name: 'Social Media', percentage: Math.floor(Math.random() * 15) + 15 },
+          { name: 'Referral', percentage: Math.floor(Math.random() * 10) + 5 },
+          { name: 'Email', percentage: Math.floor(Math.random() * 10) + 5 }
+        ],
+        userBehavior: {
+          returningUsers: Math.floor(Math.random() * 15) + 55 + '%',
+          votesPerUser: (Math.random() * 4 + 5).toFixed(1),
+          submissionQuality: (Math.random() * 1 + 3.5).toFixed(1) + '★',
+          userRetention: Math.floor(Math.random() * 15) + 60 + '%',
+          userGrowth: Math.floor(Math.random() * 10) + 5 + '%',
+          activeDays: Math.floor(Math.random() * 2) + 3,
+          commentFrequency: (Math.random() * 2 + 1).toFixed(1)
+        },
+        peakActivity: `${Math.floor(Math.random() * 4) + 1}pm - ${Math.floor(Math.random() * 4) + 5}pm`,
+        sessionDuration: (Math.random() * 2 + 3).toFixed(1) + ' min',
+        geographicData: {
+          regions: [
+            { name: 'North America', percentage: Math.floor(Math.random() * 20) + 40 },
+            { name: 'Europe', percentage: Math.floor(Math.random() * 15) + 25 },
+            { name: 'Asia', percentage: Math.floor(Math.random() * 10) + 15 },
+            { name: 'Other', percentage: Math.floor(Math.random() * 10) + 5 }
+          ]
+        },
+        competitionPerformance: {
+          averageSubmissionsPerCompetition: (totalSubmissions / competitions.length).toFixed(1),
+          submissionCompletionRate: Math.floor(Math.random() * 20) + 70 + '%',
+          averageCompetitionDuration: Math.floor(Math.random() * 10) + 20 + ' days',
+          topPerformingCategory: ['Design', 'Marketing', 'Technology', 'Creative Writing'][Math.floor(Math.random() * 4)]
+        },
+        deviceData: {
+          mobile: Math.floor(Math.random() * 20) + 50,
+          desktop: Math.floor(Math.random() * 20) + 30,
+          tablet: Math.floor(Math.random() * 10) + 5
         }
       };
       
