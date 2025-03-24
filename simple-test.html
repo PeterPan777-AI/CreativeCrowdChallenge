@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreativeCrowdChallenge - Basic Test</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            height: 100%;
+            width: 100%;
+        }
+        #app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #3B82F6;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+        p {
+            font-size: 18px;
+            margin-bottom: 24px;
+        }
+        .info {
+            font-size: 14px;
+            color: #E5E7EB;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: white;
+            color: #3B82F6;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>CreativeCrowdChallenge</h1>
+        <p>Welcome to the app!</p>
+        <div class="info">Basic HTML test page</div>
+        <button onclick="alert('Button clicked!')">Get Started</button>
+    </div>
+
+    <script>
+        // Simple script to verify JavaScript works
+        console.log('Simple test page loaded successfully');
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded');
+        });
+    </script>
+</body>
+</html>
