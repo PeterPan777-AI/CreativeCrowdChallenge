@@ -580,7 +580,7 @@
         
         try {
           // Get current user info
-          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
           if (!currentUser || !currentUser.id || currentUser.role !== 'admin') {
             showNotification('Admin access required', 'error');
             return;
@@ -736,7 +736,7 @@
         
         try {
           // Get current user for admin validation
-          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
           if (!currentUser || currentUser.role !== 'admin') {
             showNotification('Admin access required', 'error');
             return;
@@ -809,7 +809,7 @@
         
         try {
           // Get current user for admin validation
-          const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
           if (!currentUser || currentUser.role !== 'admin') {
             showNotification('Admin access required', 'error');
             return;
@@ -944,7 +944,7 @@
       
       window.logout = function() {
         // Clear user data from localStorage
-        localStorage.removeItem('currentUser');
+        localStorage.removeItem('user');
         
         // Show login form
         loginSection.style.display = 'block';
