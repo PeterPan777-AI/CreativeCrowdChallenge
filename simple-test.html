@@ -344,6 +344,67 @@
       0% { transform: translateX(0); opacity: 1; }
       100% { transform: translateX(100%); opacity: 0; }
     }
+    
+    /* App installation prompt */
+    #install-prompt {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e6f7ff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      border-left: 4px solid #3B82F6;
+      animation: slide-in 0.5s ease-out forwards;
+    }
+    
+    #install-prompt p {
+      margin: 0 0 12px 0;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+    
+    #install-prompt p::before {
+      content: "📱";
+      margin-right: 10px;
+      font-size: 1.2em;
+    }
+    
+    #install-prompt .button-container {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    #install-button {
+      background-color: #3B82F6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    #install-button:hover {
+      background-color: #2563EB;
+    }
+    
+    #dismiss-install {
+      background-color: transparent;
+      border: 1px solid #9CA3AF;
+      color: #6B7280;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    
+    #dismiss-install:hover {
+      background-color: #F3F4F6;
+      border-color: #6B7280;
+    }
 
     /* Profile header */
     .profile-header {
@@ -678,11 +739,11 @@
       You are currently offline. Some features may be limited.
     </div>
     <!-- Add to Home Screen Prompt -->
-    <div id="install-prompt" style="display: none; background-color: #e6f7ff; color: #333; padding: 10px; text-align: center; font-weight: bold; margin-top: 10px; border-radius: 5px;">
-      <p style="margin: 0 0 8px 0;">📱 Add this app to your home screen for a better experience!</p>
-      <div>
-        <button id="install-button" class="primary" style="margin-right: 10px;">Install App</button>
-        <button id="dismiss-install" class="secondary">Later</button>
+    <div id="install-prompt" style="display: none;">
+      <p>Add this app to your home screen for a better experience!</p>
+      <div class="button-container">
+        <button id="install-button">Install App</button>
+        <button id="dismiss-install">Later</button>
       </div>
     </div>
   </header>

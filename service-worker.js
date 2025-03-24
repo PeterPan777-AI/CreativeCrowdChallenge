@@ -141,7 +141,7 @@ async function processQueuedVotes() {
   try {
     // Open the IndexedDB store
     const db = await openDB();
-    const store = db.transaction('votes', 'readwrite').objectStore('votes');
+    const store = db.transaction('pendingVotes', 'readwrite').objectStore('pendingVotes');
     const votes = await store.getAll();
     
     console.log('Service Worker: Found queued votes:', votes.length);
@@ -173,8 +173,8 @@ async function processQueuedVotes() {
     }
     
     // Delete successful votes from the queue
-    const tx = db.transaction('votes', 'readwrite');
-    const voteStore = tx.objectStore('votes');
+    const tx = db.transaction('pendingVotes', 'readwrite');
+    const voteStore = tx.objectStore('pendingVotes');
     
     for (const voteId of successfulVotes) {
       await voteStore.delete(voteId);
@@ -209,7 +209,7 @@ async function processQueuedSubmissions() {
   try {
     // Open the IndexedDB store
     const db = await openDB();
-    const store = db.transaction('submissions', 'readwrite').objectStore('submissions');
+    const store = db.transaction('pendingSubmissions', 'readwrite').objectStore('pendingSubmissions');
     const submissions = await store.getAll();
     
     console.log('Service Worker: Found queued submissions:', submissions.length);
@@ -245,8 +245,8 @@ async function processQueuedSubmissions() {
     }
     
     // Delete successful submissions from the queue
-    const tx = db.transaction('submissions', 'readwrite');
-    const submissionStore = tx.objectStore('submissions');
+    const tx = db.transaction('pendingSubmissions', 'readwrite');
+    const submissionStore = tx.objectStore('pendingSubmissions');
     
     for (const submissionId of successfulSubmissions) {
       await submissionStore.delete(submissionId);
@@ -279,7 +279,7 @@ async function processQueuedSubmissions() {
 // Helper function to open IndexedDB
 async function openDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('cccOfflineDB', 1);
+    const request = indexedDB.open('CreativeCrowdChallenge', 1);
     
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);
@@ -288,12 +288,12 @@ async function openDB() {
       const db = event.target.result;
       
       // Create stores if they don't exist
-      if (!db.objectStoreNames.contains('votes')) {
-        db.createObjectStore('votes', { keyPath: 'id', autoIncrement: true });
+      if (!db.objectStoreNames.contains('pendingVotes')) {
+        db.createObjectStore('pendingVotes', { keyPath: 'id', autoIncrement: true });
       }
       
-      if (!db.objectStoreNames.contains('submissions')) {
-        db.createObjectStore('submissions', { keyPath: 'id', autoIncrement: true });
+      if (!db.objectStoreNames.contains('pendingSubmissions')) {
+        db.createObjectStore('pendingSubmissions', { keyPath: 'id', autoIncrement: true });
       }
       
       // Create a store for app metadata (including badge count)
