@@ -3036,9 +3036,10 @@
     
     function createEngagementChart(engagementData) {
       // Get canvas element
-      const canvas = document.getElementById('engagement-chart-canvas');
+      const canvas = document.getElementById('engagement-line-chart');
       if (!canvas) {
-        console.error('Engagement chart canvas not found');
+        console.error('Engagement chart canvas element not found');
+        console.log('Looking for ID:', 'engagement-line-chart');
         return;
       }
       
@@ -3056,6 +3057,8 @@
       // Default data if not provided
       const dailyData = engagementData.daily || [12, 18, 22, 15, 25, 30, 28];
       const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      
+      console.log('Creating engagement chart with daily data:', dailyData);
       
       engagementChart = new Chart(ctx, {
         type: 'line',
@@ -3079,16 +3082,26 @@
             }
           },
           responsive: true,
-          maintainAspectRatio: false
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          }
         }
       });
     }
     
     function createTrafficSourcesChart(sourcesData) {
       // Get canvas element
-      const canvas = document.getElementById('sources-chart-canvas');
+      const canvas = document.getElementById('traffic-sources-chart');
       if (!canvas) {
         console.error('Traffic sources chart canvas not found');
+        console.log('Looking for ID:', 'traffic-sources-chart');
         return;
       }
       
@@ -3112,6 +3125,8 @@
       ];
       
       const sources = sourcesData || defaultSources;
+      
+      console.log('Creating traffic sources chart with data:', sources);
       
       sourcesChart = new Chart(ctx, {
         type: 'pie',
