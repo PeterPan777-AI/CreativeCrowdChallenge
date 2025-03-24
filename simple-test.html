@@ -1976,14 +1976,17 @@
       }
       
       // Initialize analytics if user visits that tab
-      document.querySelector('.tab[data-screen="analytics"]').addEventListener('click', function() {
-        initializeAnalytics();
-        
-        // Add a little delay to ensure the screen is fully shown before rendering charts
-        setTimeout(() => {
-          loadBusinessAnalytics();
-        }, 100);
-      });
+      const analyticsTab = document.querySelector('.tab[data-screen="analytics"]');
+      if (analyticsTab) {
+        analyticsTab.addEventListener('click', function() {
+          initializeAnalytics();
+          
+          // Add a little delay to ensure the screen is fully shown before rendering charts
+          setTimeout(() => {
+            loadBusinessAnalytics();
+          }, 100);
+        });
+      }
     });
     
     // Business Analytics Functions
