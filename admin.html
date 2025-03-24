@@ -459,6 +459,11 @@
       if (checkAdminLogin()) {
         // Already logged in, so no need for further login actions
         console.log('Admin already logged in');
+        
+        // Load analytics requests for the admin dashboard
+        setTimeout(() => {
+          loadAnalyticsRequests();
+        }, 300);
       }
       
       // Handle admin login form submission
@@ -506,6 +511,9 @@
               setTimeout(() => {
                 loginSection.style.display = 'none';
                 adminDashboard.style.display = 'block';
+                
+                // Load analytics requests
+                loadAnalyticsRequests();
               }, 1000);
             } else {
               showNotification('This account does not have admin privileges.', 'error');
@@ -535,6 +543,9 @@
               setTimeout(() => {
                 loginSection.style.display = 'none';
                 adminDashboard.style.display = 'block';
+                
+                // Load analytics requests for demo admin
+                loadAnalyticsRequests();
               }, 1000);
             } else {
               showNotification('Please use an admin account (containing "admin" in the email).', 'error');
