@@ -2089,6 +2089,12 @@
         return;
       }
       
+      // Check password minimum length requirement
+      if (password.length < 6) {
+        showNotification('Password must be at least 6 characters long', 'error');
+        return;
+      }
+      
       // Show loading state
       const loginButton = document.querySelector('#login-form button');
       const originalButtonText = loginButton.textContent;
@@ -2175,6 +2181,12 @@
       
       if (!name || !email || !password) {
         showNotification('Please fill in all fields', 'error');
+        return;
+      }
+      
+      // Check password minimum length requirement
+      if (password.length < 6) {
+        showNotification('Password must be at least 6 characters long', 'error');
         return;
       }
       
