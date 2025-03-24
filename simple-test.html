@@ -3078,6 +3078,7 @@
     let timelineChart;
     let engagementChart;
     let sourcesChart;
+    let deviceChart;
     let analyticsData = null;
     
     // Helper function to reset canvas for chart reuse
@@ -3183,6 +3184,10 @@
       if (sourcesChart) {
         sourcesChart.destroy();
         sourcesChart = null;
+      }
+      if (deviceChart) {
+        deviceChart.destroy();
+        deviceChart = null;
       }
       
       // Show loading state and prepare chart containers
@@ -3325,6 +3330,21 @@
           document.getElementById('user-retention').textContent = data.userBehavior.userRetention || '71%';
         }
         
+        // Update user growth if available
+        if (document.getElementById('user-growth') && data.userBehavior.userGrowth) {
+          document.getElementById('user-growth').textContent = data.userBehavior.userGrowth;
+        }
+        
+        // Update active days if available
+        if (document.getElementById('active-days') && data.userBehavior.activeDays) {
+          document.getElementById('active-days').textContent = data.userBehavior.activeDays;
+        }
+        
+        // Update comment frequency if available
+        if (document.getElementById('comment-frequency') && data.userBehavior.commentFrequency) {
+          document.getElementById('comment-frequency').textContent = data.userBehavior.commentFrequency;
+        }
+        
         // Update trends
         const trendElements = document.querySelectorAll('.insight-trend');
         trendElements.forEach(el => {
@@ -3338,6 +3358,60 @@
             el.classList.remove('trend-up');
           }
         });
+      }
+      
+      // Update device usage if data is available
+      if (data.deviceData) {
+        if (document.getElementById('mobile-percentage')) {
+          document.getElementById('mobile-percentage').textContent = `${data.deviceData.mobile}%`;
+        }
+        if (document.getElementById('desktop-percentage')) {
+          document.getElementById('desktop-percentage').textContent = `${data.deviceData.desktop}%`;
+        }
+        if (document.getElementById('tablet-percentage')) {
+          document.getElementById('tablet-percentage').textContent = `${data.deviceData.tablet}%`;
+        }
+        
+        // Create device usage chart
+        createDeviceUsageChart(data.deviceData);
+      }
+      
+      // Update competition performance metrics if available
+      if (data.competitionPerformance) {
+        if (document.getElementById('avg-submissions-per-competition')) {
+          document.getElementById('avg-submissions-per-competition').textContent = 
+            data.competitionPerformance.averageSubmissionsPerCompetition;
+        }
+        if (document.getElementById('submission-completion-rate')) {
+          document.getElementById('submission-completion-rate').textContent = 
+            data.competitionPerformance.submissionCompletionRate;
+        }
+        if (document.getElementById('avg-competition-duration')) {
+          document.getElementById('avg-competition-duration').textContent = 
+            data.competitionPerformance.averageCompetitionDuration;
+        }
+        if (document.getElementById('top-performing-category')) {
+          document.getElementById('top-performing-category').textContent = 
+            data.competitionPerformance.topPerformingCategory;
+        }
+      }
+      
+      // Update geographic regions if available
+      if (data.geographicData && data.geographicData.regions) {
+        const geoContainer = document.getElementById('geo-data-container');
+        if (geoContainer) {
+          geoContainer.innerHTML = ''; // Clear existing content
+          
+          data.geographicData.regions.forEach(region => {
+            const regionItem = document.createElement('div');
+            regionItem.className = 'region-item';
+            regionItem.innerHTML = `
+              <span class="region-name">${region.name}</span>
+              <span class="region-percentage">${region.percentage}%</span>
+            `;
+            geoContainer.appendChild(regionItem);
+          });
+        }
       }
       
       // Update engagement metrics
@@ -3470,6 +3544,78 @@
               intersect: false
             }
           }
+        }
+      });
+    }
+    
+    function createDeviceUsageChart(deviceData) {
+      // First, check if we need to create or reset the canvas
+      const deviceChartContainer = document.getElementById('device-usage-chart');
+      if (!deviceChartContainer) {
+        console.error('Device usage chart container not found');
+        return;
+      }
+      
+      // Create a canvas if it doesn't exist
+      let canvas = document.getElementById('device-usage-chart-canvas');
+      if (!canvas) {
+        // Clear the container and add a new canvas
+        deviceChartContainer.innerHTML = '';
+        canvas = document.createElement('canvas');
+        canvas.id = 'device-usage-chart-canvas';
+        deviceChartContainer.appendChild(canvas);
+      }
+      
+      // Get 2D context
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Could not get 2D context for device usage chart');
+        return;
+      }
+      
+      // Clear any existing chart
+      if (deviceChart) {
+        deviceChart.destroy();
+      }
+      
+      console.log('Creating device usage chart with data:', deviceData);
+      
+      // Create the new chart
+      deviceChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Mobile', 'Desktop', 'Tablet'],
+          datasets: [{
+            data: [deviceData.mobile, deviceData.desktop, deviceData.tablet],
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.7)', // Blue for mobile
+              'rgba(16, 185, 129, 0.7)', // Green for desktop
+              'rgba(245, 158, 11, 0.7)'  // Orange for tablet
+            ],
+            borderColor: [
+              'rgba(59, 130, 246, 1)',
+              'rgba(16, 185, 129, 1)',
+              'rgba(245, 158, 11, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: ${context.raw}%`;
+                }
+              }
+            }
+          },
+          cutout: '60%'
         }
       });
     }
@@ -3804,7 +3950,30 @@
             returningUsers: '68%',
             votesPerUser: '8.2',
             submissionQuality: '4.2★',
-            userRetention: '71%'
+            userRetention: '71%',
+            userGrowth: '+15% MoM',
+            activeDays: '3.5 per week',
+            commentFrequency: '2.3 per submission'
+          },
+          deviceData: {
+            mobile: 63,
+            desktop: 24,
+            tablet: 13
+          },
+          competitionPerformance: {
+            averageSubmissionsPerCompetition: '14',
+            submissionCompletionRate: '87%',
+            averageCompetitionDuration: '18 days',
+            topPerformingCategory: 'Graphic Design'
+          },
+          geographicData: {
+            regions: [
+              { name: 'North America', percentage: 42 },
+              { name: 'Europe', percentage: 28 },
+              { name: 'Asia', percentage: 18 },
+              { name: 'South America', percentage: 7 },
+              { name: 'Other', percentage: 5 }
+            ]
           },
           peakActivity: '2pm - 6pm',
           sessionDuration: '4.5 min'
@@ -3847,7 +4016,30 @@
             returningUsers: '52%',
             votesPerUser: '5.1',
             submissionQuality: '3.8★',
-            userRetention: '62%'
+            userRetention: '62%',
+            userGrowth: '+8% MoM',
+            activeDays: '2.1 per week',
+            commentFrequency: '1.5 per submission'
+          },
+          deviceData: {
+            mobile: 72,
+            desktop: 18,
+            tablet: 10
+          },
+          competitionPerformance: {
+            averageSubmissionsPerCompetition: '9',
+            submissionCompletionRate: '74%',
+            averageCompetitionDuration: '14 days',
+            topPerformingCategory: 'UI/UX Design'
+          },
+          geographicData: {
+            regions: [
+              { name: 'North America', percentage: 38 },
+              { name: 'Europe', percentage: 25 },
+              { name: 'Asia', percentage: 24 },
+              { name: 'South America', percentage: 8 },
+              { name: 'Other', percentage: 5 }
+            ]
           },
           peakActivity: '3pm - 7pm',
           sessionDuration: '3.8 min'
