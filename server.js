@@ -343,6 +343,127 @@ async function handleApiRequest(req, res) {
     return;
   }
   
+  // POST /api/category/suggest
+  if (endpoint === '/category/suggest' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { name, description } = body;
+      
+      if (!name || !description) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Category name and description are required' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log('Supabase not available, simulating category suggestion');
+        // Simulate category suggestion for demo purposes
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          id: 'mock-category-' + Date.now(),
+          name: name,
+          description: description,
+          status: 'pending'
+        }));
+        return;
+      }
+      
+      try {
+        console.log(`Submitting category suggestion: ${name}`);
+        const { data, error } = await supabase
+          .from('category_suggestions')
+          .insert([{ 
+            name: name,
+            description: description,
+            status: 'pending'
+          }])
+          .select();
+          
+        if (error) {
+          console.error('Category suggestion error:', error);
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: error.message }));
+          return;
+        }
+        
+        console.log('Category suggestion submitted successfully');
+        res.writeHead(200);
+        res.end(JSON.stringify(data[0]));
+      } catch (supabaseError) {
+        console.error('Supabase error during category suggestion:', supabaseError);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Category suggestion service unavailable' }));
+      }
+    } catch (error) {
+      console.error('Error submitting category suggestion:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Category suggestion failed' }));
+    }
+    return;
+  }
+  
+  // POST /api/submission
+  if (endpoint === '/submission' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { competitionId, title, description } = body;
+      
+      if (!competitionId || !title || !description) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Competition ID, title, and description are required' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log('Supabase not available, simulating submission');
+        // Simulate submission for demo purposes
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          id: 'mock-submission-' + Date.now(),
+          competition_id: competitionId,
+          title: title,
+          description: description,
+          created_at: new Date().toISOString(),
+          status: 'submitted'
+        }));
+        return;
+      }
+      
+      try {
+        console.log(`Submitting entry for competition: ${competitionId}`);
+        const { data, error } = await supabase
+          .from('submissions')
+          .insert([{ 
+            competition_id: competitionId,
+            title: title,
+            description: description,
+            status: 'submitted'
+          }])
+          .select();
+          
+        if (error) {
+          console.error('Submission error:', error);
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: error.message }));
+          return;
+        }
+        
+        console.log('Submission submitted successfully');
+        res.writeHead(200);
+        res.end(JSON.stringify(data[0]));
+      } catch (supabaseError) {
+        console.error('Supabase error during submission:', supabaseError);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Submission service unavailable' }));
+      }
+    } catch (error) {
+      console.error('Error submitting entry:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Submission failed' }));
+    }
+    return;
+  }
+
   // Default response for unknown endpoints
   res.writeHead(404);
   res.end(JSON.stringify({ error: 'Not found' }));

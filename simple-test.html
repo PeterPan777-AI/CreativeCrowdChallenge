@@ -1027,14 +1027,49 @@
         return;
       }
       
-      // Would connect to Supabase in real app
-      showNotification('Entry submitted successfully!');
+      // Show loading state
+      const submitButton = document.querySelector('#submission-form button');
+      const originalButtonText = submitButton.textContent;
+      submitButton.textContent = 'Submitting...';
+      submitButton.disabled = true;
       
-      // Reset form
-      document.getElementById('competition-select').value = '';
-      document.getElementById('submission-title').value = '';
-      document.getElementById('submission-description').value = '';
-      document.getElementById('submission-file').value = '';
+      // Call our API
+      fetch('/api/submission', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          competitionId: competitionId,
+          title: title,
+          description: description
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to submit entry');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Entry submitted successfully:', data);
+        showNotification('Entry submitted successfully!');
+        
+        // Reset form
+        document.getElementById('competition-select').value = '';
+        document.getElementById('submission-title').value = '';
+        document.getElementById('submission-description').value = '';
+        document.getElementById('submission-file').value = '';
+      })
+      .catch(error => {
+        console.error('Error submitting entry:', error);
+        showNotification('Failed to submit entry: ' + error.message, 'error');
+      })
+      .finally(() => {
+        // Reset button state
+        submitButton.textContent = originalButtonText;
+        submitButton.disabled = false;
+      });
     }
     
     // Show notification
@@ -1054,9 +1089,102 @@
       }, 3000);
     }
     
+    // Load competitions from API
+    function loadCompetitions() {
+      const competitionsList = document.getElementById('competitions-list');
+      const loadingHTML = '<div class="card"><p>Loading competitions...</p></div>';
+      competitionsList.innerHTML = loadingHTML;
+      
+      fetch('/api/competitions')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch competitions');
+          }
+          return response.json();
+        })
+        .then(competitions => {
+          console.log('Competitions loaded:', competitions);
+          
+          if (competitions && competitions.length > 0) {
+            // Clear loading message
+            competitionsList.innerHTML = '';
+            
+            // Update competition select dropdown
+            const competitionSelect = document.getElementById('competition-select');
+            competitionSelect.innerHTML = '<option value="">-- Select a competition --</option>';
+            
+            // Add each competition
+            competitions.forEach(competition => {
+              // Create competition card
+              const card = document.createElement('div');
+              card.className = 'card';
+              
+              // Format deadline date if available
+              let deadline = 'Coming soon';
+              if (competition.deadline) {
+                try {
+                  const deadlineDate = new Date(competition.deadline);
+                  deadline = deadlineDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                } catch (e) {
+                  console.error('Error formatting date:', e);
+                  deadline = competition.deadline;
+                }
+              }
+              
+              // Set HTML content for the card
+              card.innerHTML = `
+                <h3>${competition.title}</h3>
+                <div class="competition-meta">
+                  <div class="meta-item"><strong>Ends:</strong> ${deadline}</div>
+                  <div class="meta-item"><strong>Prize:</strong> ${competition.prize || 'Various prizes'}</div>
+                </div>
+                <p>${competition.description}</p>
+                <div>
+                  <span class="badge primary">${competition.category || 'General'}</span>
+                  <span class="badge success">${competition.status || 'Active'}</span>
+                </div>
+                <div style="margin-top: 15px;">
+                  <button onclick="showCompetitionDetails('${competition.id}')">View Details</button>
+                </div>
+              `;
+              
+              competitionsList.appendChild(card);
+              
+              // Add to select dropdown
+              const option = document.createElement('option');
+              option.value = competition.id;
+              option.textContent = competition.title;
+              competitionSelect.appendChild(option);
+            });
+          } else {
+            competitionsList.innerHTML = '<div class="card"><p>No active competitions found. Check back soon!</p></div>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading competitions:', error);
+          competitionsList.innerHTML = `<div class="card"><p>Error loading competitions: ${error.message}</p></div>`;
+        });
+    }
+    
     // Log when page loads
     window.addEventListener('load', function() {
       console.log('CreativeCrowdChallenge app loaded successfully!');
+      
+      // Load competitions on page load
+      loadCompetitions();
+      
+      // Check for existing logged in user
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
+        try {
+          currentUser = JSON.parse(savedUser);
+          isLoggedIn = true;
+          updateProfileView();
+        } catch (e) {
+          console.error('Error loading saved user:', e);
+          localStorage.removeItem('user');
+        }
+      }
     });
     
     // Close modals when clicking outside
