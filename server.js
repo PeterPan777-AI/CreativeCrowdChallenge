@@ -659,6 +659,117 @@ async function handleApiRequest(req, res) {
     return;
   }
   
+  // POST /api/auth/login - Similar to signin but specifically for admin panel
+  if (endpoint === '/auth/login' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { email, password } = body;
+      
+      if (!email || !password) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ message: 'Email and password are required' }));
+        return;
+      }
+
+      // Check if email contains "admin" to ensure only admin accounts can log in
+      if (!email.toLowerCase().includes('admin')) {
+        res.writeHead(401);
+        res.end(JSON.stringify({ message: 'Not an admin account' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log('Supabase not available, using simulated admin authentication');
+        // Simulate authentication for demo purposes
+        if (email.includes('admin') && password === 'password') {
+          // Create a mock admin user for demo
+          const mockAdminUser = {
+            id: 'admin-123',
+            email: email,
+            name: 'Admin User',
+            role: 'admin'
+          };
+          
+          console.log(`Demo admin login successful for ${email}`);
+          
+          res.writeHead(200);
+          res.end(JSON.stringify({ 
+            user: mockAdminUser,
+            message: 'Login successful (Demo Mode)' 
+          }));
+        } else {
+          console.log(`Demo admin login failed for ${email}`);
+          res.writeHead(401);
+          res.end(JSON.stringify({ message: 'Invalid credentials' }));
+        }
+        return;
+      }
+      
+      try {
+        // Attempt Supabase authentication
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) {
+          console.error('Authentication error:', error.message);
+          res.writeHead(401);
+          res.end(JSON.stringify({ message: error.message }));
+          return;
+        }
+        
+        if (!data || !data.user) {
+          res.writeHead(401);
+          res.end(JSON.stringify({ message: 'Authentication failed' }));
+          return;
+        }
+        
+        // Ensure the user is an admin
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+        
+        if (profileError) {
+          console.error('Error fetching user profile:', profileError);
+          res.writeHead(401);
+          res.end(JSON.stringify({ message: 'Failed to verify admin status' }));
+          return;
+        }
+        
+        if (!profileData || profileData.role !== 'admin') {
+          res.writeHead(401);
+          res.end(JSON.stringify({ message: 'Not an admin account' }));
+          return;
+        }
+        
+        console.log('Admin authenticated successfully');
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          user: {
+            id: data.user.id,
+            email: data.user.email,
+            name: profileData.name,
+            role: 'admin'
+          },
+          message: 'Login successful' 
+        }));
+      } catch (supabaseError) {
+        console.error('Supabase error during admin auth:', supabaseError);
+        res.writeHead(500);
+        res.end(JSON.stringify({ message: 'Authentication service error' }));
+      }
+    } catch (error) {
+      console.error('Error processing admin login:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ message: 'Internal server error' }));
+    }
+    return;
+  }
+
   // POST /api/auth/signup
   if (endpoint === '/auth/signup' && req.method === 'POST') {
     try {
