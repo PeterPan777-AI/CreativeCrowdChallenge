@@ -2595,6 +2595,7 @@
     
     function loadBusinessAnalytics() {
       const businessId = document.getElementById('business-selector').value;
+      const timelinePeriod = document.getElementById('timeline-period')?.value || '30days';
       
       // Clear existing charts if they exist
       if (competitionsChart) {
@@ -2609,11 +2610,30 @@
         timelineChart.destroy();
         timelineChart = null;
       }
+      if (engagementChart) {
+        engagementChart.destroy();
+        engagementChart = null;
+      }
+      if (sourcesChart) {
+        sourcesChart.destroy();
+        sourcesChart = null;
+      }
       
       // Show loading state and prepare chart containers
       document.getElementById('competitions-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
       document.getElementById('demographics-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
       document.getElementById('timeline-chart').innerHTML = '<div class="loading">Loading chart data...</div>';
+      
+      // Add loading state for new chart containers
+      if (document.getElementById('engagement-chart')) {
+        document.getElementById('engagement-chart').innerHTML = '<div class="loading">Loading engagement data...</div>';
+      }
+      if (document.getElementById('sources-chart')) {
+        document.getElementById('sources-chart').innerHTML = '<div class="loading">Loading traffic data...</div>';
+      }
+      if (document.getElementById('engagement-metrics')) {
+        document.getElementById('engagement-metrics').innerHTML = '<div class="loading">Loading metrics...</div>';
+      }
       
       console.log(`Loading analytics data for business ID: ${businessId}`);
       
@@ -2648,28 +2668,222 @@
       
       // Update analytics table
       const tableBody = document.getElementById('analytics-table-body');
-      tableBody.innerHTML = '';
+      if (tableBody) {
+        tableBody.innerHTML = '';
+        
+        data.competitions.forEach(comp => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${comp.title}</td>
+            <td>${comp.submissions}</td>
+            <td>${comp.views}</td>
+            <td>${comp.engagementRate}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
       
-      data.competitions.forEach(comp => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${comp.title}</td>
-          <td>${comp.submissions}</td>
-          <td>${comp.views}</td>
-          <td>${comp.engagementRate}</td>
-        `;
-        tableBody.appendChild(row);
-      });
+      // Update user behavior insights if they exist
+      if (data.userBehavior) {
+        if (document.getElementById('returning-users')) {
+          document.getElementById('returning-users').textContent = data.userBehavior.returningUsers || '68%';
+        }
+        if (document.getElementById('votes-per-user')) {
+          document.getElementById('votes-per-user').textContent = data.userBehavior.votesPerUser || '8.2';
+        }
+        if (document.getElementById('submission-quality')) {
+          document.getElementById('submission-quality').textContent = data.userBehavior.submissionQuality || '4.2★';
+        }
+        if (document.getElementById('user-retention')) {
+          document.getElementById('user-retention').textContent = data.userBehavior.userRetention || '71%';
+        }
+        
+        // Update trends
+        const trendElements = document.querySelectorAll('.insight-trend');
+        trendElements.forEach(el => {
+          // Check if trend is positive or negative and add appropriate class
+          const trendValue = el.textContent;
+          if (trendValue.includes('+')) {
+            el.classList.add('trend-up');
+            el.classList.remove('trend-down');
+          } else if (trendValue.includes('-')) {
+            el.classList.add('trend-down');
+            el.classList.remove('trend-up');
+          }
+        });
+      }
       
-      // Prepare canvas elements for the charts
+      // Update engagement metrics
+      if (document.getElementById('engagement-metrics')) {
+        updateEngagementMetrics(data.engagement || {});
+      }
+      
+      // Update time spent and peak time statistics
+      if (document.getElementById('peak-time')) {
+        document.getElementById('peak-time').textContent = data.peakActivity || '2pm - 6pm';
+      }
+      if (document.getElementById('session-duration')) {
+        document.getElementById('session-duration').textContent = data.sessionDuration || '4.5 min';
+      }
+      
+      // Prepare canvas elements for all charts
       const competitionsCanvas = resetCanvasElement('competitions-chart');
       const demographicsCanvas = resetCanvasElement('demographics-chart');
       const timelineCanvas = resetCanvasElement('timeline-chart');
+      const engagementCanvas = resetCanvasElement('engagement-chart');
+      const sourcesCanvas = resetCanvasElement('sources-chart');
       
       // Create/update charts
       if (competitionsCanvas) createCompetitionsChart(data.competitions);
       if (demographicsCanvas) createDemographicsChart(data.demographics);
       if (timelineCanvas) createTimelineChart(data.timeline);
+      if (engagementCanvas && data.engagement) createEngagementChart(data.engagement);
+      if (sourcesCanvas && data.trafficSources) createTrafficSourcesChart(data.trafficSources);
+    }
+    
+    function updateEngagementMetrics(engagementData) {
+      const metricsContainer = document.getElementById('engagement-metrics');
+      if (!metricsContainer) return;
+      
+      metricsContainer.innerHTML = `
+        <div class="metric-card">
+          <div class="metric-icon">📈</div>
+          <div class="metric-info">
+            <div class="metric-label">Weekly Trend</div>
+            <div class="metric-value ${(engagementData.weeklyTrend > 0) ? 'trend-up' : 'trend-down'}">
+              ${engagementData.weeklyTrend > 0 ? '+' : ''}${engagementData.weeklyTrend || '15'}%
+            </div>
+          </div>
+        </div>
+        
+        <div class="metric-card">
+          <div class="metric-icon">🔄</div>
+          <div class="metric-info">
+            <div class="metric-label">Conversion Rate</div>
+            <div class="metric-value">${engagementData.conversionRate || '3.8'}%</div>
+          </div>
+        </div>
+        
+        <div class="metric-card">
+          <div class="metric-icon">⏱️</div>
+          <div class="metric-info">
+            <div class="metric-label">Avg. Time Spent</div>
+            <div class="metric-value">${engagementData.avgTimeSpent || '4.5'} min</div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function createEngagementChart(engagementData) {
+      // Get canvas element
+      const canvas = document.getElementById('engagement-chart-canvas');
+      if (!canvas) {
+        console.error('Engagement chart canvas not found');
+        return;
+      }
+      
+      // Get 2D context
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Could not get 2D context for engagement chart');
+        return;
+      }
+      
+      if (engagementChart) {
+        engagementChart.destroy();
+      }
+      
+      // Default data if not provided
+      const dailyData = engagementData.daily || [12, 18, 22, 15, 25, 30, 28];
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      
+      engagementChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: days,
+          datasets: [{
+            label: 'Daily Engagement',
+            data: dailyData,
+            fill: true,
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderColor: 'rgb(59, 130, 246)',
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgb(59, 130, 246)'
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          },
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    }
+    
+    function createTrafficSourcesChart(sourcesData) {
+      // Get canvas element
+      const canvas = document.getElementById('sources-chart-canvas');
+      if (!canvas) {
+        console.error('Traffic sources chart canvas not found');
+        return;
+      }
+      
+      // Get 2D context
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Could not get 2D context for traffic sources chart');
+        return;
+      }
+      
+      if (sourcesChart) {
+        sourcesChart.destroy();
+      }
+      
+      // Default data if not provided
+      const defaultSources = [
+        { name: 'Organic Search', percentage: 45 },
+        { name: 'Direct', percentage: 25 },
+        { name: 'Social Media', percentage: 20 },
+        { name: 'Referral', percentage: 10 }
+      ];
+      
+      const sources = sourcesData || defaultSources;
+      
+      sourcesChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: sources.map(source => source.name),
+          datasets: [{
+            data: sources.map(source => source.percentage),
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.7)',
+              'rgba(16, 185, 129, 0.7)',
+              'rgba(245, 158, 11, 0.7)',
+              'rgba(239, 68, 68, 0.7)'
+            ],
+            borderColor: [
+              'rgba(59, 130, 246, 1)',
+              'rgba(16, 185, 129, 1)',
+              'rgba(245, 158, 11, 1)',
+              'rgba(239, 68, 68, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
     }
     
     function createCompetitionsChart(competitions) {
@@ -2919,7 +3133,28 @@
             dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
             submissions: [5, 12, 18, 23, 29, 42],
             views: [120, 250, 380, 470, 580, 720]
-          }
+          },
+          // Enhanced engagement analytics data
+          engagement: {
+            daily: [15, 22, 18, 25, 30, 28, 32],
+            weeklyTrend: 15,
+            conversionRate: 3.8,
+            avgTimeSpent: 4.5
+          },
+          trafficSources: [
+            { name: 'Organic Search', percentage: 45 },
+            { name: 'Direct', percentage: 25 },
+            { name: 'Social Media', percentage: 20 },
+            { name: 'Referral', percentage: 10 }
+          ],
+          userBehavior: {
+            returningUsers: '68%',
+            votesPerUser: '8.2',
+            submissionQuality: '4.2★',
+            userRetention: '71%'
+          },
+          peakActivity: '2pm - 6pm',
+          sessionDuration: '4.5 min'
         };
       } else {
         return {
@@ -2941,7 +3176,28 @@
             dates: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
             submissions: [0, 0, 4, 7, 10, 12],
             views: [0, 0, 90, 152, 217, 295]
-          }
+          },
+          // Enhanced engagement analytics data
+          engagement: {
+            daily: [8, 12, 10, 14, 17, 15, 18],
+            weeklyTrend: 9,
+            conversionRate: 2.5,
+            avgTimeSpent: 3.2
+          },
+          trafficSources: [
+            { name: 'Organic Search', percentage: 35 },
+            { name: 'Direct', percentage: 30 },
+            { name: 'Social Media', percentage: 25 },
+            { name: 'Referral', percentage: 10 }
+          ],
+          userBehavior: {
+            returningUsers: '52%',
+            votesPerUser: '5.1',
+            submissionQuality: '3.8★',
+            userRetention: '62%'
+          },
+          peakActivity: '3pm - 7pm',
+          sessionDuration: '3.8 min'
         };
       }
     }
