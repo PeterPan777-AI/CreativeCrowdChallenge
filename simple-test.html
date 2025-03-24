@@ -782,14 +782,7 @@
           </div>
         </div>
         
-        <!-- Back Office Section (only for business/admin) -->
-        <div id="back-office-section" style="display: none;" class="card">
-          <h3>Back Office</h3>
-          <p>Access your business tools and analytics.</p>
-          <div style="margin-top: 15px;">
-            <button onclick="showScreen('analytics-screen')">Analytics Dashboard</button>
-          </div>
-        </div>
+
         
         <button onclick="logout()" class="secondary">Logout</button>
       </div>
@@ -1242,6 +1235,44 @@
       if (isLoggedIn) {
         document.getElementById('profile-logged-out').style.display = 'none';
         document.getElementById('profile-logged-in').style.display = 'block';
+        
+        // Update profile display data
+        if (currentUser) {
+          // Update profile details
+          const profileNameEl = document.getElementById('profile-user-name');
+          const profileMemberSinceEl = document.getElementById('profile-member-since');
+          const profileRoleEl = document.getElementById('profile-user-role');
+          const profileSubmissionsEl = document.getElementById('profile-submissions');
+          const profileAwardsEl = document.getElementById('profile-awards');
+          const profileVotesEl = document.getElementById('profile-votes');
+          
+          if (profileNameEl) profileNameEl.textContent = currentUser.name || 'User';
+          if (profileMemberSinceEl) profileMemberSinceEl.textContent = `Member since ${currentUser.memberSince || 'March 2025'}`;
+          if (profileRoleEl) {
+            // Format role name nicely
+            let roleDisplay = 'Regular User';
+            if (currentUser.role === 'admin') roleDisplay = 'Administrator';
+            if (currentUser.role === 'business') roleDisplay = 'Business Account';
+            
+            profileRoleEl.textContent = roleDisplay;
+          }
+          
+          if (profileSubmissionsEl) profileSubmissionsEl.textContent = currentUser.submissions || 0;
+          if (profileAwardsEl) profileAwardsEl.textContent = currentUser.awards || 0;
+          if (profileVotesEl) profileVotesEl.textContent = currentUser.votesCast || 0;
+          
+          // Set profile avatar initials
+          const avatarEl = document.querySelector('.profile-avatar');
+          if (avatarEl && currentUser.name) {
+            // Extract initials from name
+            const nameParts = currentUser.name.split(' ');
+            let initials = nameParts[0][0]; // First letter of first name
+            if (nameParts.length > 1) {
+              initials += nameParts[nameParts.length - 1][0]; // First letter of last name
+            }
+            avatarEl.textContent = initials.toUpperCase();
+          }
+        }
         
         // Show or hide back office based on user role
         const backOfficeSection = document.getElementById('back-office-section');
@@ -1769,6 +1800,25 @@
           exportAnalytics(format);
         });
       });
+    }
+    
+    // Show Analytics Dashboard from back office
+    function showAnalyticsDashboard() {
+      console.log('Opening Analytics Dashboard from back office');
+      showScreen('analytics-screen');
+      
+      // Add a back button in the header when coming from profile
+      document.getElementById('main-header').innerHTML = `
+        <button class="back-button" onclick="showScreen('profile')">
+          <span class="back-icon">←</span> Back to Profile
+        </button>
+        <h1>Analytics Dashboard</h1>
+      `;
+      
+      // Initialize analytics dashboard
+      setTimeout(() => {
+        initializeAnalytics();
+      }, 100);
     }
     
     function loadBusinessAnalytics() {
