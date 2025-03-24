@@ -681,7 +681,7 @@
     // Tab functionality
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', function() {
-        const screenName = this.getAttribute('data-screen');
+        const screenName = this.getAttribute('data-screen') + '-screen';
         showScreen(screenName);
       });
     });
@@ -722,8 +722,10 @@
       
       // Update the active tab (except for competition details which isn't a tab)
       if (screenName !== 'competition-details-screen') {
+        // Get base screen name without -screen suffix
+        const baseScreenName = screenName.replace('-screen', '');
         document.querySelectorAll('.tab').forEach(tab => {
-          if (tab.getAttribute('data-screen') === screenName) {
+          if (tab.getAttribute('data-screen') === baseScreenName) {
             tab.classList.add('active');
           } else {
             tab.classList.remove('active');
@@ -732,7 +734,7 @@
       }
       
       // Special handling for profile screen
-      if (screenName === 'profile') {
+      if (screenName === 'profile-screen' || screenName === 'profile') {
         updateProfileView();
       }
       
