@@ -3298,6 +3298,264 @@
           exportAnalytics(format);
         });
       });
+      
+      // Initialize analytics request form
+      initializeAnalyticsRequestForm();
+      
+      // Load user's existing analytics requests
+      loadUserAnalyticsRequests();
+    }
+    
+    // Initialize the analytics request form with the user's competitions
+    function initializeAnalyticsRequestForm() {
+      console.log('Initializing analytics request form');
+      const competitionSelector = document.getElementById('competition-selector');
+      
+      if (!competitionSelector) {
+        console.error('Competition selector not found');
+        return;
+      }
+      
+      // Clear existing options (keeping the default)
+      while (competitionSelector.options.length > 1) {
+        competitionSelector.remove(1);
+      }
+      
+      // Get business competitions to populate the dropdown
+      // We're filtering for business competitions that are visible to the current user
+      const businessCompetitions = Object.values(competitions).filter(comp => 
+        comp.type === 'business' && (currentUser?.role === 'business' || currentUser?.role === 'admin')
+      );
+      
+      if (businessCompetitions.length === 0) {
+        console.log('No business competitions found for this user');
+        // Add a placeholder option
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'No competitions available';
+        option.disabled = true;
+        competitionSelector.appendChild(option);
+        
+        // Show message to the user
+        document.getElementById('competition-selector').disabled = true;
+        document.getElementById('submit-request-btn').disabled = true;
+        
+        const requestStatus = document.getElementById('request-status');
+        if (requestStatus) {
+          requestStatus.textContent = 'You need business competitions to request analytics.';
+          requestStatus.style.color = '#ef4444';
+        }
+        return;
+      }
+      
+      // Add competitions to the dropdown
+      businessCompetitions.forEach(comp => {
+        const option = document.createElement('option');
+        option.value = comp.id;
+        option.textContent = comp.title;
+        competitionSelector.appendChild(option);
+      });
+      
+      // Enable the form elements
+      document.getElementById('competition-selector').disabled = false;
+      document.getElementById('submit-request-btn').disabled = false;
+      document.getElementById('request-status').textContent = '';
+    }
+    
+    // Load the user's existing analytics requests
+    async function loadUserAnalyticsRequests() {
+      console.log('Loading user analytics requests');
+      
+      if (!currentUser) {
+        console.log('User not logged in');
+        return;
+      }
+      
+      const requestsContainer = document.getElementById('user-analytics-requests');
+      const noRequestsMessage = document.getElementById('no-requests-message');
+      
+      if (!requestsContainer || !noRequestsMessage) {
+        console.error('Analytics requests container elements not found');
+        return;
+      }
+      
+      // Show loading state
+      requestsContainer.innerHTML = '<div class="loading-indicator">Loading your requests...</div>';
+      
+      try {
+        // Call the API to get user's requests
+        const response = await fetch('/api/analytics/requests', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': currentUser.id || 'demo-user-id',
+            'X-User-Role': currentUser.role || 'business'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to load analytics requests');
+        }
+        
+        const requests = await response.json();
+        console.log('Loaded analytics requests:', requests);
+        
+        // Clear container
+        requestsContainer.innerHTML = '';
+        
+        if (requests.length === 0) {
+          // Show no requests message
+          noRequestsMessage.style.display = 'block';
+        } else {
+          // Hide no requests message and display the requests
+          noRequestsMessage.style.display = 'none';
+          
+          // Sort requests by creation date (newest first)
+          requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          
+          // Render each request
+          requests.forEach(request => {
+            const requestElement = createRequestElement(request);
+            requestsContainer.appendChild(requestElement);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading analytics requests:', error);
+        requestsContainer.innerHTML = `
+          <div class="error-message">
+            Failed to load your analytics requests. Please try again later.
+          </div>
+        `;
+      }
+    }
+    
+    // Create an element to display an analytics request
+    function createRequestElement(request) {
+      const requestItem = document.createElement('div');
+      requestItem.className = 'request-item';
+      requestItem.id = `request-${request.id}`;
+      
+      // Get competition title from the stored competitions
+      let competitionTitle = 'Unknown Competition';
+      if (request.competitionIds && request.competitionIds.length > 0) {
+        const competition = competitions[request.competitionIds[0]];
+        if (competition) {
+          competitionTitle = competition.title;
+        }
+      }
+      
+      // Format the date
+      const requestDate = new Date(request.createdAt);
+      const formattedDate = requestDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+      
+      // Set status class
+      const statusClass = `status-${request.status.toLowerCase()}`;
+      
+      // Create the content HTML
+      requestItem.innerHTML = `
+        <div class="request-header">
+          <span class="request-title">${competitionTitle}</span>
+          <span class="request-date">${formattedDate}</span>
+        </div>
+        <div class="request-details">
+          <p><strong>Time Period:</strong> ${request.timeFrame}</p>
+          <p>${request.description}</p>
+        </div>
+        <div class="request-status-badge ${statusClass}">
+          ${capitalizeFirstLetter(request.status)}
+        </div>
+        ${request.adminNotes ? `<div class="admin-notes"><strong>Admin Notes:</strong> ${request.adminNotes}</div>` : ''}
+      `;
+      
+      return requestItem;
+    }
+    
+    // Helper function to capitalize first letter
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    
+    // Handle analytics request form submission
+    async function submitAnalyticsRequest(event) {
+      event.preventDefault();
+      console.log('Submitting analytics request');
+      
+      if (!currentUser) {
+        showNotification('Please log in to submit an analytics request', 'error');
+        return;
+      }
+      
+      const competitionId = document.getElementById('competition-selector').value;
+      const timeFrame = document.getElementById('date-range').value;
+      const description = document.getElementById('request-details').value;
+      
+      if (!competitionId || !timeFrame) {
+        showNotification('Please complete all required fields', 'error');
+        return;
+      }
+      
+      // Show loading state
+      const submitButton = document.getElementById('submit-request-btn');
+      const requestStatus = document.getElementById('request-status');
+      
+      submitButton.disabled = true;
+      submitButton.textContent = 'Submitting...';
+      requestStatus.textContent = '';
+      
+      try {
+        // Prepare request data
+        const requestData = {
+          businessId: 'mock-business-1', // In a real app, get this from the user's profile
+          competitionIds: [competitionId],
+          timeFrame,
+          description,
+          userId: currentUser.id || 'demo-user-id',
+          userEmail: currentUser.email || 'demo@example.com',
+          requestType: 'competition-analytics'
+        };
+        
+        // Call the API to create the request
+        const response = await fetch('/api/analytics/request', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to submit analytics request');
+        }
+        
+        const result = await response.json();
+        console.log('Analytics request submitted:', result);
+        
+        // Show success message
+        showNotification('Analytics request submitted successfully!');
+        requestStatus.textContent = 'Request submitted successfully!';
+        requestStatus.style.color = '#10b981';
+        
+        // Reset form
+        document.getElementById('request-details').value = '';
+        
+        // Reload the user's requests
+        loadUserAnalyticsRequests();
+      } catch (error) {
+        console.error('Error submitting analytics request:', error);
+        showNotification('Failed to submit request: ' + error.message, 'error');
+        
+        requestStatus.textContent = 'Failed to submit request. Please try again.';
+        requestStatus.style.color = '#ef4444';
+      } finally {
+        // Reset button state
+        submitButton.disabled = false;
+        submitButton.textContent = 'Submit Request';
+      }
     }
     
     // Show Analytics Dashboard from back office
