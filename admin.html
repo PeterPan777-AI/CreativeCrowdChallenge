@@ -196,6 +196,35 @@
       border-left: 4px solid #10B981;
     }
     
+    .request-card.declined {
+      border-left: 4px solid #EF4444;
+    }
+    
+    .status-approved {
+      color: #10B981;
+      font-weight: bold;
+    }
+    
+    .status-declined {
+      color: #EF4444;
+      font-weight: bold;
+    }
+    
+    .reconsider-btn {
+      background-color: #6B7280;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    
+    .reconsider-btn:hover {
+      background-color: #4B5563;
+    }
+    
     .request-header {
       display: flex;
       justify-content: space-between;
@@ -967,6 +996,75 @@
         }
       };
       
+      // Reconsider a previously declined analytics request
+      window.reconsiderAnalyticsRequest = async function(requestId) {
+        console.log(`Reconsidering analytics request: ${requestId}`);
+        
+        try {
+          // Get current user for admin validation
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          if (!currentUser || currentUser.role !== 'admin') {
+            showNotification('Admin access required', 'error');
+            return;
+          }
+          
+          // Find the request card
+          const requestCard = document.getElementById(`request-card-${requestId}`);
+          if (!requestCard) {
+            showNotification('Request not found', 'error');
+            return;
+          }
+          
+          // Show loading state
+          const actionButtons = requestCard.querySelector('.request-actions');
+          const originalButtons = actionButtons.innerHTML;
+          actionButtons.innerHTML = '<div class="message">Processing...</div>';
+          
+          // Call the API to update the request status back to pending
+          const response = await fetch(`/api/analytics/request/${requestId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            },
+            body: JSON.stringify({
+              status: 'pending',
+              adminNotes: 'Request reopened for reconsideration'
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to reconsider request');
+          }
+          
+          const result = await response.json();
+          console.log('Request reopened for reconsideration:', result);
+          
+          // Show success notification
+          showNotification('Analytics request reopened for reconsideration', 'success');
+          
+          // Reload all requests to reflect the changes
+          loadAnalyticsRequests();
+          
+        } catch (error) {
+          console.error('Error reconsidering request:', error);
+          showNotification('Failed to reconsider request: ' + error.message, 'error');
+          
+          // Restore the original button if we can find the card
+          const requestCard = document.getElementById(`request-card-${requestId}`);
+          if (requestCard) {
+            const actionButtons = requestCard.querySelector('.request-actions');
+            if (actionButtons) {
+              actionButtons.innerHTML = `
+                <button class="reconsider-btn" onclick="reconsiderAnalyticsRequest('${requestId}')">Reconsider</button>
+              `;
+            }
+          }
+        }
+      };
+
       window.viewPlatformAnalytics = function() {
         // Navigate to the platform-wide analytics dashboard
         window.location.href = '/?adminAnalytics=true';
