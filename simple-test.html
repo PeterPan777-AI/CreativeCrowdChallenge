@@ -2986,19 +2986,30 @@
         document.getElementById('session-duration').textContent = data.sessionDuration || '4.5 min';
       }
       
-      // Prepare canvas elements for all charts
-      const competitionsCanvas = resetCanvasElement('competitions-chart');
-      const demographicsCanvas = resetCanvasElement('demographics-chart');
-      const timelineCanvas = resetCanvasElement('timeline-chart');
-      const engagementCanvas = resetCanvasElement('engagement-chart');
-      const sourcesCanvas = resetCanvasElement('sources-chart');
+      // Prepare canvas elements for all charts with correct IDs
+      const competitionsCanvas = resetCanvasElement('competitions-chart-canvas');
+      const demographicsCanvas = resetCanvasElement('demographics-chart-canvas');
+      const timelineCanvas = resetCanvasElement('timeline-chart-canvas');
+      const engagementCanvas = resetCanvasElement('engagement-line-chart');
+      const sourcesCanvas = resetCanvasElement('traffic-sources-chart');
       
-      // Create/update charts
-      if (competitionsCanvas) createCompetitionsChart(data.competitions);
-      if (demographicsCanvas) createDemographicsChart(data.demographics);
-      if (timelineCanvas) createTimelineChart(data.timeline);
-      if (engagementCanvas && data.engagement) createEngagementChart(data.engagement);
-      if (sourcesCanvas && data.trafficSources) createTrafficSourcesChart(data.trafficSources);
+      // Log canvas elements for debugging
+      console.log('Canvas elements found:', {
+        competitions: Boolean(competitionsCanvas),
+        demographics: Boolean(demographicsCanvas),
+        timeline: Boolean(timelineCanvas),
+        engagement: Boolean(engagementCanvas),
+        sources: Boolean(sourcesCanvas)
+      });
+      
+      // Create/update charts with a slight delay to ensure DOM is ready
+      setTimeout(() => {
+        if (competitionsCanvas) createCompetitionsChart(data.competitions);
+        if (demographicsCanvas) createDemographicsChart(data.demographics);
+        if (timelineCanvas) createTimelineChart(data.timeline);
+        if (engagementCanvas && data.engagement) createEngagementChart(data.engagement);
+        if (sourcesCanvas && data.trafficSources) createTrafficSourcesChart(data.trafficSources);
+      }, 100);
     }
     
     function updateEngagementMetrics(engagementData) {
