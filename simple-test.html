@@ -813,15 +813,15 @@
       
       <div class="card">
         <h3>Competition Performance</h3>
-        <div class="chart-container">
-          <canvas id="competitions-chart" width="400" height="200"></canvas>
+        <div id="competitions-chart" class="chart-container">
+          <!-- Canvas will be created dynamically -->
         </div>
       </div>
       
       <div class="card">
         <h3>Demographic Breakdown</h3>
-        <div class="chart-container">
-          <canvas id="demographics-chart" width="400" height="200"></canvas>
+        <div id="demographics-chart" class="chart-container">
+          <!-- Canvas will be created dynamically -->
         </div>
       </div>
       
@@ -861,8 +861,8 @@
       
       <div class="card">
         <h3>Engagement Timeline</h3>
-        <div class="chart-container">
-          <canvas id="timeline-chart" width="400" height="200"></canvas>
+        <div id="timeline-chart" class="chart-container">
+          <!-- Canvas will be created dynamically -->
         </div>
       </div>
       
@@ -1804,15 +1804,24 @@
     }
     
     function createCompetitionsChart(competitions) {
+      console.log('Starting competitions chart creation');
+      
       // Get canvas element
       const canvas = document.getElementById('competitions-chart-canvas');
+      console.log('Looking for canvas with ID:', 'competitions-chart-canvas');
+      console.log('Canvas found:', Boolean(canvas));
+      
       if (!canvas) {
         console.error('Competition chart canvas not found');
+        console.log('Available chart containers:', document.querySelectorAll('.chart-container').length);
+        console.log('Contents of competitions-chart div:', document.getElementById('competitions-chart')?.innerHTML);
         return;
       }
       
       // Get 2D context
       const ctx = canvas.getContext('2d');
+      console.log('Canvas context available:', Boolean(ctx));
+      
       if (!ctx) {
         console.error('Could not get 2D context for competition chart');
         return;
