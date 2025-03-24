@@ -2140,6 +2140,9 @@
         
         showNotification('Login successful!');
         updateProfileView();
+        
+        // Navigate to profile screen after successful login
+        showScreen('profile');
       })
       .catch(error => {
         console.error('Error during login:', error);
@@ -2211,6 +2214,9 @@
         
         showNotification('Registration successful!');
         updateProfileView();
+        
+        // Navigate to profile screen after successful registration
+        showScreen('profile');
       })
       .catch(error => {
         console.error('Error during registration:', error);
