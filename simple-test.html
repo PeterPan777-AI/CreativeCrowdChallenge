@@ -602,6 +602,182 @@
       color: #EF4444;
     }
     
+    /* Enhanced analytics styles */
+    .metrics-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .engagement-metric-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .engagement-metric-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .metric-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .metric-header-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #EBF5FF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-size: 16px;
+      color: #3B82F6;
+    }
+    
+    .metric-title {
+      font-size: 14px;
+      color: #4B5563;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .metric-data {
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+      margin: 5px 0;
+    }
+    
+    .metric-trend {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .dual-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .dual-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .engagement-stats-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .engagement-stat {
+      background-color: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .engagement-stat h4 {
+      margin: 0 0 10px 0;
+      color: #4B5563;
+      font-size: 14px;
+    }
+    
+    .stat-large {
+      font-size: 28px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 5px;
+    }
+    
+    .trend-indicator {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+    }
+    
+    .insights-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    
+    .insight-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .insight-card h4 {
+      margin: 0 0 10px 0;
+      color: #4B5563;
+      font-size: 14px;
+    }
+    
+    .insight-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 5px;
+    }
+    
+    .insight-trend {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .source-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    
+    .source-name {
+      font-weight: 500;
+    }
+    
+    .source-percentage {
+      font-weight: 600;
+      color: #3B82F6;
+    }
+    
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+    }
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      margin-right: 5px;
+    }
+    
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .container {
@@ -1119,20 +1295,60 @@
       </div>
       
       <div class="card">
-        <h3>User Engagement Metrics</h3>
+        <h3>Enhanced User Engagement Metrics</h3>
         <div id="engagement-metrics" class="metrics-container">
-          <!-- Metrics will be populated dynamically -->
+          <!-- Enhanced metrics cards -->
+          <div class="engagement-metric-card">
+            <div class="metric-header">
+              <div class="metric-header-icon">📈</div>
+              <h4 class="metric-title">Daily Engagement</h4>
+            </div>
+            <div class="metric-data" id="daily-engagement">32</div>
+            <div class="metric-trend trend-up">+15% from last week</div>
+          </div>
+          
+          <div class="engagement-metric-card">
+            <div class="metric-header">
+              <div class="metric-header-icon">🔄</div>
+              <h4 class="metric-title">Weekly Trend</h4>
+            </div>
+            <div class="metric-data" id="weekly-trend">+15%</div>
+            <div class="metric-trend trend-up">Growing steadily</div>
+          </div>
+          
+          <div class="engagement-metric-card">
+            <div class="metric-header">
+              <div class="metric-header-icon">🎯</div>
+              <h4 class="metric-title">Conversion Rate</h4>
+            </div>
+            <div class="metric-data" id="conversion-rate">3.8%</div>
+            <div class="metric-trend trend-up">+0.5% from last month</div>
+          </div>
+          
+          <div class="engagement-metric-card">
+            <div class="metric-header">
+              <div class="metric-header-icon">⏱️</div>
+              <h4 class="metric-title">Avg. Time Spent</h4>
+            </div>
+            <div class="metric-data" id="avg-time">4.5 min</div>
+            <div class="metric-trend trend-up">+0.8 min from last period</div>
+          </div>
         </div>
         <div id="engagement-chart" class="chart-container">
           <!-- Canvas will be created dynamically -->
+          <canvas id="engagement-line-chart"></canvas>
         </div>
       </div>
       
       <div class="card">
-        <h3>Traffic Sources</h3>
+        <h3>Traffic Sources Analysis</h3>
         <div class="dual-container">
           <div id="sources-chart" class="chart-container">
             <!-- Canvas will be created dynamically -->
+            <canvas id="traffic-sources-chart"></canvas>
+            <div class="chart-legend" id="traffic-sources-legend">
+              <!-- Legend will be populated dynamically -->
+            </div>
           </div>
           <div class="engagement-stats-container">
             <div class="engagement-stat">
@@ -1144,6 +1360,9 @@
               <h4>Avg. Session Duration</h4>
               <div id="session-duration" class="stat-large">4.5 min</div>
               <div class="trend-indicator trend-up">+0.8 min from last period</div>
+            </div>
+            <div id="traffic-sources-list" class="source-stats">
+              <!-- Will be populated dynamically -->
             </div>
           </div>
         </div>
@@ -2681,6 +2900,47 @@
           `;
           tableBody.appendChild(row);
         });
+      }
+      
+      // Update enhanced engagement metrics if they exist
+      if (data.engagement) {
+        if (document.getElementById('daily-engagement')) {
+          document.getElementById('daily-engagement').textContent = data.engagement.daily[data.engagement.daily.length - 1];
+        }
+        if (document.getElementById('weekly-trend')) {
+          document.getElementById('weekly-trend').textContent = `+${data.engagement.weeklyTrend}%`;
+        }
+        if (document.getElementById('conversion-rate')) {
+          document.getElementById('conversion-rate').textContent = `${data.engagement.conversionRate}%`;
+        }
+        if (document.getElementById('avg-time')) {
+          document.getElementById('avg-time').textContent = `${data.engagement.avgTimeSpent} min`;
+        }
+      }
+      
+      // Update traffic sources if they exist
+      if (data.trafficSources && document.getElementById('traffic-sources-list')) {
+        const trafficSourcesList = document.getElementById('traffic-sources-list');
+        trafficSourcesList.innerHTML = '<h4>Traffic Sources</h4>';
+        
+        data.trafficSources.forEach(source => {
+          const sourceItem = document.createElement('div');
+          sourceItem.className = 'source-item';
+          sourceItem.innerHTML = `
+            <span class="source-name">${source.name}</span>
+            <span class="source-percentage">${source.percentage}%</span>
+          `;
+          trafficSourcesList.appendChild(sourceItem);
+        });
+      }
+      
+      // Update session data
+      if (data.sessionDuration && document.getElementById('session-duration')) {
+        document.getElementById('session-duration').textContent = data.sessionDuration;
+      }
+      
+      if (data.peakActivity && document.getElementById('peak-time')) {
+        document.getElementById('peak-time').textContent = data.peakActivity;
       }
       
       // Update user behavior insights if they exist
