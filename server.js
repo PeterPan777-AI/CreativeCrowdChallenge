@@ -11,23 +11,24 @@ try {
 }
 
 // Supabase client initialization - only if the library loaded successfully
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+let supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 // Log credentials availability (without exposing values)
 console.log(`Supabase URL available: ${Boolean(supabaseUrl)}`);
 console.log(`Supabase Anon Key available: ${Boolean(supabaseAnonKey)}`);
 
+// Ensure URL has https:// prefix
+if (supabaseUrl && !(supabaseUrl.startsWith('http://') || supabaseUrl.startsWith('https://'))) {
+  supabaseUrl = 'https://' + supabaseUrl;
+  console.log('Added https:// prefix to Supabase URL');
+}
+
 // Only initialize Supabase if we have valid credentials
 if (createClient && supabaseUrl && supabaseAnonKey) {
   try {
-    // Validate URL format
-    if (supabaseUrl.startsWith('http://') || supabaseUrl.startsWith('https://')) {
-      supabase = createClient(supabaseUrl, supabaseAnonKey);
-      console.log('Supabase client initialized successfully');
-    } else {
-      console.error('Invalid Supabase URL format. URL must start with http:// or https://');
-    }
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
+    console.log('Supabase client initialized successfully');
   } catch (error) {
     console.error('Error initializing Supabase client:', error.message);
   }
