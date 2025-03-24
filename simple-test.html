@@ -1193,7 +1193,7 @@
           <h3 style="color: #1E40AF;">Back Office</h3>
           <p>Access special features for businesses and administrators.</p>
           <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button onclick="showAnalyticsDashboard()" style="background-color: #1E40AF;">Analytics Dashboard</button>
+            <button onclick="showRequestAnalyticsForm()" style="background-color: #1E40AF;">Request Analytics Report</button>
           </div>
         </div>
         
@@ -4286,6 +4286,114 @@
         offlineNotification.style.display = 'block';
         console.log('Application is offline');
       }
+    }
+    
+    // Show Analytics Request Form for business users
+    function showRequestAnalyticsForm() {
+      console.log('Opening Analytics Request Form');
+      
+      // Create modal for analytics request
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'block';
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+          <span class="close" onclick="this.parentElement.parentElement.style.display='none'">&times;</span>
+          <h2>Request Analytics Report</h2>
+          <p>Complete this form to request an analytics report for your business competitions. An administrator will review your request and provide access to the analytics dashboard.</p>
+          
+          <form id="analytics-request-form" style="margin-top: 20px;">
+            <div class="form-group">
+              <label for="request-business-name">Business Name</label>
+              <input type="text" id="request-business-name" placeholder="Your business name" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="request-competition">Competition</label>
+              <select id="request-competition" required>
+                <option value="">Select a competition</option>
+                <option value="all">All my competitions</option>
+                <option value="Logo Design Challenge">Logo Design Challenge</option>
+                <option value="Mobile App UI Challenge">Mobile App UI Challenge</option>
+                <option value="Marketing Campaign Concept">Marketing Campaign Concept</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="request-timeframe">Time Period</label>
+              <select id="request-timeframe" required>
+                <option value="last7days">Last 7 days</option>
+                <option value="last30days" selected>Last 30 days</option>
+                <option value="last90days">Last 90 days</option>
+                <option value="custom">Custom date range</option>
+              </select>
+            </div>
+            
+            <div id="custom-dates" class="form-group" style="display: none;">
+              <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                  <label for="request-start-date">Start Date</label>
+                  <input type="date" id="request-start-date">
+                </div>
+                <div style="flex: 1;">
+                  <label for="request-end-date">End Date</label>
+                  <input type="date" id="request-end-date">
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="request-notes">Additional Notes</label>
+              <textarea id="request-notes" rows="3" placeholder="Any specific metrics or insights you're looking for"></textarea>
+            </div>
+            
+            <div class="form-group" style="margin-top: 20px;">
+              <button type="submit" class="primary">Submit Request</button>
+              <button type="button" onclick="this.closest('.modal').style.display='none'" class="secondary">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      // Add event listener for custom date range
+      const timeframeSelect = document.getElementById('request-timeframe');
+      const customDatesDiv = document.getElementById('custom-dates');
+      
+      timeframeSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+          customDatesDiv.style.display = 'block';
+        } else {
+          customDatesDiv.style.display = 'none';
+        }
+      });
+      
+      // Add form submission handler
+      const form = document.getElementById('analytics-request-form');
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form values
+        const businessName = document.getElementById('request-business-name').value;
+        const competition = document.getElementById('request-competition').value;
+        const timeframe = document.getElementById('request-timeframe').value;
+        const notes = document.getElementById('request-notes').value;
+        
+        // In a real app, we would submit this data to the server
+        console.log('Analytics request submitted:', {
+          businessName,
+          competition,
+          timeframe,
+          notes
+        });
+        
+        // Close the modal
+        modal.style.display = 'none';
+        
+        // Show confirmation notification
+        showNotification('Your analytics report request has been submitted. An administrator will review your request shortly.', 'success');
+      });
     }
   </script>
   
