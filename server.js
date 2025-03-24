@@ -153,6 +153,9 @@ const parseRequestBody = (req) => {
 };
 
 // Sample mock data for when Supabase is unavailable
+// In-memory storage for analytics requests
+let analyticsRequests = [];
+
 const MOCK_DATA = {
   competitions: [
     {
