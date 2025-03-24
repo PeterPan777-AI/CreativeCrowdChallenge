@@ -2,6 +2,9 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+// Import recommendation engine
+const recommendationEngine = require('./recommendation-engine.js');
+
 // Handle loading Supabase with care
 let createClient, supabase = null;
 try {
@@ -524,6 +527,61 @@ async function handleApiRequest(req, res) {
       res.end(JSON.stringify({ error: 'Google authentication failed' }));
     }
     return;
+  }
+  
+  // GET /api/recommendations - AI-powered competition recommendations
+  if (endpoint === '/recommendations' && req.method === 'GET') {
+    try {
+      // Get user ID and interests from query parameters
+      const userId = url.searchParams.get('userId') || 'anonymous';
+      const interests = url.searchParams.get('interests') || '';
+      const interestsList = interests ? interests.split(',') : [];
+      const preview = url.searchParams.get('preview') === 'true';
+      
+      console.log(`Generating recommendations for user: ${userId}, with interests: ${interests}, preview: ${preview}`);
+      
+      // If in preview mode, return special preview data
+      if (preview) {
+        // Generate personalized preview based on interests
+        const previewRecommendations = recommendationEngine.generatePreviewRecommendations(interestsList);
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          recommendations: previewRecommendations,
+          message: 'AI Recommendation Preview'
+        }));
+        return;
+      }
+      
+      // For now, return mock recommendations based on user's ID or interests
+      // In a real implementation, this would use a machine learning model
+      if (!supabase) {
+        const mockRecommendations = recommendationEngine.generateAIRecommendations(userId, interestsList, MOCK_DATA.competitions);
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          recommendations: mockRecommendations,
+          message: 'Demo Mode Recommendations'
+        }));
+        return;
+      }
+      
+      // Here we would call a real ML model or query Supabase with user data
+      // For now, just return the mock recommendations
+      const mockRecommendations = recommendationEngine.generateAIRecommendations(userId, interestsList, MOCK_DATA.competitions);
+      
+      res.writeHead(200);
+      res.end(JSON.stringify({
+        recommendations: mockRecommendations,
+        message: 'AI-Powered Recommendations'
+      }));
+      return;
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to generate recommendations' }));
+      return;
+    }
   }
   
   // GET /api/competitions

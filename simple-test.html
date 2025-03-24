@@ -962,6 +962,36 @@
         </div>
       </div>
       
+      <!-- AI Recommendations Section -->
+      <div class="card" style="margin-bottom: 20px; background-color: #f9f7ff; border-left: 4px solid #6d28d9;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="color: #6d28d9; margin: 0;">AI-Powered Recommendations</h3>
+          <button onclick="toggleRecommendationsPreview()" id="preview-toggle-btn" class="secondary" style="font-size: 0.85rem; padding: 5px 10px;">
+            Show Preview
+          </button>
+        </div>
+        <p style="margin-bottom: 15px;">Competitions tailored to your interests and profile</p>
+        
+        <div id="interests-container" style="margin-bottom: 15px;">
+          <div style="display: flex; align-items: center; margin-bottom: 8px;">
+            <label for="interests-input" style="margin-right: 10px; font-weight: bold;">My Interests:</label>
+            <input type="text" id="interests-input" placeholder="design, writing, marketing, photography, music" style="flex-grow: 1;">
+          </div>
+          <small style="display: block; color: #6B7280;">Enter comma-separated interests to improve recommendations</small>
+        </div>
+        
+        <button onclick="loadRecommendations()" style="background-color: #6d28d9; width: 100%;">Get Personalized Recommendations</button>
+        
+        <div id="recommendations-container" style="margin-top: 15px; display: none;">
+          <div class="loading-animation" id="recommendations-loading">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <div id="recommendations-list"></div>
+        </div>
+      </div>
+      
       <div class="card">
         <h3>Popular Categories</h3>
         <div style="margin: 15px 0;">
