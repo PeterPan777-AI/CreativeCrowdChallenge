@@ -273,10 +273,40 @@
       padding: 15px 20px;
       background-color: #10B981;
       color: white;
-      border-radius: 4px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       display: none;
       z-index: 1000;
+      animation: slide-in 0.3s ease-out;
+      max-width: 300px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    
+    .notification.success {
+      background-color: #10B981;
+    }
+    
+    .notification.error {
+      background-color: #EF4444;
+    }
+    
+    .notification.info {
+      background-color: #3B82F6;
+    }
+    
+    .notification.warning {
+      background-color: #F59E0B;
+    }
+    
+    @keyframes slide-in {
+      0% { transform: translateX(100%); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slide-out {
+      0% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(100%); opacity: 0; }
     }
 
     /* Profile header */
@@ -2579,6 +2609,13 @@
                   showNotification(`${count} submission(s) successfully uploaded!`, 'success');
                 }
               }
+              
+              // Handle badge count updates from service worker
+              if (event.data.type === 'BADGE_COUNT_UPDATED') {
+                const count = event.data.data.count;
+                console.log('Received badge count update:', count);
+                updateAppBadge(count);
+              }
             });
             
             // Push notification setup
@@ -2592,28 +2629,47 @@
               // Stash the event so it can be triggered later
               deferredPrompt = e;
               
-              // Show the install button if not already installed
+              // Show the install prompt if not already installed
               setTimeout(() => {
                 // Check if we should show install prompt (not already added to home screen)
                 if (deferredPrompt) {
-                  const installButton = document.createElement('button');
-                  installButton.textContent = 'Install App';
-                  installButton.classList.add('install-button');
-                  installButton.style.position = 'fixed';
-                  installButton.style.bottom = '20px';
-                  installButton.style.left = '20px';
-                  installButton.style.zIndex = '1000';
-                  installButton.addEventListener('click', (e) => {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                      if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                        document.body.removeChild(installButton);
-                      }
-                      deferredPrompt = null;
-                    });
-                  });
-                  document.body.appendChild(installButton);
+                  // Show the install prompt banner
+                  const installPrompt = document.getElementById('install-prompt');
+                  if (installPrompt) {
+                    installPrompt.style.display = 'block';
+                    
+                    // Add event listener to install button
+                    const installButton = document.getElementById('install-button');
+                    if (installButton) {
+                      installButton.addEventListener('click', () => {
+                        // Hide the prompt
+                        installPrompt.style.display = 'none';
+                        
+                        // Show the browser install prompt
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                          if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                            // Maybe show a thank you message
+                            showNotification('App installed successfully!', 'success');
+                          } else {
+                            console.log('User dismissed the install prompt');
+                          }
+                          deferredPrompt = null;
+                        });
+                      });
+                    }
+                    
+                    // Add event listener to dismiss button
+                    const dismissButton = document.getElementById('dismiss-install');
+                    if (dismissButton) {
+                      dismissButton.addEventListener('click', () => {
+                        installPrompt.style.display = 'none';
+                        // Save in localStorage to not show again for some time
+                        localStorage.setItem('installPromptDismissed', Date.now().toString());
+                      });
+                    }
+                  }
                 }
               }, 3000);
             });
@@ -2724,6 +2780,23 @@
         navigator.serviceWorker.ready.then(registration => {
           registration.showNotification(title, options);
         });
+      }
+    }
+    
+    // Update app badge (if supported)
+    function updateAppBadge(count) {
+      if ('setAppBadge' in navigator) {
+        if (count > 0) {
+          navigator.setAppBadge(count).catch(error => {
+            console.error('Error setting app badge:', error);
+          });
+        } else {
+          navigator.clearAppBadge().catch(error => {
+            console.error('Error clearing app badge:', error);
+          });
+        }
+      } else {
+        console.log('App Badge API not supported in this browser');
       }
     }
     

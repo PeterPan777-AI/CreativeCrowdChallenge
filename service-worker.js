@@ -307,11 +307,6 @@ async function openDB() {
 // Update badge count for notifications
 async function updateBadgeCount(change) {
   try {
-    if (!('setAppBadge' in navigator)) {
-      console.log('App Badge API not supported');
-      return;
-    }
-    
     // Open the metadata store
     const db = await openDB();
     const tx = db.transaction('metadata', 'readwrite');
@@ -328,12 +323,16 @@ async function updateBadgeCount(change) {
     await store.put({ key: NOTIFICATION_BADGE_COUNT, value: newCount });
     await tx.done;
     
-    // Update the app badge
-    if (newCount > 0) {
-      await navigator.setAppBadge(newCount);
-    } else {
-      await navigator.clearAppBadge();
-    }
+    // Notify clients about the badge count update
+    const clients = await self.clients.matchAll({ type: 'window' });
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'BADGE_COUNT_UPDATED',
+        data: {
+          count: newCount
+        }
+      });
+    });
     
     console.log('App badge updated:', newCount);
     return newCount;
