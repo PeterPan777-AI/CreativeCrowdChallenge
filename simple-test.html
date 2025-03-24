@@ -4,6 +4,21 @@
   <title>CreativeCrowdChallenge - Web App</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- PWA Meta Tags -->
+  <meta name="description" content="A platform for creative challenges and competitions">
+  <meta name="theme-color" content="#3b82f6">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- iOS PWA Support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CreativeCC">
+  <link rel="apple-touch-icon" href="/assets/icon-192x192.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/icon-192x192.png">
+  
   <style>
     /* Base styles */
     body {
@@ -2419,6 +2434,53 @@
         event.target.style.display = 'none';
       }
     });
+    
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(function(registration) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            
+            // Add install prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+              // Prevent Chrome 67 and earlier from automatically showing the prompt
+              e.preventDefault();
+              // Stash the event so it can be triggered later
+              deferredPrompt = e;
+              
+              // Show the install button if not already installed
+              setTimeout(() => {
+                // Check if we should show install prompt (not already added to home screen)
+                if (deferredPrompt) {
+                  const installButton = document.createElement('button');
+                  installButton.textContent = 'Install App';
+                  installButton.classList.add('install-button');
+                  installButton.style.position = 'fixed';
+                  installButton.style.bottom = '20px';
+                  installButton.style.left = '20px';
+                  installButton.style.zIndex = '1000';
+                  installButton.addEventListener('click', (e) => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                      if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        document.body.removeChild(installButton);
+                      }
+                      deferredPrompt = null;
+                    });
+                  });
+                  document.body.appendChild(installButton);
+                }
+              }, 3000);
+            });
+          })
+          .catch(function(error) {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      });
+    }
   </script>
 </body>
 </html>

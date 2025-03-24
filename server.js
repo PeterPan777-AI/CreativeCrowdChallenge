@@ -68,6 +68,9 @@ const MIME_TYPES = {
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
+  '.webp': 'image/webp',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
 };
 
 // Function to serve static files
@@ -95,6 +98,22 @@ const server = http.createServer((req, res) => {
   // API routes
   if (req.url.startsWith('/api/')) {
     handleApiRequest(req, res);
+    return;
+  }
+  
+  // Special handling for service worker and manifest
+  if (req.url === '/service-worker.js') {
+    // Serve the service worker with special headers
+    res.setHeader('Service-Worker-Allowed', '/');
+    res.setHeader('Cache-Control', 'no-cache');
+    serveFile(res, path.join(__dirname, 'service-worker.js'));
+    return;
+  }
+  
+  if (req.url === '/manifest.json') {
+    // Serve the manifest file
+    res.setHeader('Cache-Control', 'max-age=86400');
+    serveFile(res, path.join(__dirname, 'manifest.json'));
     return;
   }
   
