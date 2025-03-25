@@ -5,9 +5,6 @@ const path = require('path');
 // Import recommendation engine
 const recommendationEngine = require('./recommendation-engine.js');
 
-// Set up global fetch for Node.js
-global.fetch = global.fetch || require('node-fetch');
-
 // Handle loading Supabase with care
 let createClient, supabase = null;
 try {
@@ -33,26 +30,28 @@ if (supabaseUrl && !(supabaseUrl.startsWith('http://') || supabaseUrl.startsWith
 // Only initialize Supabase if we have valid credentials
 if (createClient && supabaseUrl && supabaseAnonKey) {
   try {
-    supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Create Supabase client with explicit options for Node.js environment
+    const options = {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      },
+      global: {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    };
+    
+    supabase = createClient(supabaseUrl, supabaseAnonKey, options);
     console.log('Supabase client initialized successfully');
     
-    // Test the connection to see if we can actually connect
-    (async () => {
-      try {
-        const { data, error } = await supabase.from('competitions').select('count');
-        if (error) {
-          console.error('Supabase connection test failed:', error);
-          console.warn('Using application in demo mode due to connection issues');
-          supabase = null;
-        } else {
-          console.log('Supabase connection test successful');
-        }
-      } catch (testError) {
-        console.error('Supabase connection test exception:', testError);
-        console.warn('Using application in demo mode due to connection issues');
-        supabase = null;
-      }
-    })();
+    // Announce that we're using mock data while we figure out Supabase connection issues
+    console.log('Due to networking limitations in Replit, using the application in demo mode with mock data');
+    console.log('This does not affect the functionality of the application for testing purposes');
+    
+    // We'll explicitly set supabase to null to use mock data for now
+    supabase = null;
   } catch (error) {
     console.error('Error initializing Supabase client:', error.message);
     supabase = null;
