@@ -142,6 +142,9 @@ const server = http.createServer((req, res) => {
   } else if (pathname === '/business-subscription' || pathname === '/business-subscription.html') {
     // Serve business subscription page
     filePath = path.join(__dirname, 'business-subscription.html');
+  } else if (pathname === '/submission-demo' || pathname === '/submission-demo.html') {
+    // Serve submission demo page with drag & drop functionality
+    filePath = path.join(__dirname, 'submission-demo.html');
   } else {
     filePath = path.join(__dirname, pathname);
   }
