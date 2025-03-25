@@ -235,8 +235,9 @@
         overlay.classList.toggle('show');
       });
       
-      // Close drawer when clicking overlay
+      // Close drawer when clicking overlay or main content
       overlay.addEventListener('click', closeDrawer);
+      mainContent.addEventListener('click', closeDrawer);
       
       function closeDrawer() {
         drawer.classList.remove('open');
@@ -247,6 +248,8 @@
       function navigateTo(path) {
         window.history.pushState({}, '', path);
         renderContent(path);
+        // Always close drawer after navigation
+        closeDrawer();
       }
       
       // Render page content based on path
