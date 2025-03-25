@@ -187,8 +187,8 @@
         { path: '/profile', text: 'Profile', icon: 'person' },
         { path: '/logout', text: 'Logout', icon: 'logout' }
       ] : [
-        { path: '/login', text: 'Login', icon: 'login' },
-        { path: '/register', text: 'Register', icon: 'person_add' }
+        { path: '/login.html', text: 'Login', icon: 'login' },
+        { path: '/login.html', text: 'Register', icon: 'person_add' }
       ];
       
       // Create Navigation List
@@ -255,6 +255,12 @@
       
       // SPA Navigation
       function navigateTo(path) {
+        // Check if the path ends with .html - this means it's an external page
+        if (path.endsWith('.html')) {
+          window.location.href = path; // Navigate to the external page
+          return;
+        }
+        
         window.history.pushState({}, '', path);
         renderContent(path);
         // Always close drawer after navigation
