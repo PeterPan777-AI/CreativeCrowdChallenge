@@ -5397,7 +5397,349 @@
       }
     }
     
-    // Function to show the analytics request form
+    // Subscription Management Functions
+    
+    // Load user's subscription data
+    async function loadUserSubscription(user) {
+      try {
+        // If no userId is available, return
+        if (!user || !user.id) {
+          console.error('No user ID available for subscription lookup');
+          return;
+        }
+        
+        const userId = user.id;
+        const response = await fetch(`/api/subscriptions/${userId}`);
+        
+        // Show the appropriate section based on whether user has subscription
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Subscription data:', data);
+          
+          if (data.subscription) {
+            // User has a subscription
+            displayActiveSubscription(data.subscription);
+          } else {
+            // User has no subscription
+            document.getElementById('no-subscription').style.display = 'block';
+            document.getElementById('active-subscription').style.display = 'none';
+          }
+        } else {
+          // If we get a 404, user has no subscription
+          if (response.status === 404) {
+            document.getElementById('no-subscription').style.display = 'block';
+            document.getElementById('active-subscription').style.display = 'none';
+          } else {
+            // Other error occurred
+            console.error('Error fetching subscription:', await response.text());
+          }
+        }
+      } catch (error) {
+        console.error('Error loading subscription:', error);
+        // Show no subscription view as fallback
+        document.getElementById('no-subscription').style.display = 'block';
+        document.getElementById('active-subscription').style.display = 'none';
+      }
+    }
+    
+    // Display active subscription details
+    function displayActiveSubscription(subscription) {
+      // Show the active subscription section
+      document.getElementById('no-subscription').style.display = 'none';
+      document.getElementById('active-subscription').style.display = 'block';
+      
+      // Format dates for display
+      const startDate = new Date(subscription.currentPeriodStart);
+      const endDate = new Date(subscription.currentPeriodEnd);
+      
+      const formatDate = (date) => {
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      };
+      
+      // Update subscription details in the UI
+      const planName = getPlanNameById(subscription.planId);
+      const planFeaturesHtml = getPlanFeaturesHtml(subscription.planId);
+      const planPrice = getPlanPriceById(subscription.planId);
+      
+      document.querySelector('.subscription-plan-name').textContent = planName;
+      document.getElementById('subscription-period-dates').textContent = 
+        `${formatDate(startDate)} - ${formatDate(endDate)}`;
+      document.getElementById('subscription-price').textContent = planPrice;
+      document.querySelector('.subscription-features').innerHTML = planFeaturesHtml;
+      
+      // Store subscription ID for cancel action
+      document.querySelector('.subscription-actions').dataset.subscriptionId = subscription.id;
+    }
+    
+    // Helper functions to get plan details
+    function getPlanNameById(planId) {
+      const planMap = {
+        'basic-monthly': 'Basic Plan',
+        'plus-monthly': 'Plus Plan',
+        'premium-monthly': 'Premium Plan'
+      };
+      return planMap[planId] || 'Unknown Plan';
+    }
+    
+    function getPlanPriceById(planId) {
+      const priceMap = {
+        'basic-monthly': '$9.99/month',
+        'plus-monthly': '$19.99/month',
+        'premium-monthly': '$49.99/month'
+      };
+      return priceMap[planId] || '$0/month';
+    }
+    
+    function getPlanFeaturesHtml(planId) {
+      // Return HTML for the features of the plan
+      const featuresMap = {
+        'basic-monthly': `
+          <div>✓ Create 1 business competition per month</div>
+          <div>✓ Basic analytics</div>
+          <div>✓ Email support</div>
+        `,
+        'plus-monthly': `
+          <div>✓ Create 3 business competitions per month</div>
+          <div>✓ Advanced analytics</div>
+          <div>✓ Priority email support</div>
+          <div>✓ Featured competitions</div>
+        `,
+        'premium-monthly': `
+          <div>✓ Unlimited business competitions</div>
+          <div>✓ Comprehensive analytics</div>
+          <div>✓ Priority phone support</div>
+          <div>✓ Featured competitions</div>
+          <div>✓ Competition promotion</div>
+        `
+      };
+      return featuresMap[planId] || '<div>No features available</div>';
+    }
+    
+    // Show available subscription plans
+    async function showSubscriptionPlans() {
+      try {
+        const response = await fetch('/api/subscriptions/plans');
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Create the modal content
+          const modalContent = `
+            <h3>Choose a Subscription Plan</h3>
+            <p>Select a plan that suits your business needs:</p>
+            <div class="subscription-plans-container">
+              ${data.plans.map(plan => `
+                <div class="subscription-plan-card">
+                  <div class="plan-header">
+                    <h4>${plan.name} Plan</h4>
+                    ${plan.recommended ? '<span class="best-value-badge">BEST VALUE</span>' : ''}
+                    <p>${plan.interval === 'month' ? 'Monthly' : 'Annual'} billing</p>
+                  </div>
+                  <div class="plan-price">
+                    <span class="price-amount">$${plan.price}</span>
+                    <span class="price-interval">/${plan.interval}</span>
+                  </div>
+                  <div class="plan-features">
+                    ${plan.features.map(feature => `<div class="plan-feature">✓ ${feature}</div>`).join('')}
+                  </div>
+                  <button onclick="subscribeToPlan('${plan.id}')" class="btn primary-btn subscribe-btn">Subscribe</button>
+                </div>
+              `).join('')}
+            </div>
+          `;
+          
+          // Show the modal
+          showModal(modalContent, 'subscription-plans-modal');
+        } else {
+          console.error('Error fetching subscription plans:', await response.text());
+          showAlert('Unable to load subscription plans. Please try again later.', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading subscription plans:', error);
+        showAlert('An error occurred while loading subscription plans', 'error');
+      }
+    }
+    
+    // Subscribe to a plan
+    async function subscribeToPlan(planId) {
+      try {
+        if (!currentUser || !currentUser.id) {
+          showAlert('Please log in to subscribe to a plan', 'error');
+          return;
+        }
+        
+        // Simulate payment process (in a real app, this would redirect to a payment provider)
+        showAlert('Processing payment...', 'info');
+        
+        // After successful payment, create the subscription
+        const response = await fetch('/api/subscriptions/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userId: currentUser.id,
+            planId: planId
+          })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Subscription created:', data);
+          
+          // Update the UI
+          closeModal();
+          showAlert('Subscription activated successfully!', 'success');
+          
+          // Update user role to business if not already
+          if (currentUser.role !== 'business') {
+            currentUser.role = 'business';
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          }
+          
+          // Reload the profile view to show subscription details
+          updateProfileView();
+        } else {
+          console.error('Error creating subscription:', await response.text());
+          showAlert('Failed to activate subscription. Please try again.', 'error');
+        }
+      } catch (error) {
+        console.error('Error subscribing to plan:', error);
+        showAlert('An error occurred during subscription process', 'error');
+      }
+    }
+    
+    // Cancel subscription
+    async function cancelSubscription(immediate = false) {
+      try {
+        const subscriptionActions = document.querySelector('.subscription-actions');
+        const subscriptionId = subscriptionActions.dataset.subscriptionId;
+        
+        if (!subscriptionId) {
+          showAlert('No active subscription found', 'error');
+          return;
+        }
+        
+        const confirmMessage = immediate 
+          ? 'Are you sure you want to cancel your subscription immediately? You will lose access to business features right away.'
+          : 'Are you sure you want to cancel your subscription? You will still have access until the end of your current billing period.';
+        
+        if (!confirm(confirmMessage)) {
+          return;
+        }
+        
+        const response = await fetch('/api/subscriptions/cancel', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            subscriptionId: subscriptionId,
+            immediate: immediate
+          })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Subscription canceled:', data);
+          
+          if (immediate) {
+            // If immediate cancellation, update user role
+            currentUser.role = 'user';
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            showAlert('Your subscription has been canceled immediately', 'success');
+          } else {
+            showAlert('Your subscription will be canceled at the end of the billing period', 'success');
+            
+            // Update the UI to show pending cancellation
+            const statusEl = document.querySelector('.subscription-status');
+            statusEl.textContent = 'CANCELING';
+            statusEl.style.backgroundColor = '#F59E0B';
+            
+            // Change cancel button to "Cancel Now" button
+            const cancelBtn = document.querySelector('.subscription-actions button');
+            cancelBtn.textContent = 'Cancel Immediately';
+            cancelBtn.onclick = () => cancelSubscription(true);
+          }
+          
+          // Refresh profile view
+          updateProfileView();
+        } else {
+          console.error('Error canceling subscription:', await response.text());
+          showAlert('Failed to cancel subscription. Please try again.', 'error');
+        }
+      } catch (error) {
+        console.error('Error canceling subscription:', error);
+        showAlert('An error occurred while canceling subscription', 'error');
+      }
+    }
+    
+    // Show invoice history
+    async function showInvoiceHistory() {
+      try {
+        if (!currentUser || !currentUser.id) {
+          showAlert('Please log in to view invoice history', 'error');
+          return;
+        }
+        
+        const response = await fetch(`/api/subscriptions/invoices/${currentUser.id}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Invoice history:', data);
+          
+          // Format dates for display
+          const formatDate = (dateString) => {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+          };
+          
+          // Format amounts for display
+          const formatAmount = (amount, currency) => {
+            return new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: currency || 'USD'
+            }).format(amount);
+          };
+          
+          // Create the modal content
+          const modalContent = `
+            <h3>Invoice History</h3>
+            <p>Your subscription billing history:</p>
+            <table class="invoice-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.invoices.length > 0 ? data.invoices.map(invoice => `
+                  <tr>
+                    <td>${formatDate(invoice.date)}</td>
+                    <td>${formatAmount(invoice.amount, invoice.currency)}</td>
+                    <td>${invoice.description}</td>
+                    <td><span class="status-badge ${invoice.status}">${invoice.status}</span></td>
+                  </tr>
+                `).join('') : '<tr><td colspan="4">No invoices found</td></tr>'}
+              </tbody>
+            </table>
+          `;
+          
+          // Show the modal
+          showModal(modalContent, 'invoice-history-modal');
+        } else {
+          console.error('Error fetching invoice history:', await response.text());
+          showAlert('Unable to load invoice history. Please try again later.', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading invoice history:', error);
+        showAlert('An error occurred while loading invoice history', 'error');
+      }
+    }
+    
+    // Function to request analytics
     function showRequestAnalyticsForm() {
       console.log('Opening Analytics Request Form');
       
