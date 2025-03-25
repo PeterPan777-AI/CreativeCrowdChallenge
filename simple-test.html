@@ -5571,6 +5571,363 @@
         container.appendChild(card);
       });
     }
+    
+    // ====== Subscription Functions ======
+    
+    // Load user subscription information
+    function loadUserSubscription(user) {
+      // Show loading state
+      document.getElementById('no-subscription').style.display = 'none';
+      document.getElementById('active-subscription').style.display = 'none';
+      
+      fetch(`/api/subscriptions/user/${user.email}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load subscription data');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Subscription data:', data);
+          
+          if (data && data.subscription && data.subscription.status === 'active') {
+            // User has an active subscription
+            document.getElementById('no-subscription').style.display = 'none';
+            document.getElementById('active-subscription').style.display = 'block';
+            
+            // Update subscription details
+            const planEl = document.querySelector('.subscription-plan-name');
+            const statusEl = document.querySelector('.subscription-status');
+            const periodEl = document.getElementById('subscription-period-dates');
+            const priceEl = document.getElementById('subscription-price');
+            
+            // Format dates for display
+            const startDate = new Date(data.subscription.current_period_start);
+            const endDate = new Date(data.subscription.current_period_end);
+            const formattedStartDate = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const formattedEndDate = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            
+            // Update elements
+            if (planEl) planEl.textContent = data.subscription.plan.name;
+            if (statusEl) statusEl.textContent = data.subscription.status;
+            if (periodEl) periodEl.textContent = `${formattedStartDate} - ${formattedEndDate}`;
+            if (priceEl) priceEl.textContent = `$${data.subscription.plan.amount/100}/${data.subscription.plan.interval}`;
+            
+            // Update cancel button text if subscription is already set to cancel
+            if (data.subscription.cancel_at_period_end) {
+              const cancelBtn = document.querySelector('.subscription-actions button:first-child');
+              if (cancelBtn) {
+                cancelBtn.textContent = 'Resume Subscription';
+                cancelBtn.setAttribute('onclick', 'cancelSubscription(true)');
+              }
+            }
+          } else {
+            // User doesn't have an active subscription
+            document.getElementById('no-subscription').style.display = 'block';
+            document.getElementById('active-subscription').style.display = 'none';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading subscription:', error);
+          // Show no subscription by default on error
+          document.getElementById('no-subscription').style.display = 'block';
+          document.getElementById('active-subscription').style.display = 'none';
+        });
+    }
+    
+    // Show subscription plans modal
+    function showSubscriptionPlans() {
+      // Show the modal
+      document.getElementById('subscription-plans-modal').style.display = 'flex';
+      
+      // Show loading state
+      document.getElementById('subscription-loading').style.display = 'block';
+      document.getElementById('subscription-plans-container').style.display = 'none';
+      
+      // Fetch plans from API
+      fetch('/api/subscriptions/plans')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load subscription plans');
+          }
+          return response.json();
+        })
+        .then(plans => {
+          console.log('Subscription plans:', plans);
+          
+          // Hide loading, show container
+          document.getElementById('subscription-loading').style.display = 'none';
+          document.getElementById('subscription-plans-container').style.display = 'block';
+          
+          // Clear existing content
+          const plansContainer = document.getElementById('subscription-plans-container');
+          plansContainer.innerHTML = '';
+          
+          // Add each plan
+          plans.forEach(plan => {
+            const planCard = document.createElement('div');
+            planCard.className = 'subscription-plan-card';
+            
+            // Determine if this is the best value plan
+            const isBestValue = plan.name.includes('Annual');
+            
+            // Create plan header with badge for annual (best value) plan
+            const planHeader = document.createElement('div');
+            planHeader.className = 'plan-header';
+            planHeader.innerHTML = `
+              <h4>${plan.name}</h4>
+              ${isBestValue ? '<span class="best-value-badge">BEST VALUE</span>' : ''}
+            `;
+            
+            // Format price for display
+            const price = plan.amount / 100;
+            const interval = plan.interval;
+            
+            // Create HTML content
+            planCard.innerHTML = `
+              <div class="plan-header">
+                <h4>${plan.name}</h4>
+                ${isBestValue ? '<span class="best-value-badge">BEST VALUE</span>' : ''}
+              </div>
+              <div class="plan-price">
+                <span class="price-amount">$${price}</span>
+                <span class="price-interval">/${interval}</span>
+              </div>
+              <div class="plan-features">
+                ${plan.features.map(feature => `<div class="plan-feature">✓ ${feature}</div>`).join('')}
+              </div>
+              <button class="btn primary-btn subscribe-btn" onclick="subscribeToPlan('${plan.id}')">
+                Subscribe
+              </button>
+            `;
+            
+            plansContainer.appendChild(planCard);
+          });
+        })
+        .catch(error => {
+          console.error('Error loading plans:', error);
+          document.getElementById('subscription-loading').style.display = 'none';
+          
+          // Show error message
+          const plansContainer = document.getElementById('subscription-plans-container');
+          plansContainer.style.display = 'block';
+          plansContainer.innerHTML = `
+            <div class="error-message">
+              <p>Failed to load subscription plans. Please try again later.</p>
+              <button class="btn secondary-btn" onclick="showSubscriptionPlans()">Retry</button>
+            </div>
+          `;
+        });
+    }
+    
+    // Close subscription plans modal
+    function closeSubscriptionPlansModal() {
+      document.getElementById('subscription-plans-modal').style.display = 'none';
+    }
+    
+    // Subscribe to a plan
+    function subscribeToPlan(planId) {
+      if (!isLoggedIn || !currentUser) {
+        showNotification('Please log in to subscribe to a plan', 'error');
+        closeSubscriptionPlansModal();
+        showScreen('profile');
+        return;
+      }
+      
+      // Show loading state in button
+      const subscribeBtn = event.target;
+      const originalText = subscribeBtn.textContent;
+      subscribeBtn.textContent = 'Processing...';
+      subscribeBtn.disabled = true;
+      
+      fetch('/api/subscriptions/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          planId: planId,
+          userEmail: currentUser.email
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to process subscription');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Subscription successful:', data);
+        showNotification('Successfully subscribed to plan!');
+        
+        // Close the modal
+        closeSubscriptionPlansModal();
+        
+        // Update the profile view to show new subscription
+        if (currentUser) {
+          loadUserSubscription(currentUser);
+        }
+      })
+      .catch(error => {
+        console.error('Error subscribing to plan:', error);
+        showNotification('Failed to subscribe to plan: ' + error.message, 'error');
+      })
+      .finally(() => {
+        // Reset button state
+        subscribeBtn.textContent = originalText;
+        subscribeBtn.disabled = false;
+      });
+    }
+    
+    // Cancel subscription with option to reactivate
+    function cancelSubscription(reactivate) {
+      if (!isLoggedIn || !currentUser) {
+        showNotification('Please log in to manage your subscription', 'error');
+        return;
+      }
+      
+      // Confirm cancellation
+      if (!reactivate) {
+        if (!confirm('Are you sure you want to cancel your subscription? Your subscription will remain active until the end of your current billing period.')) {
+          return;
+        }
+      }
+      
+      // Show loading state
+      const cancelBtn = document.querySelector('.subscription-actions button:first-child');
+      const originalText = cancelBtn.textContent;
+      cancelBtn.textContent = reactivate ? 'Resuming...' : 'Cancelling...';
+      cancelBtn.disabled = true;
+      
+      fetch('/api/subscriptions/cancel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userEmail: currentUser.email,
+          reactivate: reactivate
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to process subscription update');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Subscription update successful:', data);
+        
+        if (reactivate) {
+          showNotification('Successfully resumed your subscription!');
+          // Update cancel button to show "Cancel at Period End" again
+          cancelBtn.textContent = 'Cancel at Period End';
+          cancelBtn.setAttribute('onclick', 'cancelSubscription(false)');
+        } else {
+          showNotification('Your subscription will be cancelled at the end of your current billing period');
+          // Update cancel button to show "Resume Subscription"
+          cancelBtn.textContent = 'Resume Subscription';
+          cancelBtn.setAttribute('onclick', 'cancelSubscription(true)');
+        }
+        
+        // Reload subscription data
+        if (currentUser) {
+          loadUserSubscription(currentUser);
+        }
+      })
+      .catch(error => {
+        console.error('Error updating subscription:', error);
+        showNotification('Failed to update subscription: ' + error.message, 'error');
+      })
+      .finally(() => {
+        // Reset button state
+        cancelBtn.disabled = false;
+      });
+    }
+    
+    // Show invoice history modal
+    function showInvoiceHistory() {
+      if (!isLoggedIn || !currentUser) {
+        showNotification('Please log in to view invoice history', 'error');
+        return;
+      }
+      
+      // Show the modal
+      document.getElementById('invoice-history-modal').style.display = 'flex';
+      
+      // Show loading state
+      document.getElementById('invoices-loading').style.display = 'block';
+      document.getElementById('invoice-history-container').style.display = 'none';
+      document.getElementById('no-invoices-message').style.display = 'none';
+      
+      // Fetch invoice history from API
+      fetch(`/api/subscriptions/invoices/${currentUser.email}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load invoice history');
+          }
+          return response.json();
+        })
+        .then(invoices => {
+          console.log('Invoice history:', invoices);
+          
+          // Hide loading
+          document.getElementById('invoices-loading').style.display = 'none';
+          
+          if (invoices && invoices.length > 0) {
+            // Show container with invoices
+            document.getElementById('invoice-history-container').style.display = 'block';
+            document.getElementById('no-invoices-message').style.display = 'none';
+            
+            // Clear existing content
+            const invoiceTableBody = document.getElementById('invoice-table-body');
+            invoiceTableBody.innerHTML = '';
+            
+            // Add each invoice
+            invoices.forEach(invoice => {
+              // Format date
+              const invoiceDate = new Date(invoice.created * 1000); // Convert Unix timestamp to Date
+              const formattedDate = invoiceDate.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+              });
+              
+              // Create row
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${formattedDate}</td>
+                <td>${invoice.number}</td>
+                <td>$${(invoice.amount_paid / 100).toFixed(2)}</td>
+                <td><span class="status-badge ${invoice.status}">${invoice.status}</span></td>
+              `;
+              
+              invoiceTableBody.appendChild(row);
+            });
+          } else {
+            // Show no invoices message
+            document.getElementById('invoice-history-container').style.display = 'none';
+            document.getElementById('no-invoices-message').style.display = 'block';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading invoices:', error);
+          document.getElementById('invoices-loading').style.display = 'none';
+          document.getElementById('invoice-history-container').style.display = 'none';
+          
+          // Show error message
+          document.getElementById('no-invoices-message').style.display = 'block';
+          document.getElementById('no-invoices-message').innerHTML = `
+            <p>Failed to load invoice history. Please try again later.</p>
+            <button class="btn secondary-btn" onclick="showInvoiceHistory()">Retry</button>
+          `;
+        });
+    }
+    
+    // Close invoice history modal
+    function closeInvoiceHistoryModal() {
+      document.getElementById('invoice-history-modal').style.display = 'none';
+    }
   </script>
   
   <!-- Footer -->
