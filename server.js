@@ -578,11 +578,14 @@ async function handleApiRequest(req, res) {
   // GET /api/firebase-config - Get Firebase configuration
   if (endpoint === '/firebase-config' && req.method === 'GET') {
     try {
-      // Get Firebase configuration from environment variables
+      // Firebase configuration - hardcoded for now, will move to env vars later
       const firebaseConfig = {
-        apiKey: process.env.VITE_FIREBASE_API_KEY || '',
-        projectId: process.env.VITE_FIREBASE_PROJECT_ID || '',
-        appId: process.env.VITE_FIREBASE_APP_ID || ''
+        apiKey: process.env.VITE_FIREBASE_API_KEY || "AIzaSyD5ajskMWCzDm5m5BxtAV5843aYgpnYZVc",
+        projectId: process.env.VITE_FIREBASE_PROJECT_ID || "creativecrowdchallenge",
+        storageBucket: "creativecrowdchallenge.firebasestorage.app",
+        messagingSenderId: "73698226096",
+        appId: process.env.VITE_FIREBASE_APP_ID || "1:73698226096:web:2ae4a7a2f24054236cb075",
+        measurementId: "G-PG3RNP0RCM"
       };
       
       res.writeHead(200);
