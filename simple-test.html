@@ -5519,6 +5519,15 @@
     async function showSubscriptionPlans() {
       try {
         console.log('Fetching subscription plans...');
+        
+        // Show the modal with loading state
+        const loadingModalContent = `
+          <h3>Choose a Subscription Plan</h3>
+          <p>Loading available plans...</p>
+          <div class="loader"></div>
+        `;
+        showModal(loadingModalContent, 'subscription-plans-modal');
+        
         const response = await fetch('/api/subscriptions/plans');
         console.log('Subscription plans response status:', response.status);
         
@@ -5562,21 +5571,24 @@
               </div>
             `;
             
-            // Show the modal
-            showModal(modalContent, 'subscription-plans-modal');
+            // Update the modal with plan content
+            document.querySelector('.modal-content').innerHTML = modalContent;
           } catch (parseError) {
             console.error('Error parsing subscription plans JSON:', parseError);
             console.error('Response text that failed to parse:', responseText);
             showAlert('Error processing subscription data. Please try again.', 'error');
+            closeModal();
           }
         } else {
           const errorText = await response.text();
           console.error('Error fetching subscription plans. Status:', response.status, 'Text:', errorText);
           showAlert('Unable to load subscription plans. Please try again later.', 'error');
+          closeModal();
         }
       } catch (error) {
         console.error('Exception while loading subscription plans:', error);
         showAlert('An error occurred while loading subscription plans', 'error');
+        closeModal();
       }
     }
     
@@ -6187,94 +6199,9 @@
         });
     }
     
-    // Show subscription plans modal
-    function showSubscriptionPlans() {
-      // Show the modal
-      document.getElementById('subscription-plans-modal').style.display = 'flex';
-      
-      // Show loading state
-      document.getElementById('subscription-loading').style.display = 'block';
-      document.getElementById('subscription-plans-container').style.display = 'none';
-      
-      // Fetch plans from API
-      fetch('/api/subscriptions/plans')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to load subscription plans');
-          }
-          return response.json();
-        })
-        .then(plans => {
-          console.log('Subscription plans:', plans);
-          
-          // Hide loading, show container
-          document.getElementById('subscription-loading').style.display = 'none';
-          document.getElementById('subscription-plans-container').style.display = 'block';
-          
-          // Clear existing content
-          const plansContainer = document.getElementById('subscription-plans-container');
-          plansContainer.innerHTML = '';
-          
-          // Add each plan
-          plans.forEach(plan => {
-            const planCard = document.createElement('div');
-            planCard.className = 'subscription-plan-card';
-            
-            // Determine if this is the best value plan
-            const isBestValue = plan.name.includes('Annual');
-            
-            // Create plan header with badge for annual (best value) plan
-            const planHeader = document.createElement('div');
-            planHeader.className = 'plan-header';
-            planHeader.innerHTML = `
-              <h4>${plan.name}</h4>
-              ${isBestValue ? '<span class="best-value-badge">BEST VALUE</span>' : ''}
-            `;
-            
-            // Format price for display
-            const price = plan.amount / 100;
-            const interval = plan.interval;
-            
-            // Create HTML content
-            planCard.innerHTML = `
-              <div class="plan-header">
-                <h4>${plan.name}</h4>
-                ${isBestValue ? '<span class="best-value-badge">BEST VALUE</span>' : ''}
-              </div>
-              <div class="plan-price">
-                <span class="price-amount">$${price}</span>
-                <span class="price-interval">/${interval}</span>
-              </div>
-              <div class="plan-features">
-                ${plan.features.map(feature => `<div class="plan-feature">✓ ${feature}</div>`).join('')}
-              </div>
-              <button class="btn primary-btn subscribe-btn" onclick="subscribeToPlan('${plan.id}')">
-                Subscribe
-              </button>
-            `;
-            
-            plansContainer.appendChild(planCard);
-          });
-        })
-        .catch(error => {
-          console.error('Error loading plans:', error);
-          document.getElementById('subscription-loading').style.display = 'none';
-          
-          // Show error message
-          const plansContainer = document.getElementById('subscription-plans-container');
-          plansContainer.style.display = 'block';
-          plansContainer.innerHTML = `
-            <div class="error-message">
-              <p>Failed to load subscription plans. Please try again later.</p>
-              <button class="btn secondary-btn" onclick="showSubscriptionPlans()">Retry</button>
-            </div>
-          `;
-        });
-    }
-    
     // Close subscription plans modal
     function closeSubscriptionPlansModal() {
-      document.getElementById('subscription-plans-modal').style.display = 'none';
+      closeModal();
     }
     
     // Subscribe to a plan
