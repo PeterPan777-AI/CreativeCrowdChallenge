@@ -5518,43 +5518,64 @@
     // Show available subscription plans
     async function showSubscriptionPlans() {
       try {
+        console.log('Fetching subscription plans...');
         const response = await fetch('/api/subscriptions/plans');
+        console.log('Subscription plans response status:', response.status);
+        
         if (response.ok) {
-          const data = await response.json();
+          const responseText = await response.text();
+          console.log('Subscription plans raw response:', responseText);
           
-          // Create the modal content
-          const modalContent = `
-            <h3>Choose a Subscription Plan</h3>
-            <p>Select a plan that suits your business needs:</p>
-            <div class="subscription-plans-container">
-              ${data.plans.map(plan => `
-                <div class="subscription-plan-card">
-                  <div class="plan-header">
-                    <h4>${plan.name} Plan</h4>
-                    ${plan.recommended ? '<span class="best-value-badge">BEST VALUE</span>' : ''}
-                    <p>${plan.interval === 'month' ? 'Monthly' : 'Annual'} billing</p>
+          let data;
+          try {
+            data = JSON.parse(responseText);
+            console.log('Parsed subscription plans data:', data);
+            
+            if (!data || !data.plans || !Array.isArray(data.plans)) {
+              console.error('Invalid subscription plans data format:', data);
+              showAlert('Unable to load subscription plans. Invalid data format.', 'error');
+              return;
+            }
+            
+            // Create the modal content
+            const modalContent = `
+              <h3>Choose a Subscription Plan</h3>
+              <p>Select a plan that suits your business needs:</p>
+              <div class="subscription-plans-container">
+                ${data.plans.map(plan => `
+                  <div class="subscription-plan-card">
+                    <div class="plan-header">
+                      <h4>${plan.name} Plan</h4>
+                      ${plan.recommended ? '<span class="best-value-badge">BEST VALUE</span>' : ''}
+                      <p>${plan.interval === 'month' ? 'Monthly' : 'Annual'} billing</p>
+                    </div>
+                    <div class="plan-price">
+                      <span class="price-amount">$${plan.price}</span>
+                      <span class="price-interval">/${plan.interval}</span>
+                    </div>
+                    <div class="plan-features">
+                      ${plan.features.map(feature => `<div class="plan-feature">✓ ${feature}</div>`).join('')}
+                    </div>
+                    <button onclick="subscribeToPlan('${plan.id}')" class="btn primary-btn subscribe-btn">Subscribe</button>
                   </div>
-                  <div class="plan-price">
-                    <span class="price-amount">$${plan.price}</span>
-                    <span class="price-interval">/${plan.interval}</span>
-                  </div>
-                  <div class="plan-features">
-                    ${plan.features.map(feature => `<div class="plan-feature">✓ ${feature}</div>`).join('')}
-                  </div>
-                  <button onclick="subscribeToPlan('${plan.id}')" class="btn primary-btn subscribe-btn">Subscribe</button>
-                </div>
-              `).join('')}
-            </div>
-          `;
-          
-          // Show the modal
-          showModal(modalContent, 'subscription-plans-modal');
+                `).join('')}
+              </div>
+            `;
+            
+            // Show the modal
+            showModal(modalContent, 'subscription-plans-modal');
+          } catch (parseError) {
+            console.error('Error parsing subscription plans JSON:', parseError);
+            console.error('Response text that failed to parse:', responseText);
+            showAlert('Error processing subscription data. Please try again.', 'error');
+          }
         } else {
-          console.error('Error fetching subscription plans:', await response.text());
+          const errorText = await response.text();
+          console.error('Error fetching subscription plans. Status:', response.status, 'Text:', errorText);
           showAlert('Unable to load subscription plans. Please try again later.', 'error');
         }
       } catch (error) {
-        console.error('Error loading subscription plans:', error);
+        console.error('Exception while loading subscription plans:', error);
         showAlert('An error occurred while loading subscription plans', 'error');
       }
     }
