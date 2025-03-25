@@ -2251,6 +2251,57 @@
     </div>
   </div>
   
+  <!-- Subscription Plans Modal -->
+  <div id="subscription-plans-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Choose a Subscription Plan</h3>
+        <button class="close-modal" onclick="closeSubscriptionPlansModal()">&times;</button>
+      </div>
+      <div class="loading-animation" id="subscription-loading" style="margin: 20px auto;">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div id="subscription-plans-container" class="subscription-plans-container" style="display: none;">
+        <!-- Plans will be loaded dynamically -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Invoice History Modal -->
+  <div id="invoice-history-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Invoice History</h3>
+        <button class="close-modal" onclick="closeInvoiceHistoryModal()">&times;</button>
+      </div>
+      <div class="loading-animation" id="invoices-loading" style="margin: 20px auto;">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div id="invoice-history-container" style="display: none;">
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Invoice #</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-table-body">
+            <!-- Invoices will be loaded dynamically -->
+          </tbody>
+        </table>
+      </div>
+      <div id="no-invoices-message" style="display: none; text-align: center; padding: 20px;">
+        <p>You don't have any invoices yet.</p>
+      </div>
+    </div>
+  </div>
+  
   <!-- Notification -->
   <!-- Notifications will be dynamically created -->
   
@@ -2689,6 +2740,16 @@
             }
             avatarEl.textContent = initials.toUpperCase();
           }
+        }
+        
+        // Show or hide subscription section for business users
+        const subscriptionSection = document.getElementById('subscription-section');
+        if (currentUser && currentUser.role === 'business') {
+          subscriptionSection.style.display = 'block';
+          loadUserSubscription(currentUser);
+          console.log('Showing subscription section for business user');
+        } else {
+          subscriptionSection.style.display = 'none';
         }
         
         // Show or hide back office based on user role
