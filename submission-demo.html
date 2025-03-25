@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreativeCrowdChallenge - Submission Demo</title>
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    .submission-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: #4a6cf7;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      transition: background-color 0.2s;
+    }
+    
+    .btn:hover {
+      background-color: #3a5ce6;
+    }
+    
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+    
+    .drop-area {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .drop-area.active {
+      border-color: #4a6cf7;
+      background-color: rgba(74, 108, 247, 0.05);
+    }
+    
+    .drop-area p {
+      margin: 0.5rem 0;
+      color: #666;
+    }
+    
+    .preview-container {
+      margin-top: 1rem;
+      text-align: center;
+    }
+    
+    .preview-container img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 4px;
+    }
+    
+    .preview-container video {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 4px;
+    }
+    
+    .file-info {
+      margin-top: 1rem;
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      text-align: left;
+    }
+    
+    .file-info p {
+      margin: 0.25rem 0;
+    }
+    
+    .remove-btn {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      margin-top: 1rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    
+    .remove-btn:hover {
+      background-color: #dc2626;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+    }
+    
+    .tab.active {
+      border-bottom-color: #4a6cf7;
+      color: #4a6cf7;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="/">
+            <h2>CreativeCrowdChallenge</h2>
+          </a>
+        </div>
+        <nav class="nav">
+          <ul class="nav-list">
+            <li><a href="/">Home</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/submission-demo.html" class="active">Submission Demo</a></li>
+            <li><a href="/login.html">Login / Sign Up</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <section class="section">
+        <div class="submission-container">
+          <h1>Submission Demo</h1>
+          <p>Test the drag and drop file upload functionality.</p>
+          
+          <div class="tabs">
+            <div class="tab active" data-tab="image">Image Upload</div>
+            <div class="tab" data-tab="video">Video Upload</div>
+          </div>
+          
+          <div class="tab-content active" id="image-tab">
+            <h2>Upload Image</h2>
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input type="text" id="image-title" class="form-control" placeholder="Enter a title for your submission">
+            </div>
+            
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea id="image-description" class="form-control" rows="3" placeholder="Describe your submission"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Image Upload</label>
+              <div id="image-drop-area" class="drop-area">
+                <p><strong>Drag & drop your image here</strong></p>
+                <p>or</p>
+                <button type="button" id="image-select-btn" class="btn">Select Image</button>
+                <p class="small">Supported formats: JPG, PNG, GIF (Max: 10MB)</p>
+              </div>
+              <input type="file" id="image-file-input" accept="image/*" style="display: none;">
+              
+              <div id="image-preview" class="preview-container" style="display: none;">
+                <h3>Preview</h3>
+                <img id="image-preview-img" src="#" alt="Preview">
+                <div id="image-file-info" class="file-info">
+                  <p><strong>File Name:</strong> <span id="image-file-name"></span></p>
+                  <p><strong>File Size:</strong> <span id="image-file-size"></span></p>
+                  <p><strong>File Type:</strong> <span id="image-file-type"></span></p>
+                </div>
+                <button type="button" id="image-remove-btn" class="remove-btn">Remove Image</button>
+              </div>
+            </div>
+            
+            <button type="button" id="image-submit-btn" class="btn btn-block" disabled>Submit Image</button>
+          </div>
+          
+          <div class="tab-content" id="video-tab">
+            <h2>Upload Video</h2>
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input type="text" id="video-title" class="form-control" placeholder="Enter a title for your submission">
+            </div>
+            
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea id="video-description" class="form-control" rows="3" placeholder="Describe your submission"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Video Upload</label>
+              <div id="video-drop-area" class="drop-area">
+                <p><strong>Drag & drop your video here</strong></p>
+                <p>or</p>
+                <button type="button" id="video-select-btn" class="btn">Select Video</button>
+                <p class="small">Supported formats: MP4, MOV (Max: 50MB)</p>
+              </div>
+              <input type="file" id="video-file-input" accept="video/*" style="display: none;">
+              
+              <div id="video-preview" class="preview-container" style="display: none;">
+                <h3>Preview</h3>
+                <video id="video-preview-player" controls></video>
+                <div id="video-file-info" class="file-info">
+                  <p><strong>File Name:</strong> <span id="video-file-name"></span></p>
+                  <p><strong>File Size:</strong> <span id="video-file-size"></span></p>
+                  <p><strong>File Type:</strong> <span id="video-file-type"></span></p>
+                </div>
+                <button type="button" id="video-remove-btn" class="remove-btn">Remove Video</button>
+              </div>
+            </div>
+            
+            <button type="button" id="video-submit-btn" class="btn btn-block" disabled>Submit Video</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript for drag and drop functionality -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab functionality
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          this.classList.add('active');
+          const tabType = this.getAttribute('data-tab');
+          document.getElementById(`${tabType}-tab`).classList.add('active');
+        });
+      });
+      
+      // Image Upload Functionality
+      setupFileUpload('image', 10 * 1024 * 1024); // 10MB limit
+      
+      // Video Upload Functionality
+      setupFileUpload('video', 50 * 1024 * 1024); // 50MB limit
+      
+      // Function to setup file upload for both image and video
+      function setupFileUpload(type, maxSize) {
+        const dropArea = document.getElementById(`${type}-drop-area`);
+        const fileInput = document.getElementById(`${type}-file-input`);
+        const selectBtn = document.getElementById(`${type}-select-btn`);
+        const preview = document.getElementById(`${type}-preview`);
+        const removeBtn = document.getElementById(`${type}-remove-btn`);
+        const submitBtn = document.getElementById(`${type}-submit-btn`);
+        const titleInput = document.getElementById(`${type}-title`);
+        const descriptionInput = document.getElementById(`${type}-description`);
+        
+        // Preview elements
+        const previewElement = type === 'image' 
+          ? document.getElementById(`${type}-preview-img`) 
+          : document.getElementById(`${type}-preview-player`);
+        
+        const fileNameElement = document.getElementById(`${type}-file-name`);
+        const fileSizeElement = document.getElementById(`${type}-file-size`);
+        const fileTypeElement = document.getElementById(`${type}-file-type`);
+        
+        let file = null;
+        
+        // Click to select file
+        selectBtn.addEventListener('click', () => {
+          fileInput.click();
+        });
+        
+        // File input change
+        fileInput.addEventListener('change', () => {
+          if (fileInput.files.length) {
+            handleFile(fileInput.files[0]);
+          }
+        });
+        
+        // Drag and drop events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+          dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+          dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+          dropArea.classList.add('active');
+        }
+        
+        function unhighlight() {
+          dropArea.classList.remove('active');
+        }
+        
+        // Handle dropped files
+        dropArea.addEventListener('drop', (e) => {
+          const dt = e.dataTransfer;
+          const droppedFile = dt.files[0];
+          
+          if (droppedFile) {
+            handleFile(droppedFile);
+          }
+        });
+        
+        // Remove file
+        removeBtn.addEventListener('click', () => {
+          file = null;
+          fileInput.value = '';
+          preview.style.display = 'none';
+          dropArea.style.display = 'flex';
+          updateSubmitButtonState();
+        });
+        
+        // Handle file validation and preview
+        function handleFile(uploadedFile) {
+          // Validate file type
+          const validTypes = type === 'image' 
+            ? ['image/jpeg', 'image/png', 'image/gif'] 
+            : ['video/mp4', 'video/quicktime'];
+            
+          if (!validTypes.includes(uploadedFile.type)) {
+            alert(`Invalid file type. Please upload a ${type} file.`);
+            return;
+          }
+          
+          // Validate file size
+          if (uploadedFile.size > maxSize) {
+            alert(`File is too large. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
+            return;
+          }
+          
+          // Save file
+          file = uploadedFile;
+          
+          // Update file info
+          fileNameElement.textContent = file.name;
+          fileSizeElement.textContent = formatFileSize(file.size);
+          fileTypeElement.textContent = file.type;
+          
+          // Show preview
+          if (type === 'image') {
+            previewElement.src = URL.createObjectURL(file);
+          } else {
+            previewElement.src = URL.createObjectURL(file);
+          }
+          
+          preview.style.display = 'block';
+          dropArea.style.display = 'none';
+          updateSubmitButtonState();
+        }
+        
+        // Format file size
+        function formatFileSize(bytes) {
+          if (bytes < 1024) return bytes + ' bytes';
+          else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+          else return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        
+        // Update submit button state
+        function updateSubmitButtonState() {
+          const isValid = !!file && 
+            titleInput.value.trim() !== '' && 
+            descriptionInput.value.trim() !== '';
+            
+          submitBtn.disabled = !isValid;
+        }
+        
+        // Check form validity on input change
+        titleInput.addEventListener('input', updateSubmitButtonState);
+        descriptionInput.addEventListener('input', updateSubmitButtonState);
+        
+        // Handle form submission
+        submitBtn.addEventListener('click', () => {
+          if (!file || !titleInput.value.trim() || !descriptionInput.value.trim()) {
+            alert('Please fill in all fields and upload a file.');
+            return;
+          }
+          
+          // Create FormData for submission (for demo purposes only)
+          const formData = new FormData();
+          formData.append('title', titleInput.value);
+          formData.append('description', descriptionInput.value);
+          formData.append('file', file);
+          
+          // In a real application, you would send this to your server
+          // For demo, we'll just show an alert
+          alert(`Submission received!\n\nTitle: ${titleInput.value}\nFile: ${file.name}\n\nIn a real app, this would be sent to the server.`);
+          
+          // Reset form
+          titleInput.value = '';
+          descriptionInput.value = '';
+          file = null;
+          fileInput.value = '';
+          preview.style.display = 'none';
+          dropArea.style.display = 'flex';
+          updateSubmitButtonState();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

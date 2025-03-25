@@ -8,10 +8,12 @@ import {
   ActivityIndicator,
   StyleSheet,
   Alert,
+  Platform,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { theme } from '../styles';
+import DragDropUploader from './DragDropUploader';
 
 const styles = StyleSheet.create({
   container: {
@@ -192,46 +194,7 @@ export default function SubmissionForm({ onSubmit, isLoading }) {
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [textContent, setTextContent] = useState('');
   
-  const pickImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (!permissionResult.granted) {
-      Alert.alert('Permission Required', 'We need your permission to access the media library');
-      return;
-    }
-    
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.8,
-    });
-    
-    if (!result.canceled && result.assets && result.assets[0]) {
-      setSelectedMedia(result.assets[0]);
-    }
-  };
-  
-  const pickVideo = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (!permissionResult.granted) {
-      Alert.alert('Permission Required', 'We need your permission to access the media library');
-      return;
-    }
-    
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.8,
-      videoMaxDuration: 60,
-    });
-    
-    if (!result.canceled && result.assets && result.assets[0]) {
-      setSelectedMedia(result.assets[0]);
-    }
-  };
+  // File selection is now handled by the DragDropUploader component
   
   const handleSubmit = () => {
     const submissionData = {
@@ -361,61 +324,22 @@ export default function SubmissionForm({ onSubmit, isLoading }) {
         {mediaType === 'photo' && (
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Upload Photo</Text>
-            {selectedMedia ? (
-              <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: selectedMedia.uri }}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => setSelectedMedia(null)}
-                >
-                  <Feather name="x" size={20} color="#EF4444" />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.mediaPlaceholder}
-                onPress={pickImage}
-              >
-                <Feather name="upload" size={32} color="#9CA3AF" />
-                <Text style={styles.mediaPlaceholderText}>
-                  Tap to select a photo
-                </Text>
-              </TouchableOpacity>
-            )}
+            <DragDropUploader 
+              fileType="image"
+              maxSize={10} 
+              onFileSelect={(file) => setSelectedMedia(file)}
+            />
           </View>
         )}
         
         {mediaType === 'video' && (
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Upload Video</Text>
-            {selectedMedia ? (
-              <View style={styles.videoSelectedContainer}>
-                <Text style={styles.videoFilename}>
-                  Video selected: {selectedMedia.uri.split('/').pop()}
-                </Text>
-                <TouchableOpacity
-                  style={styles.removeVideoButton}
-                  onPress={() => setSelectedMedia(null)}
-                >
-                  <Feather name="x" size={16} color="#4B5563" />
-                  <Text style={styles.removeVideoText}>Remove Video</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.mediaPlaceholder}
-                onPress={pickVideo}
-              >
-                <Feather name="video" size={32} color="#9CA3AF" />
-                <Text style={styles.mediaPlaceholderText}>
-                  Tap to select a video (max 60 sec)
-                </Text>
-              </TouchableOpacity>
-            )}
+            <DragDropUploader 
+              fileType="video"
+              maxSize={50} 
+              onFileSelect={(file) => setSelectedMedia(file)}
+            />
           </View>
         )}
         
