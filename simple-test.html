@@ -1097,6 +1097,195 @@
     .plan-cta.secondary:hover {
       background: #EFF6FF;
     }
+    
+    /* Subscription Styles */
+    #subscription-section {
+      margin: 20px 0;
+      padding: 20px;
+    }
+    
+    .subscription-details {
+      margin-bottom: 20px;
+    }
+    
+    .subscription-plan-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #1E40AF;
+      margin-bottom: 5px;
+    }
+    
+    .subscription-status {
+      display: inline-block;
+      background-color: #10B981;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    
+    .subscription-period {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      color: #4B5563;
+    }
+    
+    .subscription-price {
+      font-size: 1.1rem;
+      color: #1F2937;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .subscription-features {
+      padding: 10px 0;
+      border-top: 1px solid #E5E7EB;
+      margin-top: 10px;
+    }
+    
+    .subscription-features div {
+      margin-bottom: 5px;
+      color: #4B5563;
+    }
+    
+    .subscription-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    /* Subscription Plans Modal */
+    .subscription-plans-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      padding: 20px 0;
+    }
+    
+    .subscription-plan-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid #E5E7EB;
+    }
+    
+    .subscription-plan-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .plan-header {
+      position: relative;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    
+    .plan-header h4 {
+      font-size: 1.2rem;
+      color: #1E40AF;
+      margin: 0 0 5px 0;
+    }
+    
+    .best-value-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #EF4444;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+    
+    .plan-price {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .price-amount {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #1F2937;
+    }
+    
+    .price-interval {
+      font-size: 1rem;
+      color: #6B7280;
+    }
+    
+    .plan-features {
+      flex-grow: 1;
+      margin-bottom: 20px;
+    }
+    
+    .plan-feature {
+      padding: 5px 0;
+      color: #4B5563;
+    }
+    
+    .subscribe-btn {
+      width: 100%;
+    }
+    
+    /* Invoice Table */
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    
+    .invoice-table th, .invoice-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    
+    .invoice-table th {
+      background-color: #F3F4F6;
+      color: #374151;
+      font-weight: 600;
+    }
+    
+    .invoice-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    
+    .status-badge.paid {
+      background-color: #D1FAE5;
+      color: #065F46;
+    }
+    
+    .status-badge.open {
+      background-color: #FEF3C7;
+      color: #92400E;
+    }
+    
+    .status-badge.void {
+      background-color: #F3F4F6;
+      color: #4B5563;
+    }
   </style>
 </head>
 <body>

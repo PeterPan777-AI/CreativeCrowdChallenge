@@ -2288,6 +2288,239 @@ async function handleApiRequest(req, res) {
     }
     return;
   }
+  
+  // GET /api/subscriptions/plans - Get available subscription plans
+  if (endpoint === '/subscriptions/plans' && req.method === 'GET') {
+    // In a production app, these would come from a database or payment provider API
+    const plans = [
+      {
+        id: 'basic-monthly',
+        name: 'Basic',
+        price: 9.99,
+        interval: 'month',
+        features: [
+          'Create 1 business competition per month',
+          'Basic analytics',
+          'Email support'
+        ],
+        recommended: false
+      },
+      {
+        id: 'plus-monthly',
+        name: 'Plus',
+        price: 19.99,
+        interval: 'month',
+        features: [
+          'Create 3 business competitions per month',
+          'Advanced analytics',
+          'Priority email support',
+          'Featured competitions'
+        ],
+        recommended: true
+      },
+      {
+        id: 'premium-monthly',
+        name: 'Premium',
+        price: 49.99,
+        interval: 'month',
+        features: [
+          'Unlimited business competitions',
+          'Comprehensive analytics',
+          'Priority phone support',
+          'Featured competitions',
+          'Competition promotion'
+        ],
+        recommended: false
+      }
+    ];
+    
+    res.writeHead(200);
+    res.end(JSON.stringify({ plans }));
+    return;
+  }
+  
+  // POST /api/subscriptions/subscribe - Subscribe to a plan
+  if (endpoint === '/subscriptions/subscribe' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { userId, planId } = body;
+      
+      if (!userId || !planId) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'User ID and plan ID are required' }));
+        return;
+      }
+      
+      // In a real application, this would create a subscription with a payment provider
+      // For demo purposes, we'll simulate a successful subscription
+      const subscription = {
+        id: `sub_${Math.random().toString(36).substring(2, 15)}`,
+        userId,
+        planId,
+        status: 'active',
+        currentPeriodStart: new Date().toISOString(),
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+        createdAt: new Date().toISOString()
+      };
+      
+      if (supabase) {
+        // Store the subscription in Supabase if available
+        const { error } = await supabase
+          .from('subscriptions')
+          .insert([subscription]);
+          
+        if (error) {
+          console.error('Error storing subscription:', error);
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: 'Failed to create subscription' }));
+          return;
+        }
+      }
+      
+      res.writeHead(201);
+      res.end(JSON.stringify({ subscription }));
+      return;
+    } catch (error) {
+      console.error('Error in subscription creation:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to create subscription' }));
+      return;
+    }
+  }
+  
+  // GET /api/subscriptions/:userId - Get user's active subscription
+  if (endpoint.match(/^\/subscriptions\/[\w-]+$/) && req.method === 'GET') {
+    try {
+      const userId = endpoint.split('/').pop();
+      
+      if (supabase) {
+        // In a real app, get the subscription from Supabase
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('userId', userId)
+          .eq('status', 'active')
+          .order('createdAt', { ascending: false })
+          .limit(1);
+          
+        if (error) {
+          console.error('Error retrieving subscription:', error);
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: 'Failed to retrieve subscription' }));
+          return;
+        }
+        
+        if (data && data.length > 0) {
+          res.writeHead(200);
+          res.end(JSON.stringify({ subscription: data[0] }));
+          return;
+        }
+      }
+      
+      // For demo purposes, return a mock subscription if user ID ends with 'business'
+      if (userId.endsWith('business')) {
+        const mockSubscription = {
+          id: `sub_${Math.random().toString(36).substring(2, 15)}`,
+          userId,
+          planId: 'plus-monthly',
+          status: 'active',
+          currentPeriodStart: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days ago
+          currentPeriodEnd: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days from now
+          createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
+        };
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ subscription: mockSubscription }));
+        return;
+      }
+      
+      // No subscription found
+      res.writeHead(404);
+      res.end(JSON.stringify({ error: 'No active subscription found' }));
+      return;
+    } catch (error) {
+      console.error('Error retrieving subscription:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to retrieve subscription' }));
+      return;
+    }
+  }
+  
+  // POST /api/subscriptions/cancel - Cancel a subscription
+  if (endpoint === '/subscriptions/cancel' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { subscriptionId } = body;
+      
+      if (!subscriptionId) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Subscription ID is required' }));
+        return;
+      }
+      
+      if (supabase) {
+        // Update the subscription status in Supabase
+        const { error } = await supabase
+          .from('subscriptions')
+          .update({ status: 'canceled' })
+          .eq('id', subscriptionId);
+          
+        if (error) {
+          console.error('Error canceling subscription:', error);
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: 'Failed to cancel subscription' }));
+          return;
+        }
+      }
+      
+      // In a real app, this would also cancel with the payment provider
+      res.writeHead(200);
+      res.end(JSON.stringify({ success: true, message: 'Subscription canceled' }));
+      return;
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to cancel subscription' }));
+      return;
+    }
+  }
+  
+  // GET /api/subscriptions/invoices/:userId - Get user's invoices
+  if (endpoint.match(/^\/subscriptions\/invoices\/[\w-]+$/) && req.method === 'GET') {
+    try {
+      const userId = endpoint.split('/').pop();
+      
+      // In a real app, get invoices from Supabase or payment provider
+      // For demo purposes, generate mock invoices
+      const mockInvoices = [];
+      
+      // Create 3 mock invoices
+      for (let i = 0; i < 3; i++) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        
+        mockInvoices.push({
+          id: `inv_${Math.random().toString(36).substring(2, 10)}`,
+          userId,
+          amount: 19.99,
+          currency: 'USD',
+          status: i === 0 ? 'paid' : (i === 1 ? 'paid' : 'paid'),
+          description: 'Plus Plan Subscription',
+          date: date.toISOString(),
+          pdfUrl: '#'
+        });
+      }
+      
+      res.writeHead(200);
+      res.end(JSON.stringify({ invoices: mockInvoices }));
+      return;
+    } catch (error) {
+      console.error('Error retrieving invoices:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to retrieve invoices' }));
+      return;
+    }
+  }
 
   // Default response for unknown endpoints
   res.writeHead(404);
