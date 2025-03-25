@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreativeCrowdChallenge - Login</title>
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    .auth-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: #4a6cf7;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      transition: background-color 0.2s;
+    }
+    
+    .btn:hover {
+      background-color: #3a5ce6;
+    }
+    
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+    
+    .btn-secondary {
+      background-color: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .my-3 {
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .user-type-selection {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .user-type-option {
+      flex: 1;
+      padding: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .user-type-option:hover {
+      border-color: #4a6cf7;
+    }
+    
+    .user-type-option.selected {
+      border-color: #4a6cf7;
+      background-color: rgba(74, 108, 247, 0.1);
+    }
+    
+    .user-type-option h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+    
+    .alert {
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid transparent;
+      border-radius: 0.25rem;
+    }
+    
+    .alert-danger {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+    
+    .hide {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="/">
+            <h2>CreativeCrowdChallenge</h2>
+          </a>
+        </div>
+        <nav class="nav">
+          <ul class="nav-list">
+            <li><a href="/">Home</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/login" class="active">Login / Sign Up</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <section class="section">
+        <div class="auth-container text-center">
+          <h1>Welcome to CreativeCrowdChallenge</h1>
+          <p>Join our community of creators and participate in exciting challenges</p>
+          <button id="loginBtn" class="btn btn-block my-3">Login / Sign Up</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal">
+    <div class="modal-content">
+      <div id="loginForm">
+        <h2 class="text-center">Login / Sign Up</h2>
+        <div id="authError" class="alert alert-danger hide"></div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" class="form-control" placeholder="Enter your email">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Enter your password">
+          <small>Password must be at least 6 characters long</small>
+        </div>
+        
+        <!-- User Type Selection (only shown during registration) -->
+        <div id="userTypeContainer" class="hide">
+          <h3>Select Account Type</h3>
+          <div class="user-type-selection">
+            <div class="user-type-option" data-type="individual">
+              <h3>Individual</h3>
+              <p>Free account</p>
+              <p>Participate in challenges</p>
+            </div>
+            <div class="user-type-option" data-type="business">
+              <h3>Business</h3>
+              <p>Subscription</p>
+              <p>Create & manage challenges</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group text-center my-3">
+          <button id="continueBtn" class="btn btn-block">Continue</button>
+          <button id="closeModalBtn" class="btn btn-secondary my-3">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // Firebase configuration - you'll need to replace this with your actual Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // DOM Elements
+    const loginBtn = document.getElementById('loginBtn');
+    const authModal = document.getElementById('authModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const continueBtn = document.getElementById('continueBtn');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const authError = document.getElementById('authError');
+    const userTypeContainer = document.getElementById('userTypeContainer');
+    const userTypeOptions = document.querySelectorAll('.user-type-option');
+    
+    let isRegistering = false;
+    let selectedUserType = null;
+    
+    // Event Listeners
+    loginBtn.addEventListener('click', openAuthModal);
+    closeModalBtn.addEventListener('click', closeAuthModal);
+    continueBtn.addEventListener('click', handleContinue);
+    
+    userTypeOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        userTypeOptions.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        selectedUserType = option.getAttribute('data-type');
+      });
+    });
+    
+    // Functions
+    function openAuthModal() {
+      authModal.style.display = 'flex';
+      resetForm();
+    }
+    
+    function closeAuthModal() {
+      authModal.style.display = 'none';
+      resetForm();
+    }
+    
+    function resetForm() {
+      emailInput.value = '';
+      passwordInput.value = '';
+      authError.textContent = '';
+      authError.classList.add('hide');
+      userTypeContainer.classList.add('hide');
+      isRegistering = false;
+      selectedUserType = null;
+      userTypeOptions.forEach(opt => opt.classList.remove('selected'));
+    }
+    
+    function showError(message) {
+      authError.textContent = message;
+      authError.classList.remove('hide');
+    }
+    
+    async function handleContinue() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      // Basic validation
+      if (!email || !password) {
+        showError('Please enter both email and password');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters long');
+        return;
+      }
+      
+      try {
+        if (!isRegistering) {
+          // Check if email exists
+          const methods = await auth.fetchSignInMethodsForEmail(email);
+          
+          if (methods && methods.length > 0) {
+            // User exists, attempt login
+            await auth.signInWithEmailAndPassword(email, password);
+            // Successful login
+            window.location.href = '/';
+          } else {
+            // User doesn't exist, show registration options
+            isRegistering = true;
+            userTypeContainer.classList.remove('hide');
+          }
+        } else {
+          // Registration flow
+          if (!selectedUserType) {
+            showError('Please select an account type');
+            return;
+          }
+          
+          // Create user
+          const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+          const user = userCredential.user;
+          
+          // Store user type in Firestore
+          await db.collection('users').doc(user.uid).set({
+            email: email,
+            userType: selectedUserType,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          
+          // If business user, redirect to a page that will later have Stripe checkout
+          if (selectedUserType === 'business') {
+            // For now, just redirect to a placeholder page
+            // In the future, this will redirect to Stripe checkout
+            window.location.href = '/business-subscription';
+          } else {
+            // Individual user, redirect to home
+            window.location.href = '/';
+          }
+        }
+      } catch (error) {
+        console.error('Authentication error:', error);
+        
+        // Handle specific error cases
+        if (error.code === 'auth/wrong-password') {
+          showError('Incorrect password. Please try again.');
+        } else if (error.code === 'auth/user-not-found') {
+          isRegistering = true;
+          userTypeContainer.classList.remove('hide');
+        } else if (error.code === 'auth/email-already-in-use') {
+          showError('Email is already in use. Please login instead.');
+        } else if (error.code === 'auth/invalid-email') {
+          showError('Please enter a valid email address.');
+        } else if (error.code === 'auth/weak-password') {
+          showError('Password is too weak. It must be at least 6 characters.');
+        } else {
+          showError(error.message || 'An error occurred. Please try again.');
+        }
+      }
+    }
+    
+    // Check if user is already logged in
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // User is signed in, update UI accordingly
+        loginBtn.textContent = 'My Account';
+        loginBtn.addEventListener('click', () => {
+          window.location.href = '/profile';
+        });
+      }
+    });
+    
+    // Close the modal if the user clicks outside of it
+    window.addEventListener('click', (event) => {
+      if (event.target === authModal) {
+        closeAuthModal();
+      }
+    });
+  </script>
+</body>
+</html>

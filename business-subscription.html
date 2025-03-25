@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business Subscription - CreativeCrowdChallenge</title>
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    .subscription-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+    
+    .subscription-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .subscription-details {
+      margin-bottom: 2rem;
+    }
+    
+    .feature-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    
+    .feature-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+    }
+    
+    .feature-list li:before {
+      content: "✓";
+      color: #4a6cf7;
+      margin-right: 0.75rem;
+      font-weight: bold;
+    }
+    
+    .price-box {
+      text-align: center;
+      padding: 1.5rem;
+      border: 2px solid #4a6cf7;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+    
+    .price {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .price-period {
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: #4a6cf7;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      transition: background-color 0.2s;
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      background-color: #3a5ce6;
+    }
+    
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+    
+    .btn-lg {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .notice {
+      background-color: #e9f5ff;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-top: 2rem;
+      border-left: 4px solid #4a6cf7;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="/">
+            <h2>CreativeCrowdChallenge</h2>
+          </a>
+        </div>
+        <nav class="nav">
+          <ul class="nav-list">
+            <li><a href="/">Home</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/login">Login / Sign Up</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <section class="section">
+        <div class="subscription-container">
+          <div class="subscription-header">
+            <h1>Business Subscription</h1>
+            <p>Unleash the full potential of CreativeCrowdChallenge for your business</p>
+          </div>
+          
+          <div class="subscription-details">
+            <div class="price-box">
+              <div class="price">$49.99</div>
+              <div class="price-period">per month</div>
+            </div>
+            
+            <h2>Features included:</h2>
+            <ul class="feature-list">
+              <li>Create unlimited business competitions</li>
+              <li>Advanced analytics dashboard</li>
+              <li>Custom branding options</li>
+              <li>Priority customer support</li>
+              <li>Export submissions and data</li>
+              <li>Featured placement on the homepage</li>
+              <li>API access for integrations</li>
+            </ul>
+          </div>
+          
+          <div class="text-center">
+            <a href="#" id="subscribeBtn" class="btn btn-lg">Subscribe Now</a>
+            <p><small>You can cancel your subscription at any time</small></p>
+          </div>
+          
+          <div class="notice">
+            <p><strong>Note:</strong> This is a placeholder for the future Stripe checkout integration. In the production version, clicking "Subscribe Now" would redirect to a Stripe payment page.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // Firebase configuration - you'll need to replace this with your actual Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // DOM Elements
+    const subscribeBtn = document.getElementById('subscribeBtn');
+    
+    // Event Listeners
+    subscribeBtn.addEventListener('click', handleSubscribe);
+    
+    // Functions
+    function handleSubscribe(e) {
+      e.preventDefault();
+      
+      // Check if user is logged in
+      const user = auth.currentUser;
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+      
+      // This is where you would redirect to Stripe Checkout in the future
+      alert('This would redirect to Stripe Checkout in the future. For now, you\'re subscribed!');
+      
+      // For demo purposes, update the user's subscription status in Firestore
+      db.collection('users').doc(user.uid).update({
+        isSubscribed: true,
+        subscriptionDate: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        window.location.href = '/';
+      }).catch(error => {
+        console.error('Error updating subscription status:', error);
+        alert('An error occurred while processing your subscription. Please try again.');
+      });
+    }
+    
+    // Check if user is already logged in
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        // If not logged in, redirect to login page
+        window.location.href = '/login';
+      }
+    });
+  </script>
+</body>
+</html>

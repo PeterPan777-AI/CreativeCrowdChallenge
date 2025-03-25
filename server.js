@@ -133,6 +133,15 @@ const server = http.createServer((req, res) => {
   } else if (pathname === '/admin' || pathname === '/admin.html') {
     // Serve admin login page
     filePath = path.join(__dirname, 'admin.html');
+  } else if (pathname === '/login' || pathname === '/login.html') {
+    // Serve login page
+    filePath = path.join(__dirname, 'login.html');
+  } else if (pathname === '/profile' || pathname === '/profile.html') {
+    // Serve profile page
+    filePath = path.join(__dirname, 'profile.html');
+  } else if (pathname === '/business-subscription' || pathname === '/business-subscription.html') {
+    // Serve business subscription page
+    filePath = path.join(__dirname, 'business-subscription.html');
   } else {
     filePath = path.join(__dirname, pathname);
   }
@@ -563,7 +572,50 @@ async function handleApiRequest(req, res) {
   
   res.setHeader('Content-Type', 'application/json');
   
-  // POST /api/auth/google - Google OAuth authentication
+  // POST /api/auth/firebase - Firebase authentication
+  if (endpoint === '/auth/firebase' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      // This endpoint will be used in the future to validate firebase tokens on the server
+      // For now, we'll just return a success response
+      res.writeHead(200);
+      res.end(JSON.stringify({ success: true }));
+      return;
+    } catch (error) {
+      console.error('Error during Firebase auth validation:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Firebase authentication validation failed' }));
+      return;
+    }
+  }
+  
+  // POST /api/users - Create or update user in database
+  if (endpoint === '/users' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { uid, email, userType, isSubscribed } = body;
+      
+      if (!uid || !email) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'User ID and email are required' }));
+        return;
+      }
+      
+      // In a real implementation, this would save to a database
+      console.log(`User data saved: ${JSON.stringify(body)}`);
+      
+      res.writeHead(200);
+      res.end(JSON.stringify({ success: true, uid }));
+      return;
+    } catch (error) {
+      console.error('Error saving user data:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to save user data' }));
+      return;
+    }
+  }
+  
+  // POST /api/auth/google - Google OAuth authentication (legacy)
   if (endpoint === '/auth/google' && req.method === 'POST') {
     try {
       const body = await parseRequestBody(req);
