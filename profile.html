@@ -306,21 +306,47 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
   
   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyD5ajskMWCzDm5m5BxtAV5843aYgpnYZVc",
-      authDomain: "creativecrowdchallenge.firebaseapp.com",
-      projectId: "creativecrowdchallenge",
-      storageBucket: "creativecrowdchallenge.firebasestorage.app",
-      messagingSenderId: "73698226096",
-      appId: "1:73698226096:web:2ae4a7a2f24054236cb075",
-      measurementId: "G-PG3RNP0RCM"
-    };
+    // Get Firebase configuration from environment variables
+    async function fetchFirebaseConfig() {
+      try {
+        // Fetch Firebase config from server API
+        const response = await fetch('/api/firebase-config');
+        const config = await response.json();
+        
+        if (!config.apiKey || !config.projectId || !config.appId) {
+          showAlert('Firebase configuration is missing. Please contact support.', 'danger');
+          return null;
+        }
+        
+        return {
+          apiKey: config.apiKey,
+          authDomain: `${config.projectId}.firebaseapp.com`,
+          projectId: config.projectId,
+          storageBucket: `${config.projectId}.appspot.com`,
+          appId: config.appId
+        };
+      } catch (error) {
+        console.error('Error fetching Firebase config:', error);
+        showAlert('Failed to load authentication. Please try again later.', 'danger');
+        return null;
+      }
+    }
     
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    let auth = null;
+    let db = null;
+    
+    // Initialize Firebase and auth
+    async function initProfile() {
+      const firebaseConfig = await fetchFirebaseConfig();
+      if (!firebaseConfig) {
+        window.location.href = '/login';
+        return;
+      }
+      
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
     
     // DOM Elements
     const tabs = document.querySelectorAll('.profile-tab');

@@ -173,36 +173,122 @@
     </div>
   </footer>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase SDK and Stripe -->
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
   
   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyD5ajskMWCzDm5m5BxtAV5843aYgpnYZVc",
-      authDomain: "creativecrowdchallenge.firebaseapp.com",
-      projectId: "creativecrowdchallenge",
-      storageBucket: "creativecrowdchallenge.firebasestorage.app",
-      messagingSenderId: "73698226096",
-      appId: "1:73698226096:web:2ae4a7a2f24054236cb075",
-      measurementId: "G-PG3RNP0RCM"
-    };
+    // Get Firebase configuration from environment variables
+    async function fetchFirebaseConfig() {
+      try {
+        // Fetch Firebase config from server API
+        const response = await fetch('/api/firebase-config');
+        const config = await response.json();
+        
+        if (!config.apiKey || !config.projectId || !config.appId) {
+          showError('Firebase configuration is missing. Please contact support.');
+          return null;
+        }
+        
+        return {
+          apiKey: config.apiKey,
+          authDomain: `${config.projectId}.firebaseapp.com`,
+          projectId: config.projectId,
+          storageBucket: `${config.projectId}.appspot.com`,
+          appId: config.appId
+        };
+      } catch (error) {
+        console.error('Error fetching Firebase config:', error);
+        showError('Failed to load authentication. Please try again later.');
+        return null;
+      }
+    }
     
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Helper function to show error message
+    function showError(message) {
+      alert(message);  // Simple alert for now, can be improved with a proper UI element
+    }
     
     // DOM Elements
     const subscribeBtn = document.getElementById('subscribeBtn');
     
-    // Event Listeners
-    subscribeBtn.addEventListener('click', handleSubscribe);
+    let auth = null;
+    let db = null;
+    let stripe = null;
     
-    // Functions
-    function handleSubscribe(e) {
+    // Initialize Firebase and auth
+    async function initSubscription() {
+      const firebaseConfig = await fetchFirebaseConfig();
+      if (!firebaseConfig) return;
+      
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
+      
+      // Initialize Stripe
+      try {
+        const stripeResponse = await fetch('/api/stripe-public-key');
+        const stripeData = await stripeResponse.json();
+        if (stripeData.publicKey) {
+          // Initialize Stripe with the public key
+          stripe = Stripe(stripeData.publicKey);
+        } else {
+          console.warn('Stripe public key not available, running in demo mode');
+        }
+      } catch (error) {
+        console.warn('Could not initialize Stripe, running in demo mode:', error);
+      }
+      
+      // Event Listeners
+      subscribeBtn.addEventListener('click', handleSubscribe);
+      
+      // Check if user is already logged in
+      auth.onAuthStateChanged(user => {
+        if (!user) {
+          // If not logged in, redirect to login page
+          window.location.href = '/login';
+          return;
+        }
+        
+        // Check if user is already a subscribed business user
+        db.collection('users').doc(user.uid).get()
+          .then(doc => {
+            if (doc.exists) {
+              const userData = doc.data();
+              if (userData.isSubscribed) {
+                // Already subscribed, show message and change button
+                const notice = document.createElement('div');
+                notice.className = 'alert alert-success';
+                notice.textContent = 'You already have an active business subscription!';
+                
+                document.querySelector('.notice').insertAdjacentElement('beforebegin', notice);
+                
+                subscribeBtn.textContent = 'Manage Subscription';
+                subscribeBtn.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  // Will lead to subscription management in the future
+                  window.location.href = '/profile';
+                });
+                
+                // Remove the old click listener
+                subscribeBtn.removeEventListener('click', handleSubscribe);
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Error checking subscription status:', error);
+          });
+      });
+    }
+    
+    // Initialize when the page loads
+    document.addEventListener('DOMContentLoaded', initSubscription);
+    
+    // Handle subscription process
+    async function handleSubscribe(e) {
       e.preventDefault();
       
       // Check if user is logged in
@@ -212,28 +298,54 @@
         return;
       }
       
-      // This is where you would redirect to Stripe Checkout in the future
-      alert('This would redirect to Stripe Checkout in the future. For now, you\'re subscribed!');
-      
-      // For demo purposes, update the user's subscription status in Firestore
-      db.collection('users').doc(user.uid).update({
-        isSubscribed: true,
-        subscriptionDate: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        window.location.href = '/';
-      }).catch(error => {
-        console.error('Error updating subscription status:', error);
-        alert('An error occurred while processing your subscription. Please try again.');
-      });
-    }
-    
-    // Check if user is already logged in
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        // If not logged in, redirect to login page
-        window.location.href = '/login';
+      try {
+        if (stripe) {
+          // Real Stripe checkout flow
+          // Create a checkout session on the server
+          const response = await fetch('/api/create-subscription', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: user.uid,
+              email: user.email
+            }),
+          });
+          
+          const session = await response.json();
+          
+          if (session.error) {
+            throw new Error(session.error);
+          }
+          
+          // Redirect to Stripe Checkout
+          const result = await stripe.redirectToCheckout({
+            sessionId: session.sessionId
+          });
+          
+          if (result.error) {
+            throw new Error(result.error.message);
+          }
+        } else {
+          // Demo mode - simulate subscription
+          console.log('Stripe not available, using demo mode for subscription');
+          
+          // Update user subscription status directly in Firestore
+          await db.collection('users').doc(user.uid).update({
+            isSubscribed: true,
+            subscriptionDate: firebase.firestore.FieldValue.serverTimestamp(),
+            demoSubscription: true  // Flag to indicate this is not a real subscription
+          });
+          
+          alert('In demo mode: Your business subscription has been activated!');
+          window.location.href = '/profile';
+        }
+      } catch (error) {
+        console.error('Subscription error:', error);
+        showError('An error occurred while processing your subscription: ' + error.message);
       }
-    });
+    }
   </script>
 </body>
 </html>

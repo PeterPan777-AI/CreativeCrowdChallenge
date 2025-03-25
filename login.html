@@ -233,21 +233,38 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
   
   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyD5ajskMWCzDm5m5BxtAV5843aYgpnYZVc",
-      authDomain: "creativecrowdchallenge.firebaseapp.com",
-      projectId: "creativecrowdchallenge",
-      storageBucket: "creativecrowdchallenge.firebasestorage.app",
-      messagingSenderId: "73698226096",
-      appId: "1:73698226096:web:2ae4a7a2f24054236cb075",
-      measurementId: "G-PG3RNP0RCM"
-    };
+    // Get Firebase configuration from environment variables
+    async function fetchFirebaseConfig() {
+      try {
+        // Fetch Firebase config from server API
+        const response = await fetch('/api/firebase-config');
+        const config = await response.json();
+        
+        if (!config.apiKey || !config.projectId || !config.appId) {
+          showAuthError('Firebase configuration is missing. Please contact support.');
+          return null;
+        }
+        
+        return {
+          apiKey: config.apiKey,
+          authDomain: `${config.projectId}.firebaseapp.com`,
+          projectId: config.projectId,
+          storageBucket: `${config.projectId}.appspot.com`,
+          appId: config.appId
+        };
+      } catch (error) {
+        console.error('Error fetching Firebase config:', error);
+        showAuthError('Failed to load authentication. Please try again later.');
+        return null;
+      }
+    }
     
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Helper function to show error message
+    function showAuthError(message) {
+      const authError = document.getElementById('authError');
+      authError.textContent = message;
+      authError.classList.remove('hide');
+    }
     
     // DOM Elements
     const loginBtn = document.getElementById('loginBtn');
@@ -262,19 +279,71 @@
     
     let isRegistering = false;
     let selectedUserType = null;
+    let auth = null;
+    let db = null;
     
-    // Event Listeners
-    loginBtn.addEventListener('click', openAuthModal);
-    closeModalBtn.addEventListener('click', closeAuthModal);
-    continueBtn.addEventListener('click', handleContinue);
-    
-    userTypeOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        userTypeOptions.forEach(opt => opt.classList.remove('selected'));
-        option.classList.add('selected');
-        selectedUserType = option.getAttribute('data-type');
+    // Initialize Firebase and auth
+    async function initAuth() {
+      const firebaseConfig = await fetchFirebaseConfig();
+      if (!firebaseConfig) return;
+      
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
+      
+      // Event Listeners
+      loginBtn.addEventListener('click', openAuthModal);
+      closeModalBtn.addEventListener('click', closeAuthModal);
+      continueBtn.addEventListener('click', handleContinue);
+      
+      userTypeOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          userTypeOptions.forEach(opt => opt.classList.remove('selected'));
+          option.classList.add('selected');
+          selectedUserType = option.getAttribute('data-type');
+        });
       });
-    });
+      
+      // Check if user is already logged in
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          // User is signed in, update UI accordingly
+          loginBtn.textContent = 'My Account';
+          loginBtn.removeEventListener('click', openAuthModal);
+          loginBtn.addEventListener('click', () => {
+            window.location.href = '/profile';
+          });
+          
+          // Check if user is business and has an active subscription
+          db.collection('users').doc(user.uid).get()
+            .then(doc => {
+              if (doc.exists) {
+                const userData = doc.data();
+                if (userData.userType === 'business' && !userData.isSubscribed) {
+                  // Business user without active subscription, redirect to subscription page
+                  if (window.location.pathname !== '/business-subscription') {
+                    window.location.href = '/business-subscription';
+                  }
+                }
+              }
+            })
+            .catch(error => {
+              console.error('Error checking user subscription:', error);
+            });
+        }
+      });
+      
+      // Close the modal if the user clicks outside of it
+      window.addEventListener('click', (event) => {
+        if (event.target === authModal) {
+          closeAuthModal();
+        }
+      });
+    }
+    
+    // Initialize auth when the page loads
+    document.addEventListener('DOMContentLoaded', initAuth);
     
     // Functions
     function openAuthModal() {
@@ -304,6 +373,11 @@
     }
     
     async function handleContinue() {
+      if (!auth) {
+        showError('Authentication service is not available');
+        return;
+      }
+      
       const email = emailInput.value.trim();
       const password = passwordInput.value;
       
@@ -325,9 +399,24 @@
           
           if (methods && methods.length > 0) {
             // User exists, attempt login
-            await auth.signInWithEmailAndPassword(email, password);
-            // Successful login
-            window.location.href = '/';
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            
+            // Check if business user has an active subscription
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (userDoc.exists) {
+              const userData = userDoc.data();
+              if (userData.userType === 'business' && !userData.isSubscribed) {
+                // Business user without subscription, redirect to subscription page
+                window.location.href = '/business-subscription';
+              } else {
+                // Normal user or business with subscription, redirect to home
+                window.location.href = '/';
+              }
+            } else {
+              // No user data, redirect to home
+              window.location.href = '/';
+            }
           } else {
             // User doesn't exist, show registration options
             isRegistering = true;
@@ -348,13 +437,12 @@
           await db.collection('users').doc(user.uid).set({
             email: email,
             userType: selectedUserType,
+            isSubscribed: false,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
           
-          // If business user, redirect to a page that will later have Stripe checkout
+          // If business user, redirect to subscription page
           if (selectedUserType === 'business') {
-            // For now, just redirect to a placeholder page
-            // In the future, this will redirect to Stripe checkout
             window.location.href = '/business-subscription';
           } else {
             // Individual user, redirect to home
@@ -381,24 +469,6 @@
         }
       }
     }
-    
-    // Check if user is already logged in
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        // User is signed in, update UI accordingly
-        loginBtn.textContent = 'My Account';
-        loginBtn.addEventListener('click', () => {
-          window.location.href = '/profile';
-        });
-      }
-    });
-    
-    // Close the modal if the user clicks outside of it
-    window.addEventListener('click', (event) => {
-      if (event.target === authModal) {
-        closeAuthModal();
-      }
-    });
   </script>
 </body>
 </html>
