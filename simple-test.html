@@ -3992,6 +3992,9 @@
       // Store admin access state
       window.hasAnalyticsAccess = isAdminAnalytics || isAnalyticsDemo;
       
+      // Initialize the drawer navigation
+      setupDrawerNavigation();
+      
       // Load competitions on page load
       loadCompetitions();
       
@@ -4007,9 +4010,6 @@
           localStorage.removeItem('user');
         }
       }
-      
-      // Setup drawer navigation
-      setupDrawerNavigation();
       
       // If this is an admin analytics view, automatically show the analytics tab
       if (isAdminAnalytics || isAnalyticsDemo) {
@@ -6486,6 +6486,129 @@
     // Close invoice history modal
     function closeInvoiceHistoryModal() {
       document.getElementById('invoice-history-modal').style.display = 'none';
+    }
+    // Setup the drawer navigation functionality
+    function setupDrawerNavigation() {
+      // Get all the required DOM elements
+      const menuButton = document.getElementById('menuButton');
+      const sideDrawer = document.getElementById('sideDrawer');
+      const navOverlay = document.getElementById('navOverlay');
+      const drawerClose = document.getElementById('drawerClose');
+      const drawerNavItems = document.querySelectorAll('.drawer-nav-item');
+      
+      // Function to open the drawer
+      function openDrawer() {
+        sideDrawer.style.left = '0';
+        navOverlay.style.display = 'block';
+        // Add a slight delay before showing the overlay to ensure smooth animation
+        setTimeout(() => {
+          navOverlay.style.opacity = '1';
+        }, 50);
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when drawer is open
+      }
+      
+      // Function to close the drawer
+      function closeDrawer() {
+        sideDrawer.style.left = '-280px';
+        navOverlay.style.opacity = '0';
+        // Add a delay before hiding the overlay to ensure smooth animation
+        setTimeout(() => {
+          navOverlay.style.display = 'none';
+        }, 300);
+        document.body.style.overflow = ''; // Re-enable scrolling
+      }
+      
+      // Add event listeners
+      menuButton.addEventListener('click', openDrawer);
+      drawerClose.addEventListener('click', closeDrawer);
+      navOverlay.addEventListener('click', closeDrawer);
+      
+      // Handle drawer navigation items
+      drawerNavItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetScreen = this.getAttribute('data-screen');
+          
+          // Only perform navigation if targetScreen is valid
+          if (targetScreen) {
+            // Update active state
+            drawerNavItems.forEach(navItem => {
+              navItem.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Navigate to the appropriate screen
+            navigateToScreen(targetScreen);
+            
+            // Close the drawer after navigation
+            closeDrawer();
+          }
+        });
+      });
+      
+      // Update the drawer based on user login state
+      updateDrawerUserSection();
+    }
+    
+    // Update drawer user section based on login state
+    function updateDrawerUserSection() {
+      const userSectionElement = document.getElementById('drawer-user-section');
+      
+      if (isLoggedIn && currentUser) {
+        // User is logged in - show profile and logout options
+        const initials = getInitials(currentUser.name || currentUser.email);
+        
+        userSectionElement.innerHTML = `
+          <div class="drawer-user-info">
+            <div class="drawer-avatar" style="display: flex; align-items: center; justify-content: center;">${initials}</div>
+            <div style="margin-left: 10px;">
+              <div style="font-weight: bold;">${currentUser.name || 'User'}</div>
+              <div style="font-size: 12px; color: #666;">${currentUser.email}</div>
+            </div>
+          </div>
+          <a href="#" class="drawer-nav-item" onclick="handleLogout(); return false;">Logout</a>
+        `;
+      } else {
+        // User is not logged in - show login/register options
+        userSectionElement.innerHTML = `
+          <a href="#" class="drawer-nav-item" onclick="showScreen('auth'); return false;">Login</a>
+          <a href="#" class="drawer-nav-item" onclick="showRegisterForm(); return false;">Register</a>
+        `;
+      }
+    }
+    
+    // Helper function to get user initials for the avatar
+    function getInitials(name) {
+      if (!name) return '?';
+      
+      return name
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase())
+        .slice(0, 2)
+        .join('');
+    }
+    
+    // Function to navigate to a specific screen
+    function navigateToScreen(screenName) {
+      switch(screenName) {
+        case 'home':
+          showScreen('home');
+          break;
+        case 'competitions':
+          showScreen('competitions');
+          break;
+        case 'profile':
+          showScreen('profile');
+          break;
+        case 'submissions':
+          showUserSubmissions();
+          break;
+        case 'categories':
+          showScreen('categories');
+          break;
+        default:
+          showScreen('home');
+      }
     }
   </script>
   
