@@ -200,7 +200,60 @@ let analyticsRequests = [
   }
 ];
 
+// Import subscription plans data
+const { subscriptionPlansData } = require('./database-schema.js');
+
 const MOCK_DATA = {
+  // Subscription plans
+  subscriptionPlans: subscriptionPlansData,
+  
+  // Mock user subscriptions
+  userSubscriptions: [
+    {
+      id: 'sub_mock_1',
+      user_id: 'mock-business-1',
+      plan_id: 'plan_pro',
+      status: 'active',
+      current_period_start: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days ago
+      current_period_end: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days from now
+      cancel_at_period_end: false,
+      is_fake: true
+    }
+  ],
+  
+  // Mock payment transactions
+  paymentTransactions: [
+    {
+      id: 'payment_mock_1',
+      user_id: 'mock-business-1',
+      subscription_id: 'sub_mock_1',
+      amount: 79.99,
+      currency: 'USD',
+      status: 'succeeded',
+      payment_method: 'credit_card',
+      description: 'Professional plan monthly subscription',
+      created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+      is_fake: true
+    }
+  ],
+  
+  // Mock invoices
+  invoices: [
+    {
+      id: 'inv_mock_1',
+      user_id: 'mock-business-1',
+      subscription_id: 'sub_mock_1',
+      amount: 79.99,
+      currency: 'USD',
+      status: 'paid',
+      due_date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+      paid_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+      invoice_number: 'INV-2025-001',
+      created_at: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
+      is_fake: true
+    }
+  ],
+  
   competitions: [
     {
       id: 'mock-comp-1',
@@ -527,6 +580,352 @@ async function handleApiRequest(req, res) {
       res.end(JSON.stringify({ error: 'Google authentication failed' }));
     }
     return;
+  }
+  
+  // GET /api/subscription-plans - Get available subscription plans
+  if (endpoint === '/subscription-plans' && req.method === 'GET') {
+    try {
+      if (!supabase) {
+        console.log('Supabase not available, using mock subscription plans data');
+        res.writeHead(200);
+        res.end(JSON.stringify(MOCK_DATA.subscriptionPlans));
+        return;
+      }
+      
+      try {
+        const { data, error } = await supabase
+          .from('subscription_plans')
+          .select('*')
+          .eq('is_active', true);
+          
+        if (error) {
+          console.error('Supabase error fetching subscription plans:', error);
+          // Fallback to mock data
+          res.writeHead(200);
+          res.end(JSON.stringify(MOCK_DATA.subscriptionPlans));
+          return;
+        }
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(data));
+      } catch (error) {
+        console.error('Error fetching subscription plans:', error);
+        // Fallback to mock data
+        res.writeHead(200);
+        res.end(JSON.stringify(MOCK_DATA.subscriptionPlans));
+      }
+      return;
+    } catch (error) {
+      console.error('Error in subscription plans endpoint:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to fetch subscription plans' }));
+      return;
+    }
+  }
+  
+  // GET /api/user-subscription/:userId - Get user's subscription details
+  if (endpoint.match(/^\/user-subscription\/[\w-]+$/) && req.method === 'GET') {
+    try {
+      const userId = endpoint.split('/').pop();
+      console.log(`Fetching subscription for user: ${userId}`);
+      
+      if (!supabase) {
+        console.log('Supabase not available, using mock subscription data');
+        const userSubscription = MOCK_DATA.userSubscriptions.find(sub => sub.user_id === userId);
+        
+        if (userSubscription) {
+          // Find the associated plan
+          const plan = MOCK_DATA.subscriptionPlans.find(plan => plan.id === userSubscription.plan_id);
+          
+          // Add plan details to subscription
+          const subscriptionWithPlan = {
+            ...userSubscription,
+            plan: plan || null
+          };
+          
+          res.writeHead(200);
+          res.end(JSON.stringify(subscriptionWithPlan));
+        } else {
+          res.writeHead(200);
+          res.end(JSON.stringify({ active: false, message: 'No active subscription found' }));
+        }
+        return;
+      }
+      
+      try {
+        // In a real implementation, query the subscriptions table
+        // Fallback to mock data for now
+        const userSubscription = MOCK_DATA.userSubscriptions.find(sub => sub.user_id === userId);
+        
+        if (userSubscription) {
+          // Find the associated plan
+          const plan = MOCK_DATA.subscriptionPlans.find(plan => plan.id === userSubscription.plan_id);
+          
+          // Add plan details to subscription
+          const subscriptionWithPlan = {
+            ...userSubscription,
+            plan: plan || null
+          };
+          
+          res.writeHead(200);
+          res.end(JSON.stringify(subscriptionWithPlan));
+        } else {
+          res.writeHead(200);
+          res.end(JSON.stringify({ active: false, message: 'No active subscription found' }));
+        }
+      } catch (error) {
+        console.error('Error fetching user subscription:', error);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Failed to fetch subscription details' }));
+      }
+      return;
+    } catch (error) {
+      console.error('Error in user subscription endpoint:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to process request' }));
+      return;
+    }
+  }
+  
+  // POST /api/subscribe - Process a subscription
+  if (endpoint === '/subscribe' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { userId, planId, paymentMethod } = body;
+      
+      if (!userId || !planId) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'User ID and plan ID are required' }));
+        return;
+      }
+      
+      console.log(`Processing subscription for user ${userId} to plan ${planId}`);
+      
+      if (!supabase) {
+        console.log('Supabase not available, creating fake subscription');
+        
+        // Find the selected plan
+        const plan = MOCK_DATA.subscriptionPlans.find(p => p.id === planId);
+        if (!plan) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Subscription plan not found' }));
+          return;
+        }
+        
+        // Create a new fake subscription
+        const newSubscription = {
+          id: `sub_mock_${Date.now()}`,
+          user_id: userId,
+          plan_id: planId,
+          status: 'active',
+          current_period_start: new Date().toISOString(),
+          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+          cancel_at_period_end: false,
+          is_fake: true,
+          created_at: new Date().toISOString()
+        };
+        
+        // Create a payment record
+        const newPayment = {
+          id: `payment_mock_${Date.now()}`,
+          user_id: userId,
+          subscription_id: newSubscription.id,
+          amount: plan.price,
+          currency: plan.currency || 'USD',
+          status: 'succeeded',
+          payment_method: paymentMethod || 'credit_card',
+          description: `${plan.name} subscription`,
+          created_at: new Date().toISOString(),
+          is_fake: true
+        };
+        
+        // Create an invoice
+        const newInvoice = {
+          id: `inv_mock_${Date.now()}`,
+          user_id: userId,
+          subscription_id: newSubscription.id,
+          amount: plan.price,
+          currency: plan.currency || 'USD',
+          status: 'paid',
+          due_date: new Date().toISOString(),
+          paid_at: new Date().toISOString(),
+          invoice_number: `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+          created_at: new Date().toISOString(),
+          is_fake: true
+        };
+        
+        // Add to mock data
+        MOCK_DATA.userSubscriptions.push(newSubscription);
+        MOCK_DATA.paymentTransactions.push(newPayment);
+        MOCK_DATA.invoices.push(newInvoice);
+        
+        // Return success with subscription details
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          success: true,
+          subscription: {
+            ...newSubscription,
+            plan: plan
+          }
+        }));
+        return;
+      }
+      
+      // In real implementation, this would use Stripe or another payment processor
+      // For now, just create a fake subscription even when Supabase is available
+      
+      // Find the selected plan
+      const plan = MOCK_DATA.subscriptionPlans.find(p => p.id === planId);
+      if (!plan) {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Subscription plan not found' }));
+        return;
+      }
+      
+      // Create a new fake subscription
+      const newSubscription = {
+        id: `sub_mock_${Date.now()}`,
+        user_id: userId,
+        plan_id: planId,
+        status: 'active',
+        current_period_start: new Date().toISOString(),
+        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+        cancel_at_period_end: false,
+        is_fake: true
+      };
+      
+      // Add to mock data
+      MOCK_DATA.userSubscriptions.push(newSubscription);
+      
+      res.writeHead(200);
+      res.end(JSON.stringify({
+        success: true,
+        subscription: {
+          ...newSubscription,
+          plan: plan
+        }
+      }));
+    } catch (error) {
+      console.error('Error processing subscription:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to process subscription' }));
+    }
+    return;
+  }
+  
+  // POST /api/cancel-subscription - Cancel a subscription
+  if (endpoint === '/cancel-subscription' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { subscriptionId, cancelImmediately } = body;
+      
+      if (!subscriptionId) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Subscription ID is required' }));
+        return;
+      }
+      
+      console.log(`Processing cancellation for subscription ${subscriptionId}`);
+      
+      if (!supabase) {
+        console.log('Supabase not available, canceling fake subscription');
+        
+        // Find the subscription
+        const subIndex = MOCK_DATA.userSubscriptions.findIndex(sub => sub.id === subscriptionId);
+        if (subIndex === -1) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Subscription not found' }));
+          return;
+        }
+        
+        // Update the subscription status
+        if (cancelImmediately) {
+          MOCK_DATA.userSubscriptions[subIndex].status = 'canceled';
+          MOCK_DATA.userSubscriptions[subIndex].canceled_at = new Date().toISOString();
+        } else {
+          MOCK_DATA.userSubscriptions[subIndex].cancel_at_period_end = true;
+        }
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          success: true,
+          subscription: MOCK_DATA.userSubscriptions[subIndex],
+          message: cancelImmediately ? 
+            'Subscription canceled immediately' : 
+            'Subscription will cancel at the end of the billing period'
+        }));
+        return;
+      }
+      
+      // In real implementation, this would use Stripe or another payment processor
+      // For now, just cancel the fake subscription even when Supabase is available
+      
+      // Find the subscription
+      const subIndex = MOCK_DATA.userSubscriptions.findIndex(sub => sub.id === subscriptionId);
+      if (subIndex === -1) {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Subscription not found' }));
+        return;
+      }
+      
+      // Update the subscription status
+      if (cancelImmediately) {
+        MOCK_DATA.userSubscriptions[subIndex].status = 'canceled';
+        MOCK_DATA.userSubscriptions[subIndex].canceled_at = new Date().toISOString();
+      } else {
+        MOCK_DATA.userSubscriptions[subIndex].cancel_at_period_end = true;
+      }
+      
+      res.writeHead(200);
+      res.end(JSON.stringify({
+        success: true,
+        subscription: MOCK_DATA.userSubscriptions[subIndex],
+        message: cancelImmediately ? 
+          'Subscription canceled immediately' : 
+          'Subscription will cancel at the end of the billing period'
+      }));
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to cancel subscription' }));
+    }
+    return;
+  }
+  
+  // GET /api/user-invoices/:userId - Get user's invoice history
+  if (endpoint.match(/^\/user-invoices\/[\w-]+$/) && req.method === 'GET') {
+    try {
+      const userId = endpoint.split('/').pop();
+      console.log(`Fetching invoices for user: ${userId}`);
+      
+      if (!supabase) {
+        console.log('Supabase not available, using mock invoice data');
+        const userInvoices = MOCK_DATA.invoices.filter(inv => inv.user_id === userId);
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(userInvoices));
+        return;
+      }
+      
+      try {
+        // In a real implementation, query the invoices table
+        // Fallback to mock data for now
+        const userInvoices = MOCK_DATA.invoices.filter(inv => inv.user_id === userId);
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(userInvoices));
+      } catch (error) {
+        console.error('Error fetching user invoices:', error);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Failed to fetch invoice history' }));
+      }
+      return;
+    } catch (error) {
+      console.error('Error in user invoices endpoint:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to process request' }));
+      return;
+    }
   }
   
   // GET /api/recommendations - AI-powered competition recommendations
