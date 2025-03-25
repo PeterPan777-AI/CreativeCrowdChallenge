@@ -264,7 +264,10 @@ const MOCK_DATA = {
       category: 'design',
       business_id: 'mock-business-1',
       created_at: '2025-03-15',
-      status: 'active'
+      status: 'active',
+      type: 'business',
+      startDate: '2025-03-15', 
+      endDate: '2025-04-30'
     },
     {
       id: 'mock-comp-2',
@@ -275,7 +278,10 @@ const MOCK_DATA = {
       category: 'design',
       business_id: 'mock-business-2',
       created_at: '2025-03-10',
-      status: 'active'
+      status: 'active',
+      type: 'business',
+      startDate: '2025-03-10', 
+      endDate: '2025-05-15'
     },
     {
       id: 'mock-comp-3',
@@ -286,7 +292,49 @@ const MOCK_DATA = {
       category: 'marketing',
       business_id: 'mock-business-1',
       created_at: '2025-03-05',
-      status: 'active'
+      status: 'active',
+      type: 'business',
+      startDate: '2025-03-05', 
+      endDate: '2025-06-01'
+    },
+    {
+      id: 'mock-comp-4',
+      title: 'Photography Contest: Urban Life',
+      description: 'Capture the essence of urban living through creative photography',
+      prize: '$300',
+      deadline: '2025-05-20',
+      category: 'photography',
+      created_at: '2025-03-18',
+      status: 'active',
+      type: 'individual',
+      startDate: '2025-03-18', 
+      endDate: '2025-05-20'
+    },
+    {
+      id: 'mock-comp-5',
+      title: 'Short Story Competition',
+      description: 'Write a compelling short story in under 2000 words on the theme of "Discovery"',
+      prize: '$400',
+      deadline: '2025-05-25',
+      category: 'writing',
+      created_at: '2025-03-20',
+      status: 'active',
+      type: 'individual',
+      startDate: '2025-03-20', 
+      endDate: '2025-05-25'
+    },
+    {
+      id: 'mock-comp-6',
+      title: 'DIY Home Decor Challenge',
+      description: 'Create an innovative home decoration using recycled materials',
+      prize: '$250',
+      deadline: '2025-04-15',
+      category: 'crafts',
+      created_at: '2025-03-01',
+      status: 'active',
+      type: 'individual',
+      startDate: '2025-03-01', 
+      endDate: '2025-04-15'
     }
   ],
   

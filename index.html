@@ -80,7 +80,16 @@
   </template>
 
   <template id="competitions-template">
-    <h1>All Competitions</h1>
+    <h1>Competitions</h1>
+    
+    <div class="tabs-container">
+      <ul class="tabs-list" id="competition-tabs">
+        <li class="tab-item active" data-tab="all">All</li>
+        <li class="tab-item" data-tab="individual">Individual</li>
+        <li class="tab-item" data-tab="business">Business</li>
+      </ul>
+    </div>
+    
     <div class="grid grid-3-col" id="competitions-list">
       <!-- Competitions will be loaded here -->
     </div>
@@ -350,7 +359,47 @@
       
       // Competitions page functionality
       function initCompetitionsPage() {
+        // Fetch all competitions data
         fetchCompetitions(false);
+        
+        // Setup competition tabs
+        const tabs = document.getElementById('competition-tabs');
+        if (tabs) {
+          const tabItems = tabs.querySelectorAll('.tab-item');
+          
+          tabItems.forEach(tab => {
+            tab.addEventListener('click', function() {
+              // Set active tab
+              tabItems.forEach(t => t.classList.remove('active'));
+              this.classList.add('active');
+              
+              // Filter competitions by tab
+              const tabType = this.getAttribute('data-tab');
+              filterCompetitions(tabType);
+            });
+          });
+        }
+      }
+      
+      // Filter competitions based on selected tab
+      function filterCompetitions(tabType) {
+        fetch('/api/competitions')
+          .then(response => response.json())
+          .then(data => {
+            let filteredData = data;
+            
+            // Filter data based on tab type
+            if (tabType === 'individual') {
+              filteredData = data.filter(comp => comp.type === 'individual');
+            } else if (tabType === 'business') {
+              filteredData = data.filter(comp => comp.type === 'business');
+            }
+            
+            renderCompetitions(filteredData, 'competitions-list');
+          })
+          .catch(error => {
+            console.error('Error fetching competitions for filtering:', error);
+          });
       }
       
       // Login page functionality
