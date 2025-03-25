@@ -2291,6 +2291,7 @@ async function handleApiRequest(req, res) {
   
   // GET /api/subscriptions/plans - Get available subscription plans
   if (endpoint === '/subscriptions/plans' && req.method === 'GET') {
+    console.log('Received request for subscription plans');
     // In a production app, these would come from a database or payment provider API
     const plans = [
       {
@@ -2334,7 +2335,8 @@ async function handleApiRequest(req, res) {
       }
     ];
     
-    res.writeHead(200);
+    console.log('Sending subscription plans:', plans);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ plans }));
     return;
   }
