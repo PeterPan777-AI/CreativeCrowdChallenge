@@ -306,6 +306,29 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
   
   <script>
+    // Global variables
+    let auth = null;
+    let db = null;
+    
+    // DOM Elements
+    let tabs;
+    let tabContents;
+    let logoutBtn;
+    let profileAlert;
+    
+    // Profile Elements
+    let profileAvatar;
+    let profileName;
+    let profileEmail;
+    let userTypeBadge;
+    let subscriptionBadge;
+    let accountEmail;
+    let accountType;
+    let subscriptionStatus;
+    let memberSince;
+    let businessUpgradeCard;
+    let businessCompetitionsCard;
+    
     // Get Firebase configuration from environment variables
     async function fetchFirebaseConfig() {
       try {
@@ -332,11 +355,11 @@
       }
     }
     
-    let auth = null;
-    let db = null;
-    
     // Initialize Firebase and auth
     async function initProfile() {
+      // Initialize DOM elements
+      initDOMElements();
+      
       const firebaseConfig = await fetchFirebaseConfig();
       if (!firebaseConfig) {
         window.location.href = '/login';
@@ -347,48 +370,146 @@
       firebase.initializeApp(firebaseConfig);
       auth = firebase.auth();
       db = firebase.firestore();
+      
+      // Set up event listeners
+      setupEventListeners();
+    }
     
-    // DOM Elements
-    const tabs = document.querySelectorAll('.profile-tab');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const profileAlert = document.getElementById('profileAlert');
+    // Initialize DOM elements
+    function initDOMElements() {
+      // Main DOM Elements
+      tabs = document.querySelectorAll('.profile-tab');
+      tabContents = document.querySelectorAll('.tab-content');
+      logoutBtn = document.getElementById('logoutBtn');
+      profileAlert = document.getElementById('profileAlert');
+      
+      // Profile Elements
+      profileAvatar = document.getElementById('profileAvatar');
+      profileName = document.getElementById('profileName');
+      profileEmail = document.getElementById('profileEmail');
+      userTypeBadge = document.getElementById('userTypeBadge');
+      subscriptionBadge = document.getElementById('subscriptionBadge');
+      accountEmail = document.getElementById('accountEmail');
+      accountType = document.getElementById('accountType');
+      subscriptionStatus = document.getElementById('subscriptionStatus');
+      memberSince = document.getElementById('memberSince');
+      businessUpgradeCard = document.getElementById('businessUpgradeCard');
+      businessCompetitionsCard = document.getElementById('businessCompetitionsCard');
+    }
     
-    // Profile Elements
-    const profileAvatar = document.getElementById('profileAvatar');
-    const profileName = document.getElementById('profileName');
-    const profileEmail = document.getElementById('profileEmail');
-    const userTypeBadge = document.getElementById('userTypeBadge');
-    const subscriptionBadge = document.getElementById('subscriptionBadge');
-    const accountEmail = document.getElementById('accountEmail');
-    const accountType = document.getElementById('accountType');
-    const subscriptionStatus = document.getElementById('subscriptionStatus');
-    const memberSince = document.getElementById('memberSince');
-    const businessUpgradeCard = document.getElementById('businessUpgradeCard');
-    const businessCompetitionsCard = document.getElementById('businessCompetitionsCard');
-    
-    // Event Listeners
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const tabId = tab.getAttribute('data-tab');
-        
-        // Update active tab
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        // Show selected tab content
-        tabContents.forEach(content => {
-          content.classList.remove('active');
-          if (content.id === `${tabId}Tab`) {
-            content.classList.add('active');
-          }
+    // Setup event listeners
+    function setupEventListeners() {
+      // Tab click handlers
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabId = tab.getAttribute('data-tab');
+          
+          // Update active tab
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          // Show selected tab content
+          tabContents.forEach(content => {
+            content.classList.remove('active');
+            if (content.id === `${tabId}Tab`) {
+              content.classList.add('active');
+            }
+          });
         });
       });
-    });
+      
+      // Logout button handler
+      logoutBtn.addEventListener('click', handleLogout);
+      
+      // Check authentication state
+      auth.onAuthStateChanged(handleAuthStateChanged);
+    }
     
-    logoutBtn.addEventListener('click', handleLogout);
+    // Handle authentication state changes
+    function handleAuthStateChanged(user) {
+      if (user) {
+        // User is signed in
+        loadUserProfile(user);
+      } else {
+        // No user is signed in, redirect to login
+        window.location.href = '/login';
+      }
+    }
     
-    // Functions
+    // Load user profile data
+    function loadUserProfile(user) {
+      db.collection('users').doc(user.uid).get()
+        .then(doc => {
+          if (doc.exists) {
+            const userData = doc.data();
+            updateProfileUI(user, userData);
+          } else {
+            // No user data found, create profile
+            createNewUserProfile(user);
+          }
+        })
+        .catch(error => {
+          console.error("Error getting user data:", error);
+          showAlert('Failed to load user data', 'danger');
+        });
+    }
+    
+    // Update profile UI with user data
+    function updateProfileUI(user, userData) {
+      // Set profile data
+      profileEmail.textContent = user.email;
+      accountEmail.textContent = user.email;
+      
+      // Set display name or email as name
+      const displayName = user.displayName || user.email.split('@')[0];
+      profileName.textContent = displayName;
+      profileAvatar.textContent = getInitials(displayName);
+      
+      // Set account type
+      const userType = userData.userType || 'individual';
+      accountType.textContent = userType.charAt(0).toUpperCase() + userType.slice(1);
+      userTypeBadge.textContent = userType.charAt(0).toUpperCase() + userType.slice(1);
+      
+      // Set subscription status
+      if (userData.isSubscribed) {
+        subscriptionStatus.textContent = 'Active';
+        subscriptionBadge.classList.remove('hide');
+      } else {
+        subscriptionStatus.textContent = 'Not Subscribed';
+      }
+      
+      // Set member since
+      memberSince.textContent = formatDate(userData.createdAt);
+      
+      // Show/hide business upgrade card
+      if (userType === 'business' || userData.isSubscribed) {
+        businessUpgradeCard.classList.add('hide');
+      }
+      
+      // Adjust competitions tab for business users
+      if (userType === 'business') {
+        // Here you would load the user's created competitions
+        // For now, just show a message
+        document.getElementById('competitionsList').innerHTML = '<p>No competitions created yet. <a href="/create-competition">Create your first competition</a></p>';
+      }
+    }
+    
+    // Create a new user profile
+    function createNewUserProfile(user) {
+      db.collection('users').doc(user.uid).set({
+        email: user.email,
+        userType: 'individual',
+        isSubscribed: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      profileName.textContent = user.email.split('@')[0];
+      profileEmail.textContent = user.email;
+      accountEmail.textContent = user.email;
+      profileAvatar.textContent = getInitials(user.email);
+    }
+    
+    // Logout handler
     function handleLogout() {
       auth.signOut()
         .then(() => {
@@ -399,6 +520,7 @@
         });
     }
     
+    // Display an alert message
     function showAlert(message, type) {
       profileAlert.textContent = message;
       profileAlert.className = `alert alert-${type}`;
@@ -409,6 +531,7 @@
       }, 5000);
     }
     
+    // Format a date timestamp
     function formatDate(timestamp) {
       if (!timestamp) return 'N/A';
       
@@ -417,79 +540,14 @@
       return date.toLocaleDateString('en-US', options);
     }
     
+    // Get user initials for avatar
     function getInitials(name) {
       if (!name) return 'U';
       return name.charAt(0).toUpperCase();
     }
     
-    // Load user data
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        // User is signed in
-        db.collection('users').doc(user.uid).get()
-          .then(doc => {
-            if (doc.exists) {
-              const userData = doc.data();
-              
-              // Set profile data
-              profileEmail.textContent = user.email;
-              accountEmail.textContent = user.email;
-              
-              // Set display name or email as name
-              const displayName = user.displayName || user.email.split('@')[0];
-              profileName.textContent = displayName;
-              profileAvatar.textContent = getInitials(displayName);
-              
-              // Set account type
-              const userType = userData.userType || 'individual';
-              accountType.textContent = userType.charAt(0).toUpperCase() + userType.slice(1);
-              userTypeBadge.textContent = userType.charAt(0).toUpperCase() + userType.slice(1);
-              
-              // Set subscription status
-              if (userData.isSubscribed) {
-                subscriptionStatus.textContent = 'Active';
-                subscriptionBadge.classList.remove('hide');
-              } else {
-                subscriptionStatus.textContent = 'Not Subscribed';
-              }
-              
-              // Set member since
-              memberSince.textContent = formatDate(userData.createdAt);
-              
-              // Show/hide business upgrade card
-              if (userType === 'business' || userData.isSubscribed) {
-                businessUpgradeCard.classList.add('hide');
-              }
-              
-              // Adjust competitions tab for business users
-              if (userType === 'business') {
-                // Here you would load the user's created competitions
-                // For now, just show a message
-                document.getElementById('competitionsList').innerHTML = '<p>No competitions created yet. <a href="/create-competition">Create your first competition</a></p>';
-              }
-            } else {
-              // No user data found, create profile
-              db.collection('users').doc(user.uid).set({
-                email: user.email,
-                userType: 'individual',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-              });
-              
-              profileName.textContent = user.email.split('@')[0];
-              profileEmail.textContent = user.email;
-              accountEmail.textContent = user.email;
-              profileAvatar.textContent = getInitials(user.email);
-            }
-          })
-          .catch(error => {
-            console.error("Error getting user data:", error);
-            showAlert('Failed to load user data', 'danger');
-          });
-      } else {
-        // No user is signed in, redirect to login
-        window.location.href = '/login';
-      }
-    });
+    // Initialize when the page loads
+    document.addEventListener('DOMContentLoaded', initProfile);
   </script>
 </body>
 </html>

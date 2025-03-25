@@ -575,6 +575,85 @@ async function handleApiRequest(req, res) {
   
   res.setHeader('Content-Type', 'application/json');
   
+  // GET /api/firebase-config - Get Firebase configuration
+  if (endpoint === '/firebase-config' && req.method === 'GET') {
+    try {
+      // Get Firebase configuration from environment variables
+      const firebaseConfig = {
+        apiKey: process.env.VITE_FIREBASE_API_KEY || '',
+        projectId: process.env.VITE_FIREBASE_PROJECT_ID || '',
+        appId: process.env.VITE_FIREBASE_APP_ID || ''
+      };
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(firebaseConfig));
+      return;
+    } catch (error) {
+      console.error('Error getting Firebase config:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to get Firebase configuration' }));
+      return;
+    }
+  }
+  
+  // GET /api/stripe-public-key - Get Stripe public key
+  if (endpoint === '/stripe-public-key' && req.method === 'GET') {
+    try {
+      // Get Stripe public key from environment variables
+      const stripePublicKey = process.env.VITE_STRIPE_PUBLIC_KEY || '';
+      
+      res.writeHead(200);
+      res.end(JSON.stringify({ publicKey: stripePublicKey }));
+      return;
+    } catch (error) {
+      console.error('Error getting Stripe public key:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to get Stripe public key' }));
+      return;
+    }
+  }
+  
+  // POST /api/create-subscription - Create a Stripe checkout session for subscription
+  if (endpoint === '/create-subscription' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { userId, email } = body;
+      
+      if (!userId || !email) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'User ID and email are required' }));
+        return;
+      }
+      
+      // Check if we have the required Stripe secret key
+      if (!process.env.STRIPE_SECRET_KEY) {
+        console.log('Stripe secret key not available, using demo mode for subscription');
+        
+        // Return a mock session ID for demo purposes
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          sessionId: 'demo_' + Date.now(),
+          demoMode: true
+        }));
+        return;
+      }
+      
+      // In a real implementation, this would create a Stripe checkout session
+      // For now, return a mock session in demo mode
+      res.writeHead(200);
+      res.end(JSON.stringify({ 
+        sessionId: 'demo_' + Date.now(),
+        demoMode: true
+      }));
+      return;
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to create subscription' }));
+      return;
+    }
+  }
+  
   // POST /api/auth/firebase - Firebase authentication
   if (endpoint === '/auth/firebase' && req.method === 'POST') {
     try {
