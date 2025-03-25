@@ -1,11 +1,14 @@
 const express = require('express');
 const path = require('path');
-const cors = require('cors');
 
 const app = express();
 
-// Enable CORS
-app.use(cors());
+// Enable CORS manually
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -16,7 +19,7 @@ app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`React frontend server running on http://0.0.0.0:${PORT}`);
 });

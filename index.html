@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3f51b5">
+  <link rel="icon" href="/assets/favicon.ico">
+  <link rel="apple-touch-icon" href="/assets/icon-192x192.png">
+  <link rel="manifest" href="/manifest.json">
+  <title>Creative Crowd Challenge</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/main.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <button class="menu-button" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </button>
+    <h1 class="header-title">Creative Crowd Challenge</h1>
+  </header>
+
+  <!-- Drawer Navigation -->
+  <nav class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h2>Menu</h2>
+    </div>
+    <div class="drawer-content">
+      <ul class="nav-list" id="nav-list">
+        <!-- Navigation links will be added here by JavaScript -->
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Overlay for drawer -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Main Content Container -->
+  <main class="main-container" id="main-content">
+    <!-- The page content will be loaded here -->
+    <div id="loading">Loading...</div>
+  </main>
+
+  <!-- Templates for different pages -->
+  <template id="home-template">
+    <div class="hero">
+      <h1 class="hero-title">Welcome to Creative Crowd Challenge</h1>
+      <p class="hero-subtitle">Discover and participate in exciting creative competitions!</p>
+      <button class="btn btn-secondary" id="explore-competitions">Explore Competitions</button>
+    </div>
+
+    <section>
+      <h2>Featured Competitions</h2>
+      <div class="grid grid-3-col" id="featured-competitions">
+        <!-- Featured competitions will be loaded here -->
+      </div>
+    </section>
+
+    <section>
+      <h2>How It Works</h2>
+      <div class="grid grid-3-col">
+        <div class="feature-box">
+          <h3 class="feature-title">1. Discover</h3>
+          <p>Browse through our curated collection of creative competitions across multiple categories.</p>
+        </div>
+        <div class="feature-box">
+          <h3 class="feature-title">2. Participate</h3>
+          <p>Submit your creative entries to competitions that inspire you and showcase your talent.</p>
+        </div>
+        <div class="feature-box">
+          <h3 class="feature-title">3. Win</h3>
+          <p>Get recognized, win prizes, and gain exposure for your creative work.</p>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="competitions-template">
+    <h1>All Competitions</h1>
+    <div class="grid grid-3-col" id="competitions-list">
+      <!-- Competitions will be loaded here -->
+    </div>
+  </template>
+
+  <template id="competition-details-template">
+    <div id="competition-details">
+      <!-- Competition details will be loaded here -->
+    </div>
+  </template>
+
+  <template id="login-template">
+    <h1>Login</h1>
+    <div class="card">
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" class="form-input" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+      <p>Don't have an account? <a href="#" id="register-link">Register</a></p>
+    </div>
+  </template>
+
+  <template id="register-template">
+    <h1>Register</h1>
+    <div class="card">
+      <form id="register-form">
+        <div class="form-group">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" id="name" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label for="reg-email" class="form-label">Email</label>
+          <input type="email" id="reg-email" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label for="reg-password" class="form-label">Password</label>
+          <input type="password" id="reg-password" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label for="confirm-password" class="form-label">Confirm Password</label>
+          <input type="password" id="confirm-password" class="form-input" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+      </form>
+      <p>Already have an account? <a href="#" id="login-link">Login</a></p>
+    </div>
+  </template>
+
+  <template id="profile-template">
+    <h1>Profile</h1>
+    <div id="profile-content">
+      <!-- Profile content will be loaded here -->
+      <p>Please log in to view your profile.</p>
+    </div>
+  </template>
+
+  <template id="submission-template">
+    <h1>Submit Entry</h1>
+    <div id="submission-form-container">
+      <!-- Submission form will be loaded here if logged in -->
+      <p>Please log in to submit an entry.</p>
+    </div>
+  </template>
+
+  <!-- App JavaScript -->
+  <script src="/assets/js/indexedDBHelper.js"></script>
+  <script>
+    // SPA Navigation
+    document.addEventListener('DOMContentLoaded', function() {
+      // Navigation State
+      let isAuthenticated = false;
+      
+      // UI Elements
+      const drawer = document.getElementById('drawer');
+      const overlay = document.getElementById('overlay');
+      const menuToggle = document.getElementById('menu-toggle');
+      const navList = document.getElementById('nav-list');
+      const mainContent = document.getElementById('main-content');
+      
+      // Navigation Items
+      const navItems = [
+        { path: '/', text: 'Home', icon: 'home' },
+        { path: '/competitions', text: 'Competitions', icon: 'emoji_events' },
+        { path: '/submission', text: 'Submit Entry', icon: 'add_circle_outline' }
+      ];
+      
+      const authItems = isAuthenticated ? [
+        { path: '/profile', text: 'Profile', icon: 'person' },
+        { path: '/logout', text: 'Logout', icon: 'logout' }
+      ] : [
+        { path: '/login', text: 'Login', icon: 'login' },
+        { path: '/register', text: 'Register', icon: 'person_add' }
+      ];
+      
+      // Create Navigation List
+      function renderNavigation() {
+        navList.innerHTML = '';
+        
+        // Main navigation items
+        navItems.forEach(item => {
+          const li = createNavItem(item);
+          navList.appendChild(li);
+        });
+        
+        // Divider
+        const divider = document.createElement('li');
+        divider.className = 'nav-divider';
+        navList.appendChild(divider);
+        
+        // Auth navigation items
+        authItems.forEach(item => {
+          const li = createNavItem(item);
+          navList.appendChild(li);
+        });
+      }
+      
+      // Create a single navigation item
+      function createNavItem(item) {
+        const li = document.createElement('li');
+        li.className = 'nav-item';
+        if (window.location.pathname === item.path) {
+          li.classList.add('active');
+        }
+        
+        const icon = document.createElement('span');
+        icon.className = 'material-icons nav-item-icon';
+        icon.textContent = item.icon;
+        
+        const text = document.createTextNode(item.text);
+        
+        li.appendChild(icon);
+        li.appendChild(text);
+        
+        li.addEventListener('click', function() {
+          navigateTo(item.path);
+          closeDrawer();
+        });
+        
+        return li;
+      }
+      
+      // Toggle drawer
+      menuToggle.addEventListener('click', function() {
+        drawer.classList.toggle('open');
+        overlay.classList.toggle('show');
+      });
+      
+      // Close drawer when clicking overlay
+      overlay.addEventListener('click', closeDrawer);
+      
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+      
+      // SPA Navigation
+      function navigateTo(path) {
+        window.history.pushState({}, '', path);
+        renderContent(path);
+      }
+      
+      // Render page content based on path
+      function renderContent(path) {
+        // Update active navigation item
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        
+        const activeNavItems = document.querySelectorAll('.nav-item');
+        for (let i = 0; i < activeNavItems.length; i++) {
+          const item = activeNavItems[i];
+          if (item.textContent.includes(getPageName(path))) {
+            item.classList.add('active');
+            break;
+          }
+        }
+        
+        // Show loading state
+        mainContent.innerHTML = '<div id="loading">Loading...</div>';
+        
+        // Route to correct template
+        let template;
+        switch (path) {
+          case '/':
+            template = document.getElementById('home-template');
+            break;
+          case '/competitions':
+            template = document.getElementById('competitions-template');
+            break;
+          case '/competition-details':
+            template = document.getElementById('competition-details-template');
+            break;
+          case '/login':
+            template = document.getElementById('login-template');
+            break;
+          case '/register':
+            template = document.getElementById('register-template');
+            break;
+          case '/profile':
+            template = document.getElementById('profile-template');
+            break;
+          case '/submission':
+            template = document.getElementById('submission-template');
+            break;
+          default:
+            template = document.getElementById('home-template');
+        }
+        
+        // Clone and insert template content
+        if (template) {
+          const content = document.importNode(template.content, true);
+          mainContent.innerHTML = '';
+          mainContent.appendChild(content);
+          
+          // Setup page-specific functionality
+          initPageFunctionality(path);
+        }
+      }
+      
+      // Helper to get page name for navigation highlighting
+      function getPageName(path) {
+        if (path === '/') return 'Home';
+        return path.substring(1).charAt(0).toUpperCase() + path.substring(2);
+      }
+      
+      // Initialize page-specific functionality
+      function initPageFunctionality(path) {
+        switch (path) {
+          case '/':
+            initHomePage();
+            break;
+          case '/competitions':
+            initCompetitionsPage();
+            break;
+          case '/login':
+            initLoginPage();
+            break;
+          case '/register':
+            initRegisterPage();
+            break;
+        }
+      }
+      
+      // Home page functionality
+      function initHomePage() {
+        // Load featured competitions
+        fetchCompetitions(true);
+        
+        // Explore competitions button
+        const exploreBtn = document.getElementById('explore-competitions');
+        if (exploreBtn) {
+          exploreBtn.addEventListener('click', function() {
+            navigateTo('/competitions');
+          });
+        }
+      }
+      
+      // Competitions page functionality
+      function initCompetitionsPage() {
+        fetchCompetitions(false);
+      }
+      
+      // Login page functionality
+      function initLoginPage() {
+        const loginForm = document.getElementById('login-form');
+        const registerLink = document.getElementById('register-link');
+        
+        if (loginForm) {
+          loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Simulated login
+            isAuthenticated = true;
+            // Update auth items
+            authItems.length = 0;
+            authItems.push(
+              { path: '/profile', text: 'Profile', icon: 'person' },
+              { path: '/logout', text: 'Logout', icon: 'logout' }
+            );
+            renderNavigation();
+            navigateTo('/');
+          });
+        }
+        
+        if (registerLink) {
+          registerLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            navigateTo('/register');
+          });
+        }
+      }
+      
+      // Register page functionality
+      function initRegisterPage() {
+        const registerForm = document.getElementById('register-form');
+        const loginLink = document.getElementById('login-link');
+        
+        if (registerForm) {
+          registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Simulated registration
+            isAuthenticated = true;
+            // Update auth items
+            authItems.length = 0;
+            authItems.push(
+              { path: '/profile', text: 'Profile', icon: 'person' },
+              { path: '/logout', text: 'Logout', icon: 'logout' }
+            );
+            renderNavigation();
+            navigateTo('/');
+          });
+        }
+        
+        if (loginLink) {
+          loginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            navigateTo('/login');
+          });
+        }
+      }
+      
+      // Fetch competitions from API
+      function fetchCompetitions(featuredOnly) {
+        fetch('/api/competitions')
+          .then(response => response.json())
+          .then(data => {
+            if (featuredOnly) {
+              // For home page - show only 3 featured competitions
+              renderCompetitions(data.slice(0, 3), 'featured-competitions');
+            } else {
+              // For competitions page - show all competitions
+              renderCompetitions(data, 'competitions-list');
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching competitions:', error);
+            const container = featuredOnly ? 
+              document.getElementById('featured-competitions') : 
+              document.getElementById('competitions-list');
+            if (container) {
+              container.innerHTML = '<p>Failed to load competitions. Please try again later.</p>';
+            }
+          });
+      }
+      
+      // Render competitions to the specified container
+      function renderCompetitions(competitions, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (competitions.length === 0) {
+          container.innerHTML = '<p>No competitions available at the moment.</p>';
+          return;
+        }
+        
+        competitions.forEach(competition => {
+          const card = createCompetitionCard(competition);
+          container.appendChild(card);
+        });
+      }
+      
+      // Create a competition card element
+      function createCompetitionCard(competition) {
+        const card = document.createElement('div');
+        card.className = 'competition-card';
+        
+        const content = document.createElement('div');
+        content.className = 'competition-content';
+        
+        const title = document.createElement('h3');
+        title.className = 'card-title';
+        title.textContent = competition.title;
+        
+        const category = document.createElement('p');
+        category.className = 'card-subtitle';
+        category.textContent = competition.category;
+        
+        const description = document.createElement('p');
+        description.textContent = competition.description.substring(0, 100) + '...';
+        
+        const footer = document.createElement('div');
+        footer.className = 'competition-footer';
+        
+        const dates = document.createElement('span');
+        dates.textContent = `${formatDate(competition.startDate)} - ${formatDate(competition.endDate)}`;
+        
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'btn btn-outline';
+        viewBtn.textContent = 'View Details';
+        viewBtn.addEventListener('click', function() {
+          // This would navigate to competition details with ID
+          alert(`Details for: ${competition.title}`);
+        });
+        
+        content.appendChild(title);
+        content.appendChild(category);
+        content.appendChild(description);
+        
+        footer.appendChild(dates);
+        footer.appendChild(viewBtn);
+        
+        card.appendChild(content);
+        card.appendChild(footer);
+        
+        return card;
+      }
+      
+      // Format date for display
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
+      }
+      
+      // Initialize the app
+      function init() {
+        renderNavigation();
+        renderContent(window.location.pathname);
+        
+        // Handle browser back/forward navigation
+        window.addEventListener('popstate', function() {
+          renderContent(window.location.pathname);
+        });
+      }
+      
+      // Start the app
+      init();
+    });
+  </script>
+</body>
+</html>
