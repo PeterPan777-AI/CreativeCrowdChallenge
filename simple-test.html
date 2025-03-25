@@ -6139,65 +6139,8 @@
     // ====== Subscription Functions ======
     
     // Load user subscription information
-    function loadUserSubscription(user) {
-      // Show loading state
-      document.getElementById('no-subscription').style.display = 'none';
-      document.getElementById('active-subscription').style.display = 'none';
-      
-      fetch(`/api/subscriptions/user/${user.email}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to load subscription data');
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log('Subscription data:', data);
-          
-          if (data && data.subscription && data.subscription.status === 'active') {
-            // User has an active subscription
-            document.getElementById('no-subscription').style.display = 'none';
-            document.getElementById('active-subscription').style.display = 'block';
-            
-            // Update subscription details
-            const planEl = document.querySelector('.subscription-plan-name');
-            const statusEl = document.querySelector('.subscription-status');
-            const periodEl = document.getElementById('subscription-period-dates');
-            const priceEl = document.getElementById('subscription-price');
-            
-            // Format dates for display
-            const startDate = new Date(data.subscription.current_period_start);
-            const endDate = new Date(data.subscription.current_period_end);
-            const formattedStartDate = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const formattedEndDate = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            
-            // Update elements
-            if (planEl) planEl.textContent = data.subscription.plan.name;
-            if (statusEl) statusEl.textContent = data.subscription.status;
-            if (periodEl) periodEl.textContent = `${formattedStartDate} - ${formattedEndDate}`;
-            if (priceEl) priceEl.textContent = `$${data.subscription.plan.amount/100}/${data.subscription.plan.interval}`;
-            
-            // Update cancel button text if subscription is already set to cancel
-            if (data.subscription.cancel_at_period_end) {
-              const cancelBtn = document.querySelector('.subscription-actions button:first-child');
-              if (cancelBtn) {
-                cancelBtn.textContent = 'Resume Subscription';
-                cancelBtn.setAttribute('onclick', 'cancelSubscription(true)');
-              }
-            }
-          } else {
-            // User doesn't have an active subscription
-            document.getElementById('no-subscription').style.display = 'block';
-            document.getElementById('active-subscription').style.display = 'none';
-          }
-        })
-        .catch(error => {
-          console.error('Error loading subscription:', error);
-          // Show no subscription by default on error
-          document.getElementById('no-subscription').style.display = 'block';
-          document.getElementById('active-subscription').style.display = 'none';
-        });
-    }
+    // This function was removed to fix duplicate loadUserSubscription issues
+    // The implementation at line ~5403 is the one being used
     
     // Close subscription plans modal
     function closeSubscriptionPlansModal() {
