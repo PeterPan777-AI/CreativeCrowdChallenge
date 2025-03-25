@@ -1,144 +1,244 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
-  Container,
   Typography,
+  Container,
   Grid,
   Card,
   CardContent,
-  CardActions,
-  Button,
+  CardMedia,
   Box,
-  Tabs,
-  Tab,
   Chip,
+  Button,
   CircularProgress,
-  Divider
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  InputAdornment
 } from '@mui/material';
-import axios from 'axios';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import SearchIcon from '@mui/icons-material/Search';
 
 export default function CompetitionsPage() {
   const [competitions, setCompetitions] = useState([]);
+  const [filteredCompetitions, setFilteredCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [tabValue, setTabValue] = useState(0);
-  const navigate = useNavigate();
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    const fetchCompetitions = async () => {
+    async function fetchCompetitions() {
       try {
-        const response = await axios.get('/api/competitions');
-        setCompetitions(response.data.competitions);
+        const response = await fetch('/api/competitions');
+        if (!response.ok) {
+          throw new Error('Failed to fetch competitions');
+        }
+        const data = await response.json();
+        setCompetitions(data);
+        setFilteredCompetitions(data);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching competitions:', err);
-        setError('Failed to load competitions. Please try again later.');
+        setError(err.message);
         setLoading(false);
       }
-    };
+    }
 
     fetchCompetitions();
   }, []);
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
+  // Apply filters when filter values change
+  useEffect(() => {
+    let result = competitions;
+    
+    // Apply category filter
+    if (categoryFilter !== 'all') {
+      result = result.filter(comp => comp.category === categoryFilter);
+    }
+    
+    // Apply type filter
+    if (typeFilter !== 'all') {
+      result = result.filter(comp => comp.type === typeFilter);
+    }
+    
+    // Apply search query
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(comp => 
+        comp.title.toLowerCase().includes(query) || 
+        comp.description.toLowerCase().includes(query)
+      );
+    }
+    
+    setFilteredCompetitions(result);
+  }, [categoryFilter, typeFilter, searchQuery, competitions]);
 
-  const handleCompetitionClick = (id) => {
-    navigate(`/competition/${id}`);
-  };
+  // Get unique categories from competitions
+  const categories = ['all', ...new Set(competitions.map(comp => comp.category))];
 
-  const filterCompetitions = () => {
-    if (tabValue === 0) return competitions;
-    const type = tabValue === 1 ? 'individual' : 'business';
-    return competitions.filter(competition => competition.type === type);
-  };
+  // Format date to a readable format
+  function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
 
-  const filteredCompetitions = filterCompetitions();
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <Typography color="error" variant="h6" sx={{ my: 4 }}>
+          Error: {error}
+        </Typography>
+        <Button variant="contained" onClick={() => window.location.reload()}>
+          Try Again
+        </Button>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Competitions
-        </Typography>
-
-        <Box sx={{ mb: 3 }}>
-          <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            textColor="primary"
-            indicatorColor="primary"
-            aria-label="competition categories"
-          >
-            <Tab label="All" id="tab-0" />
-            <Tab label="Individual" id="tab-1" />
-            <Tab label="Business" id="tab-2" />
-          </Tabs>
-          <Divider />
-        </Box>
-
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Typography color="error" sx={{ p: 2 }}>
-            {error}
+      <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 2 }}>
+        Explore Competitions
+      </Typography>
+      
+      <Box sx={{ mb: 4, mt: 3 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search competitions..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          
+          <Grid item xs={6} md={4}>
+            <FormControl fullWidth variant="outlined">
+              <InputLabel id="category-filter-label">Category</InputLabel>
+              <Select
+                labelId="category-filter-label"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                label="Category"
+              >
+                {categories.map(category => (
+                  <MenuItem key={category} value={category}>
+                    {category === 'all' ? 'All Categories' : category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          
+          <Grid item xs={6} md={4}>
+            <FormControl fullWidth variant="outlined">
+              <InputLabel id="type-filter-label">Type</InputLabel>
+              <Select
+                labelId="type-filter-label"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                label="Type"
+              >
+                <MenuItem value="all">All Types</MenuItem>
+                <MenuItem value="individual">Individual</MenuItem>
+                <MenuItem value="business">Business</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </Box>
+      
+      {filteredCompetitions.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 5 }}>
+          <Typography variant="h6" gutterBottom>
+            No competitions found
           </Typography>
-        ) : filteredCompetitions.length > 0 ? (
-          <Grid container spacing={3}>
-            {filteredCompetitions.map((competition) => (
-              <Grid item key={competition.id} xs={12} sm={6} md={4}>
-                <Card 
+          <Typography variant="body1" color="text.secondary">
+            Try changing your filters or check back later for new competitions.
+          </Typography>
+        </Box>
+      ) : (
+        <Grid container spacing={3}>
+          {filteredCompetitions.map(competition => (
+            <Grid item xs={12} sm={6} md={4} key={competition.id}>
+              <Card className="competition-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardMedia
                   sx={{ 
-                    height: '100%', 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    '&:hover': {
-                      boxShadow: 6,
-                      cursor: 'pointer'
-                    }
+                    paddingTop: '56.25%', 
+                    backgroundColor: competition.type === 'business' ? '#3f51b5' : '#2196f3',
+                    position: 'relative'
                   }}
-                  onClick={() => handleCompetitionClick(competition.id)}
-                >
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                      <Typography variant="h6" component="h2">
-                        {competition.title}
-                      </Typography>
-                      <Chip 
-                        label={competition.type === 'business' ? 'Business' : 'Individual'} 
-                        color={competition.type === 'business' ? 'primary' : 'secondary'} 
-                        size="small" 
-                      />
-                    </Box>
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary" 
-                      sx={{ mb: 1 }}
+                />
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Chip 
+                      label={competition.category} 
+                      size="small" 
+                      color="primary" 
+                      variant="outlined"
+                    />
+                    <Chip 
+                      label={competition.type === 'business' ? 'Business' : 'Individual'} 
+                      size="small"
+                      color={competition.type === 'business' ? 'primary' : 'info'}
+                    />
+                  </Box>
+                  
+                  <Typography variant="h6" component="h2" gutterBottom>
+                    {competition.title}
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    {competition.description.length > 100 
+                      ? `${competition.description.substring(0, 100)}...` 
+                      : competition.description}
+                  </Typography>
+                  
+                  <Box sx={{ mt: 'auto', pt: 2 }}>
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      Deadline: {formatDate(competition.endDate)}
+                    </Typography>
+                    <Typography variant="subtitle1" color="primary" gutterBottom>
+                      ${competition.prizeAmount} Prize
+                    </Typography>
+                    
+                    <Button 
+                      variant="outlined" 
+                      size="small" 
+                      component={Link} 
+                      to={`/competition/${competition.id}`}
+                      endIcon={<ArrowForwardIcon />}
+                      sx={{ mt: 1 }}
                     >
-                      Category: {competition.category}
-                    </Typography>
-                    <Typography variant="body2">
-                      {competition.description}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small" color="primary">
                       View Details
                     </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        ) : (
-          <Typography sx={{ p: 2 }}>
-            No competitions found in this category.
-          </Typography>
-        )}
-      </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Container>
   );
 }
