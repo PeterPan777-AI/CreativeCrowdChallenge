@@ -1,68 +1,73 @@
 import React, { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Container,
+  Box,
   Typography,
   TextField,
   Button,
-  Box,
   Paper,
-  Link,
   Divider,
-  Alert
+  Alert,
+  IconButton,
+  InputAdornment
 } from '@mui/material';
-import axios from 'axios';
+import GoogleIcon from '@mui/icons-material/Google';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export default function LoginPage({ onLogin }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
+    
+    setIsLoggingIn(true);
     setError('');
-    setLoading(true);
-
+    
     try {
-      const response = await axios.post('/api/auth/login', {
-        email,
-        password
-      });
-
-      // Store user in localStorage or context
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      localStorage.setItem('token', response.data.token);
-      
-      // Notify parent component
-      onLogin();
-      
-      // Redirect to home page
-      navigate('/');
+      // In a real app, this would be an API call to authenticate
+      // Simulate login success for demo
+      setTimeout(() => {
+        onLogin();
+        navigate('/');
+      }, 1000);
     } catch (err) {
-      console.error('Login error:', err);
-      setError(err.response?.data?.error || 'Failed to login. Please try again.');
-    } finally {
-      setLoading(false);
+      setError('Login failed. Please check your credentials and try again.');
+      setIsLoggingIn(false);
     }
   };
 
-  // Added shortcuts for demo - for quick testing
-  const handleDemoLogin = (type) => {
-    const email = type === 'business' ? 'business@example.com' : 'user@example.com';
-    setEmail(email);
-    setPassword('password123');
+  const handleGoogleLogin = () => {
+    // In a real app, this would redirect to Google OAuth
+    setError('Google login is not implemented in the demo');
   };
 
   return (
     <Container maxWidth="sm">
       <Box sx={{ my: 4 }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h4" component="h1" align="center" gutterBottom>
-            Sign In
-          </Typography>
-          
+        <Typography variant="h4" component="h1" align="center" gutterBottom>
+          Log in to CreativeCrowdChallenge
+        </Typography>
+        <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 4 }}>
+          Welcome back! Log in to continue your creative journey
+        </Typography>
+        
+        <Paper elevation={2} sx={{ p: 4 }}>
           {error && (
             <Alert severity="error" sx={{ mb: 3 }}>
               {error}
@@ -72,10 +77,10 @@ export default function LoginPage({ onLogin }) {
           <form onSubmit={handleSubmit}>
             <TextField
               label="Email Address"
-              type="email"
+              variant="outlined"
               fullWidth
               margin="normal"
-              variant="outlined"
+              type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -83,60 +88,93 @@ export default function LoginPage({ onLogin }) {
             
             <TextField
               label="Password"
-              type="password"
+              variant="outlined"
               fullWidth
               margin="normal"
-              variant="outlined"
+              type={showPassword ? 'text' : 'password'}
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleTogglePasswordVisibility}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
+            
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+              <Link to="#" style={{ textDecoration: 'none' }}>
+                <Typography variant="body2" color="primary">
+                  Forgot password?
+                </Typography>
+              </Link>
+            </Box>
             
             <Button
               type="submit"
-              fullWidth
               variant="contained"
               color="primary"
+              fullWidth
               size="large"
-              disabled={loading}
-              sx={{ mt: 3, mb: 2 }}
+              disabled={isLoggingIn}
+              sx={{ mb: 2 }}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {isLoggingIn ? 'Logging in...' : 'Log In'}
             </Button>
           </form>
           
-          <Box sx={{ mt: 2, textAlign: 'center' }}>
-            <Typography variant="body2">
-              Don't have an account?{' '}
-              <Link component={RouterLink} to="/register">
-                Sign Up
-              </Link>
-            </Typography>
-          </Box>
-          
           <Divider sx={{ my: 3 }}>
             <Typography variant="body2" color="text.secondary">
-              Demo Accounts
+              OR
             </Typography>
           </Divider>
           
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button
-              variant="outlined"
-              onClick={() => handleDemoLogin('individual')}
-            >
-              Individual Demo
-            </Button>
-            
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => handleDemoLogin('business')}
-            >
-              Business Demo
-            </Button>
+          <Button
+            variant="outlined"
+            fullWidth
+            startIcon={<GoogleIcon />}
+            onClick={handleGoogleLogin}
+            sx={{ mb: 2 }}
+          >
+            Continue with Google
+          </Button>
+          
+          <Box sx={{ mt: 3, textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
+              Don't have an account?{' '}
+              <Link to="/register" style={{ textDecoration: 'none' }}>
+                <Typography variant="body2" component="span" color="primary">
+                  Sign up
+                </Typography>
+              </Link>
+            </Typography>
           </Box>
         </Paper>
+        
+        <Box sx={{ mt: 3, textAlign: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            By logging in, you agree to our{' '}
+            <Link to="#" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" component="span" color="primary">
+                Terms of Service
+              </Typography>
+            </Link>
+            {' '}and{' '}
+            <Link to="#" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" component="span" color="primary">
+                Privacy Policy
+              </Typography>
+            </Link>
+          </Typography>
+        </Box>
       </Box>
     </Container>
   );
