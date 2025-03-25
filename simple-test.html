@@ -908,6 +908,195 @@
       50% { transform: scale(1.3); }
       100% { transform: scale(1.2); }
     }
+    
+    /* Subscription Styles */
+    .subscription-details {
+      background-color: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .subscription-plan-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1E40AF;
+      margin-bottom: 8px;
+    }
+    
+    .subscription-status {
+      display: inline-block;
+      background-color: #DCFCE7;
+      color: #166534;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    
+    .subscription-period {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #64748B;
+      margin-bottom: 8px;
+    }
+    
+    .subscription-price {
+      font-size: 16px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 16px;
+    }
+    
+    .subscription-features {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #334155;
+    }
+    
+    .subscription-features div {
+      margin-bottom: 6px;
+    }
+    
+    .subscription-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    
+    .btn {
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+    }
+    
+    .primary-btn {
+      background-color: #3B82F6;
+      color: white;
+    }
+    
+    .secondary-btn {
+      background-color: #EF4444;
+      color: white;
+    }
+    
+    .tertiary-btn {
+      background-color: #F1F5F9;
+      color: #334155;
+      border: 1px solid #E2E8F0;
+    }
+    
+    /* Subscription Plans Modal */
+    .subscription-plans-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .plan-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+      width: 280px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .plan-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .plan-card.popular {
+      border-color: #3B82F6;
+      position: relative;
+    }
+    
+    .popular-badge {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: #3B82F6;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+    
+    .plan-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1E40AF;
+      margin-bottom: 8px;
+    }
+    
+    .plan-price {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .plan-billing-cycle {
+      color: #64748B;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    
+    .plan-features {
+      margin-bottom: 24px;
+    }
+    
+    .plan-feature {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    
+    .feature-check {
+      color: #10B981;
+      margin-right: 8px;
+    }
+    
+    .feature-unavailable {
+      color: #9CA3AF;
+    }
+    
+    .plan-cta {
+      width: 100%;
+      padding: 12px 0;
+      font-size: 16px;
+      font-weight: 600;
+      background: #3B82F6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .plan-cta:hover {
+      background: #2563EB;
+    }
+    
+    .plan-cta.secondary {
+      background: white;
+      color: #3B82F6;
+      border: 2px solid #3B82F6;
+    }
+    
+    .plan-cta.secondary:hover {
+      background: #EFF6FF;
+    }
   </style>
 </head>
 <body>
@@ -1251,6 +1440,36 @@
           <div class="stat-box">
             <div class="stat-value" id="profile-votes">12</div>
             <div class="stat-label">Votes Cast</div>
+          </div>
+        </div>
+        
+        <!-- Subscription section for business users -->
+        <div id="subscription-section" class="card" style="display: none; margin-bottom: 20px; background-color: #F8FAFC; border-left: 4px solid #3B82F6;">
+          <h3 style="color: #1E40AF;">Subscription Management</h3>
+          <p>Manage your business subscription to access premium features.</p>
+          <div id="no-subscription" style="display: none;">
+            <p>You don't have an active subscription. Subscribe to create business competitions and access analytics.</p>
+            <button onclick="showSubscriptionPlans()" class="btn primary-btn">View Subscription Plans</button>
+          </div>
+          <div id="active-subscription" style="display: none;">
+            <div class="subscription-details">
+              <div class="subscription-plan-name">Professional Plan</div>
+              <div class="subscription-status">Active</div>
+              <div class="subscription-period">
+                <div>Current period:</div>
+                <div id="subscription-period-dates">Mar 25, 2025 - Apr 25, 2025</div>
+              </div>
+              <div class="subscription-price" id="subscription-price">$79.99/month</div>
+              <div class="subscription-features">
+                <div>✓ Create unlimited business competitions</div>
+                <div>✓ Advanced analytics dashboard</div>
+                <div>✓ Priority customer support</div>
+              </div>
+            </div>
+            <div class="subscription-actions">
+              <button onclick="cancelSubscription(false)" class="btn secondary-btn">Cancel at Period End</button>
+              <button onclick="showInvoiceHistory()" class="btn tertiary-btn">View Invoice History</button>
+            </div>
           </div>
         </div>
         
