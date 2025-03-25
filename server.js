@@ -5,6 +5,9 @@ const path = require('path');
 // Import recommendation engine
 const recommendationEngine = require('./recommendation-engine.js');
 
+// Set up global fetch for Node.js
+global.fetch = global.fetch || require('node-fetch');
+
 // Handle loading Supabase with care
 let createClient, supabase = null;
 try {
