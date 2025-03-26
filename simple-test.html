@@ -2629,7 +2629,7 @@
   <!-- Notifications will be dynamically created -->
   
   <!-- Include Chart.js for analytics -->
-  <script src="/assets/js/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <script src="/assets/js/indexedDBHelper.js"></script>
   
   <script>
@@ -4045,25 +4045,34 @@
     
     // Helper function to reset canvas for chart reuse
     function resetCanvasElement(canvasId) {
+      // Try finding the canvas directly for static canvas elements (they already exist in the HTML)
+      let canvas = document.getElementById(canvasId);
+      if (canvas && canvas.tagName === 'CANVAS') {
+        console.log(`Using existing canvas element: ${canvasId}`);
+        // Clear any previous chart instance
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        return canvas;
+      }
+      
+      // For dynamic canvases that need to be created in containers
       const containerId = canvasId.replace('-canvas', '');
       const container = document.getElementById(containerId);
       
-      // Clear previous canvas if any
-      if (container) {
-        container.innerHTML = '';
-        const canvas = document.createElement('canvas');
-        canvas.id = canvasId;
-        container.appendChild(canvas);
-        return canvas;
+      if (!container) {
+        console.error(`Container not found for canvas ID: ${canvasId}`);
+        return null;
       }
       
-      // Try finding the canvas directly (for static IDs)
-      const canvas = document.getElementById(canvasId);
-      if (canvas) {
-        return canvas;
-      }
+      // Clear the container and create a new canvas
+      container.innerHTML = '';
+      canvas = document.createElement('canvas');
+      canvas.id = canvasId;
+      canvas.width = container.offsetWidth;
+      canvas.height = 300; // Set a fixed height
+      container.appendChild(canvas);
       
-      return null;
+      console.log(`Created new canvas in container: ${containerId}`);
+      return canvas;
     }
     
     function initializeAnalytics() {
@@ -4701,13 +4710,22 @@
     }
     
     function createEngagementChart(engagementData) {
-      // Get canvas element
-      const canvas = document.getElementById('engagement-line-chart');
-      if (!canvas) {
-        console.error('Engagement chart canvas element not found');
-        console.log('Looking for ID:', 'engagement-line-chart');
+      console.log('Chart.js version:', typeof Chart !== 'undefined' ? Chart.version : 'not loaded');
+      
+      // Make sure the chart container exists and has the correct structure
+      const chartContainer = document.getElementById('engagement-chart');
+      if (!chartContainer) {
+        console.error('Engagement chart container not found');
         return;
       }
+      
+      // Clear any previous chart content
+      chartContainer.innerHTML = '';
+      
+      // Create a fresh canvas element
+      const canvas = document.createElement('canvas');
+      canvas.id = 'engagement-line-chart';
+      chartContainer.appendChild(canvas);
       
       // Get 2D context
       const ctx = canvas.getContext('2d');
@@ -4716,50 +4734,57 @@
         return;
       }
       
+      // Destroy previous chart instance if it exists
       if (engagementChart) {
         engagementChart.destroy();
       }
       
       // Default data if not provided
-      const dailyData = engagementData.daily || [12, 18, 22, 15, 25, 30, 28];
+      const dailyData = engagementData && engagementData.daily ? engagementData.daily : [12, 18, 22, 15, 25, 30, 28];
       const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       
       console.log('Creating engagement chart with daily data:', dailyData);
       
-      engagementChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: days,
-          datasets: [{
-            label: 'Daily Engagement',
-            data: dailyData,
-            fill: true,
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderColor: 'rgb(59, 130, 246)',
-            tension: 0.4,
-            pointRadius: 4,
-            pointBackgroundColor: 'rgb(59, 130, 246)'
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
+      try {
+        engagementChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: days,
+            datasets: [{
+              label: 'Daily Engagement',
+              data: dailyData,
+              fill: true,
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderColor: 'rgb(59, 130, 246)',
+              tension: 0.4,
+              pointRadius: 4,
+              pointBackgroundColor: 'rgb(59, 130, 246)'
+            }]
           },
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
             },
-            tooltip: {
-              mode: 'index',
-              intersect: false
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              },
+              tooltip: {
+                mode: 'index',
+                intersect: false
+              }
             }
           }
-        }
-      });
+        });
+        console.log('Engagement chart created successfully');
+      } catch (error) {
+        console.error('Error creating engagement chart:', error);
+        chartContainer.innerHTML = '<div class="error-message">Failed to create chart. Please try refreshing the page.</div>';
+      }
     }
     
     function createDeviceUsageChart(deviceData) {
