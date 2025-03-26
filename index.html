@@ -66,6 +66,7 @@
               <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/competitions">Competitions</a></li>
+                <li><a href="/leaderboard">Leaderboard</a></li>
                 <li><a href="/about">About Us</a></li>
                 <li><a href="/blog">Blog</a></li>
               </ul>
@@ -319,6 +320,7 @@
       const navItems = [
         { path: '/', text: 'Home', icon: 'home' },
         { path: '/competitions', text: 'Competitions', icon: 'emoji_events' },
+        { path: '/leaderboard', text: 'Leaderboard', icon: 'leaderboard' },
         { path: '/submission', text: 'Submit Entry', icon: 'add_circle_outline' },
         { path: '/submission-demo', text: 'Submission Demo', icon: 'file_upload' }
       ];
@@ -398,7 +400,7 @@
       // SPA Navigation
       function navigateTo(path) {
         // These paths are served directly as HTML pages, not through the SPA
-        const externalPaths = ['/submission-demo', '/business-subscription', '/login', '/competitions'];
+        const externalPaths = ['/submission-demo', '/business-subscription', '/login', '/competitions', '/leaderboard'];
         
         // Check if this is an external page path
         if (path.endsWith('.html') || externalPaths.includes(path)) {
