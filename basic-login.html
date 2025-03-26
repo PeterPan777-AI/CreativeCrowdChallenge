@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Crowd Challenge - Basic Login</title>
+  <link rel="stylesheet" href="/assets/main.css">
+  <style>
+    .auth-container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    
+    .btn-primary:hover {
+      background-color: #303f9f;
+    }
+    
+    .message {
+      padding: 0.75rem;
+      margin-top: 1rem;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .error {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+    
+    .success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .user-type {
+      margin-top: 1rem;
+      display: none;
+    }
+    
+    .radio-group {
+      margin-top: 0.5rem;
+    }
+    
+    .radio-group label {
+      margin-right: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="/">
+            <h1>CreativeCrowdChallenge</h1>
+          </a>
+        </div>
+        <nav class="navigation">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/about">About</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="auth-container">
+      <h2>Login or Sign Up</h2>
+      <p>Enter your information to continue</p>
+      
+      <form id="authForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+        
+        <div id="userTypeSection" class="user-type">
+          <h3>Select Account Type</h3>
+          <div class="radio-group">
+            <input type="radio" id="individual" name="userType" value="individual" checked>
+            <label for="individual">Individual (Free)</label>
+            
+            <input type="radio" id="business" name="userType" value="business">
+            <label for="business">Business ($79.99/month)</label>
+          </div>
+        </div>
+        
+        <div id="errorMessage" class="message error"></div>
+        <div id="successMessage" class="message success"></div>
+        
+        <button type="submit" id="submitButton" class="btn-primary">Continue</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // DOM elements
+    const authForm = document.getElementById('authForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const userTypeSection = document.getElementById('userTypeSection');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const submitButton = document.getElementById('submitButton');
+    
+    let isRegistering = false;
+    
+    // Handle form submission
+    authForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get form values
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      // Basic validation
+      if (!email || !password) {
+        showError('Please enter both email and password');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters long');
+        return;
+      }
+      
+      // For demo purposes, we'll just simulate the auth flow
+      if (!isRegistering) {
+        // Simulate checking if user exists
+        if (email === 'user@example.com' && password === 'password123') {
+          // Successful login
+          showSuccess('Login successful! Redirecting...');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1500);
+        } else if (email === 'business@example.com' && password === 'password123') {
+          // Business user login
+          showSuccess('Business account login successful! Redirecting...');
+          setTimeout(() => {
+            window.location.href = '/business-subscription';
+          }, 1500);
+        } else {
+          // User doesn't exist, or wrong password
+          // For demo, we'll show registration options for any failed login
+          isRegistering = true;
+          userTypeSection.style.display = 'block';
+          submitButton.textContent = 'Create Account';
+          showError('No account found with these credentials. Please sign up.');
+        }
+      } else {
+        // Registration flow
+        const userType = document.querySelector('input[name="userType"]:checked').value;
+        
+        // Simulate user creation
+        showSuccess(`Account created successfully as ${userType} user! Redirecting...`);
+        
+        // If business user, redirect to subscription page
+        if (userType === 'business') {
+          setTimeout(() => {
+            window.location.href = '/business-subscription';
+          }, 1500);
+        } else {
+          // Otherwise, redirect to home page
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1500);
+        }
+      }
+    });
+    
+    // Helper functions
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      successMessage.style.display = 'none';
+    }
+    
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.style.display = 'block';
+      errorMessage.style.display = 'none';
+    }
+  </script>
+</body>
+</html>

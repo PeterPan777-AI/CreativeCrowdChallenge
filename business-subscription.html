@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Business Subscription - CreativeCrowdChallenge</title>
+  <title>Business Subscription - Creative Crowd Challenge</title>
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="manifest" href="/manifest.json">
   <style>
     .subscription-container {
-      max-width: 800px;
-      margin: 0 auto;
+      max-width: 900px;
+      margin: 50px auto;
       padding: 2rem;
+      background-color: white;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      background-color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     
     .subscription-header {
@@ -21,87 +20,151 @@
       margin-bottom: 2rem;
     }
     
-    .subscription-details {
-      margin-bottom: 2rem;
+    .subscription-header h1 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
     }
     
-    .feature-list {
+    .subscription-header p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+    
+    .plan-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .plan-card {
+      flex: 1;
+      min-width: 250px;
+      margin: 10px;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .plan-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .plan-card.highlight {
+      border: 2px solid var(--primary-color);
+    }
+    
+    .plan-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+    }
+    
+    .plan-price {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    
+    .plan-price span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #666;
+    }
+    
+    .plan-features {
+      margin-bottom: 1.5rem;
+    }
+    
+    .plan-features ul {
       list-style-type: none;
       padding: 0;
     }
     
-    .feature-list li {
-      padding: 0.75rem 0;
-      border-bottom: 1px solid #eee;
+    .plan-features li {
+      padding: 8px 0;
+      color: #333;
       display: flex;
       align-items: center;
     }
     
-    .feature-list li:before {
+    .plan-features li::before {
       content: "✓";
-      color: #4a6cf7;
-      margin-right: 0.75rem;
+      color: var(--primary-color);
       font-weight: bold;
+      margin-right: 10px;
     }
     
-    .price-box {
-      text-align: center;
-      padding: 1.5rem;
-      border: 2px solid #4a6cf7;
-      border-radius: 8px;
-      margin-bottom: 2rem;
-    }
-    
-    .price {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #333;
-    }
-    
-    .price-period {
-      color: #666;
-      margin-bottom: 1rem;
-    }
-    
-    .btn {
-      display: inline-block;
-      padding: 0.75rem 1.5rem;
-      background-color: #4a6cf7;
+    .select-plan-btn {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--primary-color);
       color: white;
       border: none;
       border-radius: 4px;
-      cursor: pointer;
       font-size: 1rem;
-      font-weight: 500;
-      text-align: center;
-      transition: background-color 0.2s;
-      text-decoration: none;
-    }
-    
-    .btn:hover {
-      background-color: #3a5ce6;
-    }
-    
-    .btn-block {
-      display: block;
-      width: 100%;
-    }
-    
-    .btn-lg {
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-    }
-    
-    .text-center {
+      cursor: pointer;
       text-align: center;
     }
     
-    .notice {
-      background-color: #e9f5ff;
-      padding: 1rem;
-      border-radius: 4px;
-      margin-top: 2rem;
-      border-left: 4px solid #4a6cf7;
+    .select-plan-btn:hover {
+      background-color: #303f9f;
+    }
+    
+    .benefits-section {
+      margin-top: 3rem;
+    }
+    
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .benefit-card {
+      padding: 1.5rem;
+      border-radius: 8px;
+      background-color: #f5f5f5;
+    }
+    
+    .benefit-card h3 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .faq-section {
+      margin-top: 3rem;
+    }
+    
+    .faq-item {
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+    }
+    
+    .faq-question {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    
+    .faq-answer {
+      color: #666;
+    }
+    
+    @media (max-width: 768px) {
+      .plan-details {
+        flex-direction: column;
+      }
+      
+      .plan-card {
+        margin-bottom: 1.5rem;
+      }
     }
   </style>
 </head>
@@ -111,241 +174,207 @@
       <div class="header-content">
         <div class="logo">
           <a href="/">
-            <h2>CreativeCrowdChallenge</h2>
+            <h1>CreativeCrowdChallenge</h1>
           </a>
         </div>
-        <nav class="nav">
-          <ul class="nav-list">
+        <nav class="navigation">
+          <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/competitions">Competitions</a></li>
-            <li><a href="/login">Login / Sign Up</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/login">Login</a></li>
           </ul>
         </nav>
       </div>
     </div>
   </header>
 
-  <main class="main-content">
-    <div class="container">
-      <section class="section">
-        <div class="subscription-container">
-          <div class="subscription-header">
-            <h1>Business Subscription</h1>
-            <p>Unleash the full potential of CreativeCrowdChallenge for your business</p>
-          </div>
-          
-          <div class="subscription-details">
-            <div class="price-box">
-              <div class="price">$49.99</div>
-              <div class="price-period">per month</div>
-            </div>
-            
-            <h2>Features included:</h2>
-            <ul class="feature-list">
-              <li>Create unlimited business competitions</li>
-              <li>Advanced analytics dashboard</li>
-              <li>Custom branding options</li>
-              <li>Priority customer support</li>
-              <li>Export submissions and data</li>
-              <li>Featured placement on the homepage</li>
-              <li>API access for integrations</li>
+  <main class="main-container">
+    <div class="subscription-container">
+      <div class="subscription-header">
+        <h1>Business Subscription Plans</h1>
+        <p>Elevate your brand with creative competitions tailored to your business needs</p>
+      </div>
+      
+      <div class="plan-details">
+        <div class="plan-card">
+          <div class="plan-name">Standard</div>
+          <div class="plan-price">$49.99<span>/month</span></div>
+          <div class="plan-features">
+            <ul>
+              <li>2 active competitions</li>
+              <li>Basic analytics dashboard</li>
+              <li>Up to 100 submissions per competition</li>
+              <li>Email support</li>
+              <li>30-day competition duration</li>
             </ul>
           </div>
-          
-          <div class="text-center">
-            <a href="#" id="subscribeBtn" class="btn btn-lg">Subscribe Now</a>
-            <p><small>You can cancel your subscription at any time</small></p>
+          <a href="#" class="select-plan-btn">Select Plan</a>
+        </div>
+        
+        <div class="plan-card highlight">
+          <div class="plan-name">Professional</div>
+          <div class="plan-price">$79.99<span>/month</span></div>
+          <div class="plan-features">
+            <ul>
+              <li>5 active competitions</li>
+              <li>Advanced analytics dashboard</li>
+              <li>Unlimited submissions</li>
+              <li>Priority email & phone support</li>
+              <li>Custom competition duration</li>
+              <li>Featured placement on homepage</li>
+            </ul>
+          </div>
+          <a href="#" class="select-plan-btn">Select Plan</a>
+        </div>
+        
+        <div class="plan-card">
+          <div class="plan-name">Premium</div>
+          <div class="plan-price">$129.99<span>/month</span></div>
+          <div class="plan-features">
+            <ul>
+              <li>10 active competitions</li>
+              <li>Enterprise analytics with custom reports</li>
+              <li>Unlimited submissions</li>
+              <li>24/7 dedicated support</li>
+              <li>Custom competition duration</li>
+              <li>Premium placement on all pages</li>
+              <li>White-label competition hosting</li>
+            </ul>
+          </div>
+          <a href="#" class="select-plan-btn">Select Plan</a>
+        </div>
+      </div>
+      
+      <div class="benefits-section">
+        <h2>Why Choose a Business Subscription?</h2>
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <h3>Tap into Global Creativity</h3>
+            <p>Access a diverse pool of creative talent from around the world to solve your business challenges.</p>
           </div>
           
-          <div class="notice">
-            <p><strong>Note:</strong> This is a placeholder for the future Stripe checkout integration. In the production version, clicking "Subscribe Now" would redirect to a Stripe payment page.</p>
+          <div class="benefit-card">
+            <h3>Cost-Effective Solutions</h3>
+            <p>Get multiple creative ideas for a fraction of the cost of traditional agencies or freelancers.</p>
+          </div>
+          
+          <div class="benefit-card">
+            <h3>Rapid Turnaround</h3>
+            <p>Receive submissions quickly, with most competitions generating results within days.</p>
+          </div>
+          
+          <div class="benefit-card">
+            <h3>Community Engagement</h3>
+            <p>Build brand awareness and engage with potential customers through interactive competitions.</p>
+          </div>
+          
+          <div class="benefit-card">
+            <h3>Data-Driven Insights</h3>
+            <p>Gain valuable analytics about your audience and their preferences through detailed reports.</p>
+          </div>
+          
+          <div class="benefit-card">
+            <h3>Seamless Management</h3>
+            <p>Easy-to-use tools to create, manage, and evaluate your competitions from start to finish.</p>
           </div>
         </div>
-      </section>
+      </div>
+      
+      <div class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        
+        <div class="faq-item">
+          <div class="faq-question">Can I upgrade or downgrade my plan?</div>
+          <div class="faq-answer">Yes, you can upgrade or downgrade your subscription at any time. Changes will take effect at the start of your next billing cycle.</div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">What happens to my competitions if I cancel my subscription?</div>
+          <div class="faq-answer">Active competitions will continue until their set end date. After your subscription ends, you won't be able to create new competitions, but you'll still have access to view and download past submissions.</div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">Can I customize the look and feel of my competitions?</div>
+          <div class="faq-answer">Yes, all business plans include customization options. Premium plan subscribers get additional white-label features for complete branding control.</div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">How do I manage intellectual property rights?</div>
+          <div class="faq-answer">Our platform includes customizable terms for each competition, allowing you to specify IP rights transfer. We recommend clearly stating your requirements in the competition brief.</div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">Is there a trial period available?</div>
+          <div class="faq-answer">We offer a 14-day free trial for new business users. During this period, you can access all the features of the Professional plan.</div>
+        </div>
+      </div>
     </div>
   </main>
 
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
+        <div class="footer-logo">
+          <h2>CreativeCrowdChallenge</h2>
+          <p>Unleash creativity through competition</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-links-column">
+            <h3>Platform</h3>
+            <ul>
+              <li><a href="/">Home</a></li>
+              <li><a href="/competitions">Competitions</a></li>
+              <li><a href="/about">About Us</a></li>
+              <li><a href="/blog">Blog</a></li>
+            </ul>
+          </div>
+          <div class="footer-links-column">
+            <h3>Legal</h3>
+            <ul>
+              <li><a href="/terms">Terms of Service</a></li>
+              <li><a href="/privacy">Privacy Policy</a></li>
+              <li><a href="/copyright">Copyright Info</a></li>
+            </ul>
+          </div>
+          <div class="footer-links-column">
+            <h3>Support</h3>
+            <ul>
+              <li><a href="/help">Help Center</a></li>
+              <li><a href="/faq">FAQs</a></li>
+              <li><a href="/contact">Contact Us</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
         <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- Firebase SDK and Stripe -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-  <script src="https://js.stripe.com/v3/"></script>
-  
   <script>
-    // Get Firebase configuration from environment variables
-    async function fetchFirebaseConfig() {
-      try {
-        // Fetch Firebase config from server API
-        const response = await fetch('/api/firebase-config');
-        const config = await response.json();
-        
-        if (!config.apiKey || !config.projectId || !config.appId) {
-          showError('Firebase configuration is missing. Please contact support.');
-          return null;
-        }
-        
-        return {
-          apiKey: config.apiKey,
-          authDomain: `${config.projectId}.firebaseapp.com`,
-          projectId: config.projectId,
-          storageBucket: `${config.projectId}.appspot.com`,
-          appId: config.appId
-        };
-      } catch (error) {
-        console.error('Error fetching Firebase config:', error);
-        showError('Failed to load authentication. Please try again later.');
-        return null;
-      }
-    }
-    
-    // Helper function to show error message
-    function showError(message) {
-      alert(message);  // Simple alert for now, can be improved with a proper UI element
-    }
-    
-    // DOM Elements
-    const subscribeBtn = document.getElementById('subscribeBtn');
-    
-    let auth = null;
-    let db = null;
-    let stripe = null;
-    
-    // Initialize Firebase and auth
-    async function initSubscription() {
-      const firebaseConfig = await fetchFirebaseConfig();
-      if (!firebaseConfig) return;
+    // Simulated subscription handling - in a real app, this would connect to Stripe
+    document.addEventListener('DOMContentLoaded', function() {
+      const planButtons = document.querySelectorAll('.select-plan-btn');
       
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      auth = firebase.auth();
-      db = firebase.firestore();
-      
-      // Initialize Stripe
-      try {
-        const stripeResponse = await fetch('/api/stripe-public-key');
-        const stripeData = await stripeResponse.json();
-        if (stripeData.publicKey) {
-          // Initialize Stripe with the public key
-          stripe = Stripe(stripeData.publicKey);
-        } else {
-          console.warn('Stripe public key not available, running in demo mode');
-        }
-      } catch (error) {
-        console.warn('Could not initialize Stripe, running in demo mode:', error);
-      }
-      
-      // Event Listeners
-      subscribeBtn.addEventListener('click', handleSubscribe);
-      
-      // Check if user is already logged in
-      auth.onAuthStateChanged(user => {
-        if (!user) {
-          // If not logged in, redirect to login page
-          window.location.href = '/login';
-          return;
-        }
-        
-        // Check if user is already a subscribed business user
-        db.collection('users').doc(user.uid).get()
-          .then(doc => {
-            if (doc.exists) {
-              const userData = doc.data();
-              if (userData.isSubscribed) {
-                // Already subscribed, show message and change button
-                const notice = document.createElement('div');
-                notice.className = 'alert alert-success';
-                notice.textContent = 'You already have an active business subscription!';
-                
-                document.querySelector('.notice').insertAdjacentElement('beforebegin', notice);
-                
-                subscribeBtn.textContent = 'Manage Subscription';
-                subscribeBtn.addEventListener('click', (e) => {
-                  e.preventDefault();
-                  // Will lead to subscription management in the future
-                  window.location.href = '/profile';
-                });
-                
-                // Remove the old click listener
-                subscribeBtn.removeEventListener('click', handleSubscribe);
-              }
-            }
-          })
-          .catch(error => {
-            console.error('Error checking subscription status:', error);
-          });
+      planButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Get plan details
+          const planCard = this.closest('.plan-card');
+          const planName = planCard.querySelector('.plan-name').textContent;
+          const planPrice = planCard.querySelector('.plan-price').textContent.split('/')[0];
+          
+          // For demo purposes, just show an alert
+          alert(`You've selected the ${planName} plan at ${planPrice}.\n\nIn a production environment, this would redirect to Stripe for payment processing.`);
+          
+          // In a real application, we would redirect to a Stripe checkout page
+          // window.location.href = '/api/create-checkout-session?plan=' + planName.toLowerCase();
+        });
       });
-    }
-    
-    // Initialize when the page loads
-    document.addEventListener('DOMContentLoaded', initSubscription);
-    
-    // Handle subscription process
-    async function handleSubscribe(e) {
-      e.preventDefault();
-      
-      // Check if user is logged in
-      const user = auth.currentUser;
-      if (!user) {
-        window.location.href = '/login';
-        return;
-      }
-      
-      try {
-        if (stripe) {
-          // Real Stripe checkout flow
-          // Create a checkout session on the server
-          const response = await fetch('/api/create-subscription', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: user.uid,
-              email: user.email
-            }),
-          });
-          
-          const session = await response.json();
-          
-          if (session.error) {
-            throw new Error(session.error);
-          }
-          
-          // Redirect to Stripe Checkout
-          const result = await stripe.redirectToCheckout({
-            sessionId: session.sessionId
-          });
-          
-          if (result.error) {
-            throw new Error(result.error.message);
-          }
-        } else {
-          // Demo mode - simulate subscription
-          console.log('Stripe not available, using demo mode for subscription');
-          
-          // Update user subscription status directly in Firestore
-          await db.collection('users').doc(user.uid).update({
-            isSubscribed: true,
-            subscriptionDate: firebase.firestore.FieldValue.serverTimestamp(),
-            demoSubscription: true  // Flag to indicate this is not a real subscription
-          });
-          
-          alert('In demo mode: Your business subscription has been activated!');
-          window.location.href = '/profile';
-        }
-      } catch (error) {
-        console.error('Subscription error:', error);
-        showError('An error occurred while processing your subscription: ' + error.message);
-      }
-    }
+    });
   </script>
 </body>
 </html>

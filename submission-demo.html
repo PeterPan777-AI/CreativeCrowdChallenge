@@ -3,152 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CreativeCrowdChallenge - Submission Demo</title>
+  <title>Submission Demo - Creative Crowd Challenge</title>
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="manifest" href="/manifest.json">
   <style>
     .submission-container {
-      max-width: 800px;
-      margin: 0 auto;
+      max-width: 900px;
+      margin: 50px auto;
       padding: 2rem;
+      background-color: white;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      background-color: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     
-    .form-group {
-      margin-bottom: 1.5rem;
+    .submission-header {
+      margin-bottom: 2rem;
     }
     
-    .form-group label {
-      display: block;
+    .competition-details {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+    }
+    
+    .competition-title {
+      color: var(--primary-color);
       margin-bottom: 0.5rem;
-      font-weight: 500;
     }
     
-    .form-control {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
+    .competition-description {
+      color: #666;
+      margin-bottom: 1rem;
     }
     
-    .btn {
+    .competition-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .meta-item {
+      display: flex;
+      align-items: center;
+      color: #333;
+      font-size: 0.9rem;
+    }
+    
+    .meta-item:before {
+      content: '';
       display: inline-block;
-      padding: 0.75rem 1.5rem;
-      background-color: #4a6cf7;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 500;
-      text-align: center;
-      transition: background-color 0.2s;
+      width: 8px;
+      height: 8px;
+      margin-right: 8px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
     }
     
-    .btn:hover {
-      background-color: #3a5ce6;
+    .upload-container {
+      margin-bottom: 2rem;
     }
     
-    .btn-block {
-      display: block;
-      width: 100%;
-    }
-    
-    .drop-area {
+    .drag-drop-area {
       border: 2px dashed #ccc;
       border-radius: 8px;
       padding: 2rem;
       text-align: center;
+      transition: border-color 0.3s;
+      cursor: pointer;
       margin-bottom: 1rem;
-      transition: all 0.2s;
-      min-height: 200px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
     }
     
-    .drop-area.active {
-      border-color: #4a6cf7;
-      background-color: rgba(74, 108, 247, 0.05);
+    .drag-drop-area.dragover {
+      border-color: var(--primary-color);
+      background-color: rgba(63, 81, 181, 0.05);
     }
     
-    .drop-area p {
-      margin: 0.5rem 0;
+    .drag-drop-area p {
+      margin-bottom: 1rem;
       color: #666;
     }
     
-    .preview-container {
-      margin-top: 1rem;
-      text-align: center;
-    }
-    
-    .preview-container img {
-      max-width: 100%;
-      max-height: 300px;
-      border-radius: 4px;
-    }
-    
-    .preview-container video {
-      max-width: 100%;
-      max-height: 300px;
-      border-radius: 4px;
-    }
-    
-    .file-info {
-      margin-top: 1rem;
-      padding: 1rem;
-      background-color: #f8f9fa;
-      border-radius: 4px;
-      text-align: left;
-    }
-    
-    .file-info p {
-      margin: 0.25rem 0;
-    }
-    
-    .remove-btn {
-      background-color: #ef4444;
-      color: white;
-      border: none;
-      border-radius: 4px;
+    .browse-button {
+      display: inline-block;
       padding: 0.5rem 1rem;
-      margin-top: 1rem;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 0.875rem;
     }
     
-    .remove-btn:hover {
-      background-color: #dc2626;
+    .browse-button:hover {
+      background-color: #303f9f;
     }
     
-    .tabs {
-      display: flex;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid #ddd;
-    }
-    
-    .tab {
-      padding: 0.75rem 1.5rem;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      font-weight: 500;
-    }
-    
-    .tab.active {
-      border-bottom-color: #4a6cf7;
-      color: #4a6cf7;
-    }
-    
-    .tab-content {
+    #fileInput {
       display: none;
     }
     
-    .tab-content.active {
+    .preview-container {
+      margin-top: 1.5rem;
+      display: none;
+    }
+    
+    .preview-container.show {
       display: block;
+    }
+    
+    .preview-image {
+      max-width: 100%;
+      max-height: 300px;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+    }
+    
+    .form-row {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .submit-button {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    
+    .submit-button:hover {
+      background-color: #303f9f;
+    }
+    
+    .submission-guidelines {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+    }
+    
+    .submission-guidelines h3 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+    
+    .submission-guidelines ul {
+      padding-left: 1.5rem;
+    }
+    
+    .submission-guidelines li {
+      margin-bottom: 0.5rem;
+      color: #666;
+    }
+    
+    .message {
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+    
+    .error {
+      background-color: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #c62828;
     }
   </style>
 </head>
@@ -158,308 +204,254 @@
       <div class="header-content">
         <div class="logo">
           <a href="/">
-            <h2>CreativeCrowdChallenge</h2>
+            <h1>CreativeCrowdChallenge</h1>
           </a>
         </div>
-        <nav class="nav">
-          <ul class="nav-list">
+        <nav class="navigation">
+          <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/competitions">Competitions</a></li>
-            <li><a href="/submission-demo.html" class="active">Submission Demo</a></li>
-            <li><a href="/login.html">Login / Sign Up</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/login">Login</a></li>
           </ul>
         </nav>
       </div>
     </div>
   </header>
 
-  <main class="main-content">
-    <div class="container">
-      <section class="section">
-        <div class="submission-container">
-          <h1>Submission Demo</h1>
-          <p>Test the drag and drop file upload functionality.</p>
+  <main class="main-container">
+    <div class="submission-container">
+      <div class="submission-header">
+        <h1>Submit Your Entry</h1>
+        <p>Share your creative work for this competition</p>
+      </div>
+      
+      <div class="competition-details">
+        <h2 class="competition-title">Logo Design Challenge</h2>
+        <p class="competition-description">Create a modern, memorable logo for a tech startup focusing on renewable energy solutions. The logo should convey innovation, sustainability, and forward-thinking.</p>
+        <div class="competition-meta">
+          <span class="meta-item">Deadline: April 30, 2025</span>
+          <span class="meta-item">Prize: $500</span>
+          <span class="meta-item">Category: Design</span>
+        </div>
+      </div>
+      
+      <form id="submissionForm">
+        <div class="upload-container">
+          <h3>Upload Your Work</h3>
           
-          <div class="tabs">
-            <div class="tab active" data-tab="image">Image Upload</div>
-            <div class="tab" data-tab="video">Video Upload</div>
+          <div id="dragDropArea" class="drag-drop-area">
+            <p>Drag & drop your file here</p>
+            <p>or</p>
+            <label for="fileInput" class="browse-button">Browse Files</label>
+            <input type="file" id="fileInput" accept="image/*">
+            <p class="file-types">Supported formats: JPG, PNG, GIF (max 5MB)</p>
           </div>
           
-          <div class="tab-content active" id="image-tab">
-            <h2>Upload Image</h2>
-            <div class="form-group">
-              <label for="title">Title</label>
-              <input type="text" id="image-title" class="form-control" placeholder="Enter a title for your submission">
-            </div>
-            
-            <div class="form-group">
-              <label for="description">Description</label>
-              <textarea id="image-description" class="form-control" rows="3" placeholder="Describe your submission"></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label>Image Upload</label>
-              <div id="image-drop-area" class="drop-area">
-                <p><strong>Drag & drop your image here</strong></p>
-                <p>or</p>
-                <button type="button" id="image-select-btn" class="btn">Select Image</button>
-                <p class="small">Supported formats: JPG, PNG, GIF (Max: 10MB)</p>
-              </div>
-              <input type="file" id="image-file-input" accept="image/*" style="display: none;">
-              
-              <div id="image-preview" class="preview-container" style="display: none;">
-                <h3>Preview</h3>
-                <img id="image-preview-img" src="#" alt="Preview">
-                <div id="image-file-info" class="file-info">
-                  <p><strong>File Name:</strong> <span id="image-file-name"></span></p>
-                  <p><strong>File Size:</strong> <span id="image-file-size"></span></p>
-                  <p><strong>File Type:</strong> <span id="image-file-type"></span></p>
-                </div>
-                <button type="button" id="image-remove-btn" class="remove-btn">Remove Image</button>
-              </div>
-            </div>
-            
-            <button type="button" id="image-submit-btn" class="btn btn-block" disabled>Submit Image</button>
-          </div>
-          
-          <div class="tab-content" id="video-tab">
-            <h2>Upload Video</h2>
-            <div class="form-group">
-              <label for="title">Title</label>
-              <input type="text" id="video-title" class="form-control" placeholder="Enter a title for your submission">
-            </div>
-            
-            <div class="form-group">
-              <label for="description">Description</label>
-              <textarea id="video-description" class="form-control" rows="3" placeholder="Describe your submission"></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label>Video Upload</label>
-              <div id="video-drop-area" class="drop-area">
-                <p><strong>Drag & drop your video here</strong></p>
-                <p>or</p>
-                <button type="button" id="video-select-btn" class="btn">Select Video</button>
-                <p class="small">Supported formats: MP4, MOV (Max: 50MB)</p>
-              </div>
-              <input type="file" id="video-file-input" accept="video/*" style="display: none;">
-              
-              <div id="video-preview" class="preview-container" style="display: none;">
-                <h3>Preview</h3>
-                <video id="video-preview-player" controls></video>
-                <div id="video-file-info" class="file-info">
-                  <p><strong>File Name:</strong> <span id="video-file-name"></span></p>
-                  <p><strong>File Size:</strong> <span id="video-file-size"></span></p>
-                  <p><strong>File Type:</strong> <span id="video-file-type"></span></p>
-                </div>
-                <button type="button" id="video-remove-btn" class="remove-btn">Remove Video</button>
-              </div>
-            </div>
-            
-            <button type="button" id="video-submit-btn" class="btn btn-block" disabled>Submit Video</button>
+          <div id="previewContainer" class="preview-container">
+            <img id="previewImage" class="preview-image" src="" alt="Preview">
+            <button type="button" id="removeFileButton" class="browse-button">Remove File</button>
           </div>
         </div>
-      </section>
+        
+        <div class="form-row">
+          <label for="title" class="form-label">Submission Title</label>
+          <input type="text" id="title" class="form-input" placeholder="Enter a title for your work" required>
+        </div>
+        
+        <div class="form-row">
+          <label for="description" class="form-label">Description</label>
+          <textarea id="description" class="form-textarea" placeholder="Tell us about your submission and the thinking behind it" required></textarea>
+        </div>
+        
+        <button type="submit" class="submit-button">Submit Entry</button>
+        
+        <div id="successMessage" class="message success"></div>
+        <div id="errorMessage" class="message error"></div>
+      </form>
+      
+      <div class="submission-guidelines">
+        <h3>Submission Guidelines</h3>
+        <ul>
+          <li>All entries must be original work and not infringe on any copyrights.</li>
+          <li>You may submit up to 3 different designs for this competition.</li>
+          <li>Submitted logos should work well in both color and monochrome formats.</li>
+          <li>Include a brief description explaining your design rationale.</li>
+          <li>By submitting, you grant the competition organizer a license to use your design if selected as the winner.</li>
+        </ul>
+      </div>
     </div>
   </main>
 
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
+        <div class="footer-logo">
+          <h2>CreativeCrowdChallenge</h2>
+          <p>Unleash creativity through competition</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-links-column">
+            <h3>Platform</h3>
+            <ul>
+              <li><a href="/">Home</a></li>
+              <li><a href="/competitions">Competitions</a></li>
+              <li><a href="/about">About Us</a></li>
+              <li><a href="/blog">Blog</a></li>
+            </ul>
+          </div>
+          <div class="footer-links-column">
+            <h3>Legal</h3>
+            <ul>
+              <li><a href="/terms">Terms of Service</a></li>
+              <li><a href="/privacy">Privacy Policy</a></li>
+              <li><a href="/copyright">Copyright Info</a></li>
+            </ul>
+          </div>
+          <div class="footer-links-column">
+            <h3>Support</h3>
+            <ul>
+              <li><a href="/help">Help Center</a></li>
+              <li><a href="/faq">FAQs</a></li>
+              <li><a href="/contact">Contact Us</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
         <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- JavaScript for drag and drop functionality -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Tab functionality
-      const tabs = document.querySelectorAll('.tab');
-      const tabContents = document.querySelectorAll('.tab-content');
+      const dragDropArea = document.getElementById('dragDropArea');
+      const fileInput = document.getElementById('fileInput');
+      const previewContainer = document.getElementById('previewContainer');
+      const previewImage = document.getElementById('previewImage');
+      const removeFileButton = document.getElementById('removeFileButton');
+      const submissionForm = document.getElementById('submissionForm');
+      const successMessage = document.getElementById('successMessage');
+      const errorMessage = document.getElementById('errorMessage');
       
-      tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          // Remove active class from all tabs and contents
-          tabs.forEach(t => t.classList.remove('active'));
-          tabContents.forEach(c => c.classList.remove('active'));
-          
-          // Add active class to clicked tab and corresponding content
-          this.classList.add('active');
-          const tabType = this.getAttribute('data-tab');
-          document.getElementById(`${tabType}-tab`).classList.add('active');
-        });
+      // File input change handler
+      fileInput.addEventListener('change', handleFileSelect);
+      
+      // Drag and drop handlers
+      dragDropArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dragDropArea.classList.add('dragover');
       });
       
-      // Image Upload Functionality
-      setupFileUpload('image', 10 * 1024 * 1024); // 10MB limit
+      dragDropArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dragDropArea.classList.remove('dragover');
+      });
       
-      // Video Upload Functionality
-      setupFileUpload('video', 50 * 1024 * 1024); // 50MB limit
+      dragDropArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dragDropArea.classList.remove('dragover');
+        
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length) {
+          fileInput.files = files;
+          handleFileSelect();
+        }
+      });
       
-      // Function to setup file upload for both image and video
-      function setupFileUpload(type, maxSize) {
-        const dropArea = document.getElementById(`${type}-drop-area`);
-        const fileInput = document.getElementById(`${type}-file-input`);
-        const selectBtn = document.getElementById(`${type}-select-btn`);
-        const preview = document.getElementById(`${type}-preview`);
-        const removeBtn = document.getElementById(`${type}-remove-btn`);
-        const submitBtn = document.getElementById(`${type}-submit-btn`);
-        const titleInput = document.getElementById(`${type}-title`);
-        const descriptionInput = document.getElementById(`${type}-description`);
+      // Click to browse files
+      dragDropArea.addEventListener('click', function() {
+        fileInput.click();
+      });
+      
+      // Remove file button handler
+      removeFileButton.addEventListener('click', function() {
+        fileInput.value = '';
+        previewImage.src = '';
+        previewContainer.classList.remove('show');
+        dragDropArea.style.display = 'block';
+      });
+      
+      // Form submission handler
+      submissionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
         
-        // Preview elements
-        const previewElement = type === 'image' 
-          ? document.getElementById(`${type}-preview-img`) 
-          : document.getElementById(`${type}-preview-player`);
+        // Get form values
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const file = fileInput.files[0];
         
-        const fileNameElement = document.getElementById(`${type}-file-name`);
-        const fileSizeElement = document.getElementById(`${type}-file-size`);
-        const fileTypeElement = document.getElementById(`${type}-file-type`);
-        
-        let file = null;
-        
-        // Click to select file
-        selectBtn.addEventListener('click', () => {
-          fileInput.click();
-        });
-        
-        // File input change
-        fileInput.addEventListener('change', () => {
-          if (fileInput.files.length) {
-            handleFile(fileInput.files[0]);
-          }
-        });
-        
-        // Drag and drop events
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-          dropArea.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        function preventDefaults(e) {
-          e.preventDefault();
-          e.stopPropagation();
+        // Basic validation
+        if (!title || !description || !file) {
+          showError('Please fill in all fields and upload an image.');
+          return;
         }
         
-        ['dragenter', 'dragover'].forEach(eventName => {
-          dropArea.addEventListener(eventName, highlight, false);
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-          dropArea.addEventListener(eventName, unhighlight, false);
-        });
-        
-        function highlight() {
-          dropArea.classList.add('active');
-        }
-        
-        function unhighlight() {
-          dropArea.classList.remove('active');
-        }
-        
-        // Handle dropped files
-        dropArea.addEventListener('drop', (e) => {
-          const dt = e.dataTransfer;
-          const droppedFile = dt.files[0];
-          
-          if (droppedFile) {
-            handleFile(droppedFile);
-          }
-        });
-        
-        // Remove file
-        removeBtn.addEventListener('click', () => {
-          file = null;
-          fileInput.value = '';
-          preview.style.display = 'none';
-          dropArea.style.display = 'flex';
-          updateSubmitButtonState();
-        });
-        
-        // Handle file validation and preview
-        function handleFile(uploadedFile) {
-          // Validate file type
-          const validTypes = type === 'image' 
-            ? ['image/jpeg', 'image/png', 'image/gif'] 
-            : ['video/mp4', 'video/quicktime'];
-            
-          if (!validTypes.includes(uploadedFile.type)) {
-            alert(`Invalid file type. Please upload a ${type} file.`);
-            return;
-          }
-          
-          // Validate file size
-          if (uploadedFile.size > maxSize) {
-            alert(`File is too large. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
-            return;
-          }
-          
-          // Save file
-          file = uploadedFile;
-          
-          // Update file info
-          fileNameElement.textContent = file.name;
-          fileSizeElement.textContent = formatFileSize(file.size);
-          fileTypeElement.textContent = file.type;
-          
-          // Show preview
-          if (type === 'image') {
-            previewElement.src = URL.createObjectURL(file);
-          } else {
-            previewElement.src = URL.createObjectURL(file);
-          }
-          
-          preview.style.display = 'block';
-          dropArea.style.display = 'none';
-          updateSubmitButtonState();
-        }
-        
-        // Format file size
-        function formatFileSize(bytes) {
-          if (bytes < 1024) return bytes + ' bytes';
-          else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-          else return (bytes / 1048576).toFixed(1) + ' MB';
-        }
-        
-        // Update submit button state
-        function updateSubmitButtonState() {
-          const isValid = !!file && 
-            titleInput.value.trim() !== '' && 
-            descriptionInput.value.trim() !== '';
-            
-          submitBtn.disabled = !isValid;
-        }
-        
-        // Check form validity on input change
-        titleInput.addEventListener('input', updateSubmitButtonState);
-        descriptionInput.addEventListener('input', updateSubmitButtonState);
-        
-        // Handle form submission
-        submitBtn.addEventListener('click', () => {
-          if (!file || !titleInput.value.trim() || !descriptionInput.value.trim()) {
-            alert('Please fill in all fields and upload a file.');
-            return;
-          }
-          
-          // Create FormData for submission (for demo purposes only)
-          const formData = new FormData();
-          formData.append('title', titleInput.value);
-          formData.append('description', descriptionInput.value);
-          formData.append('file', file);
-          
-          // In a real application, you would send this to your server
-          // For demo, we'll just show an alert
-          alert(`Submission received!\n\nTitle: ${titleInput.value}\nFile: ${file.name}\n\nIn a real app, this would be sent to the server.`);
+        // Simulate API submission
+        setTimeout(() => {
+          showSuccess('Your submission has been successfully uploaded! Our team will review it shortly.');
           
           // Reset form
-          titleInput.value = '';
-          descriptionInput.value = '';
-          file = null;
-          fileInput.value = '';
-          preview.style.display = 'none';
-          dropArea.style.display = 'flex';
-          updateSubmitButtonState();
-        });
+          submissionForm.reset();
+          previewImage.src = '';
+          previewContainer.classList.remove('show');
+          dragDropArea.style.display = 'block';
+        }, 1500);
+      });
+      
+      // Helper functions
+      function handleFileSelect() {
+        const file = fileInput.files[0];
+        
+        if (!file) return;
+        
+        // Check file type
+        const fileType = file.type;
+        if (!fileType.match('image.*')) {
+          showError('Please select an image file (JPG, PNG, GIF).');
+          return;
+        }
+        
+        // Check file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+          showError('File size exceeds the 5MB limit. Please choose a smaller file.');
+          return;
+        }
+        
+        // Read and preview the file
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          previewImage.src = e.target.result;
+          previewContainer.classList.add('show');
+          dragDropArea.style.display = 'none';
+          hideMessages();
+        };
+        
+        reader.readAsDataURL(file);
+      }
+      
+      function showSuccess(message) {
+        successMessage.textContent = message;
+        successMessage.style.display = 'block';
+        errorMessage.style.display = 'none';
+      }
+      
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        successMessage.style.display = 'none';
+      }
+      
+      function hideMessages() {
+        successMessage.style.display = 'none';
+        errorMessage.style.display = 'none';
       }
     });
   </script>
