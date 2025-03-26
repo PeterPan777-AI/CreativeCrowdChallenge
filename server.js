@@ -1814,7 +1814,7 @@ async function handleApiRequest(req, res) {
       if (!supabase) {
         console.log('Supabase not available, using simulated admin authentication');
         // Simulate authentication for demo purposes
-        if (email.includes('admin') && password === 'password') {
+        if (email.includes('admin') && (password === 'password' || password === 'admin123')) {
           // Create a mock admin user for demo
           const mockAdminUser = {
             id: 'admin-123',
