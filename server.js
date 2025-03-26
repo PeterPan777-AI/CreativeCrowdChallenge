@@ -2939,6 +2939,192 @@ async function handleApiRequest(req, res) {
     }
   }
 
+  // Handle Categories API
+  if (endpoint === '/categories' && req.method === 'GET') {
+    console.log('Handling categories request');
+    res.writeHead(200);
+    res.end(JSON.stringify(MOCK_DATA.categories));
+    return;
+  }
+  
+  // Handle Leaderboards API for specific competition
+  if (endpoint.match(/^\/leaderboards\/[\w-]+$/) && req.method === 'GET') {
+    const competitionId = endpoint.split('/').pop();
+    console.log(`Fetching leaderboard for competition: ${competitionId}`);
+    
+    // Find the competition leaderboard
+    const leaderboard = MOCK_DATA.leaderboards.find(lb => lb.competition_id === competitionId);
+    
+    if (leaderboard) {
+      res.writeHead(200);
+      res.end(JSON.stringify(leaderboard));
+    } else {
+      res.writeHead(404);
+      res.end(JSON.stringify({ error: 'Leaderboard not found' }));
+    }
+    return;
+  }
+  
+  // Handle Leaderboards API for specific category
+  if (endpoint.match(/^\/leaderboards\/category\/[\w-]+$/) && req.method === 'GET') {
+    const categoryId = endpoint.split('/').pop();
+    console.log(`Fetching leaderboard for category: ${categoryId}`);
+    
+    // Find competitions in this category
+    const competitionsInCategory = MOCK_DATA.competitions.filter(
+      comp => comp.category === categoryId
+    );
+    
+    if (competitionsInCategory.length === 0) {
+      res.writeHead(200);
+      res.end(JSON.stringify({ entries: [] }));
+      return;
+    }
+    
+    // Get competition IDs
+    const competitionIds = competitionsInCategory.map(comp => comp.id);
+    
+    // Find leaderboards for these competitions
+    const relevantLeaderboards = MOCK_DATA.leaderboards.filter(
+      lb => competitionIds.includes(lb.competition_id)
+    );
+    
+    // Combine all entries
+    let allEntries = [];
+    relevantLeaderboards.forEach(lb => {
+      if (lb.entries) {
+        allEntries = [...allEntries, ...lb.entries];
+      }
+    });
+    
+    // If no entries found, return empty array
+    if (allEntries.length === 0) {
+      res.writeHead(200);
+      res.end(JSON.stringify({ entries: [] }));
+      return;
+    }
+    
+    // Sort and rerank
+    allEntries.sort((a, b) => {
+      if (b.average_rating !== a.average_rating) {
+        return b.average_rating - a.average_rating;
+      }
+      return b.vote_count - a.vote_count;
+    });
+    
+    allEntries.forEach((entry, index) => {
+      entry.rank = index + 1;
+    });
+    
+    res.writeHead(200);
+    res.end(JSON.stringify({ entries: allEntries }));
+    return;
+  }
+  
+  // Handle Votes API
+  if (endpoint === '/votes' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { submission_id, user_id, rating } = body;
+      
+      if (!submission_id || !user_id || rating === undefined) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Missing required fields' }));
+        return;
+      }
+      
+      console.log(`Processing vote: user ${user_id} rated submission ${submission_id} with ${rating}`);
+      
+      // Check if the submission exists
+      const submission = MOCK_DATA.submissions.find(sub => sub.id === submission_id);
+      if (!submission) {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Submission not found' }));
+        return;
+      }
+      
+      // Check if the user has already voted for this submission
+      const existingVoteIndex = MOCK_DATA.votes.findIndex(
+        vote => vote.user_id === user_id && vote.submission_id === submission_id
+      );
+      
+      if (existingVoteIndex !== -1) {
+        // Update existing vote
+        const oldRating = MOCK_DATA.votes[existingVoteIndex].rating;
+        MOCK_DATA.votes[existingVoteIndex].rating = rating;
+        MOCK_DATA.votes[existingVoteIndex].created_at = new Date().toISOString();
+        
+        // Update the submission stats
+        submission.total_rating = submission.total_rating - oldRating + rating;
+        submission.average_rating = submission.total_rating / submission.vote_count;
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          success: true, 
+          message: 'Vote updated',
+          submission: {
+            id: submission.id,
+            vote_count: submission.vote_count,
+            average_rating: submission.average_rating,
+            rank: submission.rank
+          }
+        }));
+      } else {
+        // Create a new vote
+        const newVote = {
+          id: `vote-${MOCK_DATA.votes.length + 1}`,
+          user_id,
+          submission_id,
+          rating,
+          created_at: new Date().toISOString()
+        };
+        
+        MOCK_DATA.votes.push(newVote);
+        
+        // Update the submission stats
+        submission.vote_count += 1;
+        submission.total_rating += rating;
+        submission.average_rating = submission.total_rating / submission.vote_count;
+        
+        // Update ranks for all submissions in this competition
+        const competitionSubmissions = MOCK_DATA.submissions.filter(
+          sub => sub.competition_id === submission.competition_id
+        );
+        
+        // Sort by average rating (desc) and then by vote count (desc)
+        competitionSubmissions.sort((a, b) => {
+          if (b.average_rating !== a.average_rating) {
+            return b.average_rating - a.average_rating;
+          }
+          return b.vote_count - a.vote_count;
+        });
+        
+        // Update ranks
+        competitionSubmissions.forEach((sub, index) => {
+          sub.rank = index + 1;
+        });
+        
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          success: true, 
+          message: 'Vote submitted',
+          submission: {
+            id: submission.id,
+            vote_count: submission.vote_count,
+            average_rating: submission.average_rating,
+            rank: submission.rank
+          }
+        }));
+      }
+      return;
+    } catch (error) {
+      console.error('Error processing vote:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Internal server error processing vote' }));
+      return;
+    }
+  }
+  
   // Default response for unknown endpoints
   res.writeHead(404);
   res.end(JSON.stringify({ error: 'Not found' }));
