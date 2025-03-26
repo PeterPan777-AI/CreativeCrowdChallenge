@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rating Component - VoteNest</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      margin-bottom: 15px;
+    }
+    
+    .submission {
+      margin-bottom: 20px;
+    }
+    
+    .submission-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .submission-header img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .submission-header .info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .submission-header .title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .submission-header .username {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .submission-content {
+      margin-bottom: 20px;
+    }
+    
+    .submission-image {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .rating-system {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    
+    .stars-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .stars {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .star {
+      cursor: pointer;
+      font-size: 32px;
+      color: #ddd;
+      transition: color 0.2s ease;
+    }
+    
+    .star.selected {
+      color: gold;
+    }
+    
+    .rating-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      width: 40px;
+      text-align: center;
+    }
+    
+    .slider-container {
+      margin-bottom: 15px;
+    }
+    
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: #ddd;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+    }
+    
+    .slider:hover {
+      opacity: 1;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #4CAF50;
+      cursor: pointer;
+    }
+    
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #4CAF50;
+      cursor: pointer;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    
+    .btn:hover {
+      background-color: #3e8e41;
+    }
+    
+    .btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .feedback {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .rating-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .rating-stat {
+      text-align: center;
+    }
+    
+    .rating-stat .value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .rating-stat .label {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h1>Submission Rating</h1>
+      </div>
+      
+      <div class="submission">
+        <div class="submission-header">
+          <img src="https://via.placeholder.com/50" alt="Profile">
+          <div class="info">
+            <div class="title">Colorful Tech Identity</div>
+            <div class="username">@artisanCreator</div>
+          </div>
+        </div>
+        
+        <div class="submission-content">
+          <img class="submission-image" src="https://via.placeholder.com/800x400" alt="Submission">
+          <p>Vibrant colors representing diverse technology. This logo design combines modern aesthetics with a playful color palette to represent the diverse nature of technology today.</p>
+        </div>
+        
+        <div class="rating-summary">
+          <div class="rating-stat">
+            <div class="value" id="average-rating">8.0</div>
+            <div class="label">Average Rating</div>
+          </div>
+          <div class="rating-stat">
+            <div class="value" id="vote-count">31</div>
+            <div class="label">Total Votes</div>
+          </div>
+          <div class="rating-stat">
+            <div class="value" id="current-rank">#1</div>
+            <div class="label">Current Rank</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="rating-system">
+        <h2>Rate this submission</h2>
+        <p>Provide your rating from 0 to 10 (10 being the highest)</p>
+        
+        <!-- Star Rating -->
+        <div class="stars-container">
+          <div class="stars" id="star-rating">
+            <span class="star material-icons" data-value="0">star_border</span>
+            <span class="star material-icons" data-value="1">star_border</span>
+            <span class="star material-icons" data-value="2">star_border</span>
+            <span class="star material-icons" data-value="3">star_border</span>
+            <span class="star material-icons" data-value="4">star_border</span>
+            <span class="star material-icons" data-value="5">star_border</span>
+            <span class="star material-icons" data-value="6">star_border</span>
+            <span class="star material-icons" data-value="7">star_border</span>
+            <span class="star material-icons" data-value="8">star_border</span>
+            <span class="star material-icons" data-value="9">star_border</span>
+            <span class="star material-icons" data-value="10">star_border</span>
+          </div>
+          <div class="rating-value" id="rating-value">0</div>
+        </div>
+        
+        <!-- Slider Rating -->
+        <div class="slider-container">
+          <input type="range" min="0" max="10" value="0" step="1" class="slider" id="rating-slider">
+        </div>
+        
+        <button class="btn" id="submit-rating" disabled>Submit Rating</button>
+        
+        <div class="feedback" id="feedback"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get DOM elements
+      const stars = document.querySelectorAll('.star');
+      const ratingValue = document.getElementById('rating-value');
+      const ratingSlider = document.getElementById('rating-slider');
+      const submitButton = document.getElementById('submit-rating');
+      const feedback = document.getElementById('feedback');
+      const averageRating = document.getElementById('average-rating');
+      const voteCount = document.getElementById('vote-count');
+      const currentRank = document.getElementById('current-rank');
+      
+      // Initial state
+      let currentRating = 0;
+      
+      // Mock submission data
+      const submission = {
+        id: 'submission-3',
+        user_id: 'user-3',
+        title: 'Colorful Tech Identity',
+        average_rating: 8.0,
+        vote_count: 31,
+        rank: 1
+      };
+      
+      // Update stars based on rating
+      function updateStars(rating) {
+        stars.forEach(star => {
+          const starValue = parseInt(star.getAttribute('data-value'));
+          
+          if (starValue <= rating) {
+            star.textContent = 'star';
+            star.classList.add('selected');
+          } else {
+            star.textContent = 'star_border';
+            star.classList.remove('selected');
+          }
+        });
+      }
+      
+      // Star click event
+      stars.forEach(star => {
+        star.addEventListener('click', function() {
+          currentRating = parseInt(this.getAttribute('data-value'));
+          updateStars(currentRating);
+          ratingValue.textContent = currentRating;
+          ratingSlider.value = currentRating;
+          submitButton.disabled = false;
+        });
+        
+        star.addEventListener('mouseover', function() {
+          const hoverRating = parseInt(this.getAttribute('data-value'));
+          updateStars(hoverRating);
+        });
+        
+        star.addEventListener('mouseout', function() {
+          updateStars(currentRating);
+        });
+      });
+      
+      // Slider change event
+      ratingSlider.addEventListener('input', function() {
+        currentRating = parseInt(this.value);
+        updateStars(currentRating);
+        ratingValue.textContent = currentRating;
+        submitButton.disabled = false;
+      });
+      
+      // Submit rating button
+      submitButton.addEventListener('click', async function() {
+        try {
+          // In a real app, we would call the API
+          // const response = await fetch('/api/votes', {
+          //   method: 'POST',
+          //   headers: {
+          //     'Content-Type': 'application/json'
+          //   },
+          //   body: JSON.stringify({
+          //     submission_id: submission.id,
+          //     user_id: 'current-user-id', // This would be the logged-in user
+          //     rating: currentRating
+          //   })
+          // });
+          
+          // For demo purposes, simulate a successful response
+          const simulatedResponse = {
+            success: true,
+            submission: {
+              id: submission.id,
+              vote_count: submission.vote_count + 1,
+              average_rating: ((submission.average_rating * submission.vote_count) + currentRating) / (submission.vote_count + 1)
+            }
+          };
+          
+          if (simulatedResponse.success) {
+            // Update UI with new stats
+            submission.vote_count = simulatedResponse.submission.vote_count;
+            submission.average_rating = simulatedResponse.submission.average_rating;
+            
+            // Update the stats display
+            averageRating.textContent = submission.average_rating.toFixed(1);
+            voteCount.textContent = submission.vote_count;
+            
+            // Show success feedback
+            feedback.classList.add('success');
+            feedback.classList.remove('error');
+            feedback.textContent = 'Rating submitted successfully!';
+            feedback.style.display = 'block';
+            
+            // Disable submit button to prevent multiple submissions
+            submitButton.disabled = true;
+            
+            // Hide feedback after a few seconds
+            setTimeout(() => {
+              feedback.style.display = 'none';
+            }, 3000);
+          } else {
+            throw new Error('Failed to submit rating');
+          }
+        } catch (error) {
+          console.error('Error submitting rating:', error);
+          
+          // Show error feedback
+          feedback.classList.add('error');
+          feedback.classList.remove('success');
+          feedback.textContent = 'Failed to submit rating. Please try again.';
+          feedback.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

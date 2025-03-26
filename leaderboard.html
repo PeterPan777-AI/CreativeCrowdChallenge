@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoteNest - Leaderboards</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/main.css">
+  <style>
+    .leaderboard-container {
+      margin: 20px 0;
+    }
+    
+    .leaderboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .leaderboard-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 10px;
+    }
+    
+    .leaderboard-tab {
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+    
+    .leaderboard-tab:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .leaderboard-tab.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .leaderboard-table th,
+    .leaderboard-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .leaderboard-table th {
+      background-color: #f5f5f5;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .leaderboard-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .leaderboard-table tr:hover {
+      background-color: #f9f9f9;
+    }
+    
+    .rank {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+    }
+    
+    .rank.top-1 {
+      color: gold;
+    }
+    
+    .rank.top-2 {
+      color: silver;
+    }
+    
+    .rank.top-3 {
+      color: #cd7f32; /* bronze */
+    }
+    
+    .submission-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .submission-info img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .submission-info .details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .submission-info .title {
+      font-weight: 500;
+    }
+    
+    .submission-info .username {
+      font-size: 0.85rem;
+      color: #666;
+    }
+    
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .rating .star {
+      color: gold;
+    }
+    
+    .votes {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .category-label {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: white;
+      background-color: var(--primary-color);
+    }
+    
+    .no-entries {
+      padding: 20px;
+      text-align: center;
+      color: #666;
+      font-style: italic;
+    }
+    
+    .vote-now {
+      margin-top: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo" onclick="navigateToHome()">
+            <h1>VoteNest</h1>
+          </div>
+          <nav class="desktop-nav">
+            <ul>
+              <li><a href="/">Home</a></li>
+              <li><a href="/competitions">Competitions</a></li>
+              <li><a href="/leaderboard" class="active">Leaderboards</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <button id="login-btn" class="btn btn-primary">Login / Sign Up</button>
+            <button id="menu-toggle" class="menu-toggle">
+              <span class="material-icons">menu</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <div id="drawer" class="drawer">
+      <div class="drawer-header">
+        <div class="logo">
+          <h2>VoteNest</h2>
+        </div>
+        <button id="drawer-close" class="drawer-close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <ul id="nav-list" class="nav-list"></ul>
+    </div>
+    
+    <div id="overlay" class="overlay"></div>
+    
+    <main id="main-content" class="main-content">
+      <div class="container">
+        <div class="page-header">
+          <h1>Leaderboards</h1>
+          <p>See the top-rated submissions across all categories and competitions</p>
+        </div>
+        
+        <div class="leaderboard-container">
+          <div class="leaderboard-header">
+            <h2>Top Submissions</h2>
+            <select id="category-select" class="form-select">
+              <option value="">All Categories</option>
+              <!-- Categories will be populated dynamically -->
+            </select>
+          </div>
+          
+          <div class="leaderboard-tabs">
+            <div class="leaderboard-tab active" data-tab="overall">Overall</div>
+            <div class="leaderboard-tab" data-tab="recent">Recent</div>
+            <div class="leaderboard-tab" data-tab="trending">Trending</div>
+          </div>
+          
+          <div id="leaderboard-content">
+            <!-- Leaderboard will be populated dynamically -->
+            <div class="loading">Loading leaderboard data...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <footer class="app-footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="copyright">
+            &copy; 2025 VoteNest. All rights reserved.
+          </div>
+          <div class="footer-links">
+            <a href="#">Terms</a>
+            <a href="#">Privacy</a>
+            <a href="#">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize navigation
+      const navItems = [
+        { path: '/', text: 'Home', icon: 'home' },
+        { path: '/competitions', text: 'Competitions', icon: 'emoji_events' },
+        { path: '/leaderboard', text: 'Leaderboards', icon: 'leaderboard' }
+      ];
+      
+      const authItems = [];
+      
+      // DOM elements
+      const menuToggle = document.getElementById('menu-toggle');
+      const drawer = document.getElementById('drawer');
+      const drawerClose = document.getElementById('drawer-close');
+      const overlay = document.getElementById('overlay');
+      const navList = document.getElementById('nav-list');
+      const mainContent = document.getElementById('main-content');
+      const loginBtn = document.getElementById('login-btn');
+      
+      // Authentication state
+      let isAuthenticated = false;
+      
+      // Create Navigation List
+      function renderNavigation() {
+        navList.innerHTML = '';
+        
+        // Main navigation items
+        navItems.forEach(item => {
+          const li = createNavItem(item);
+          navList.appendChild(li);
+        });
+        
+        // Only show divider and auth items if there are any auth items
+        if (authItems.length > 0) {
+          // Divider
+          const divider = document.createElement('li');
+          divider.className = 'nav-divider';
+          navList.appendChild(divider);
+          
+          // Auth navigation items
+          authItems.forEach(item => {
+            const li = createNavItem(item);
+            navList.appendChild(li);
+          });
+        }
+      }
+      
+      // Create a single navigation item
+      function createNavItem(item) {
+        const li = document.createElement('li');
+        li.className = 'nav-item';
+        if (window.location.pathname === item.path) {
+          li.classList.add('active');
+        }
+        
+        const icon = document.createElement('span');
+        icon.className = 'material-icons nav-item-icon';
+        icon.textContent = item.icon;
+        
+        const text = document.createTextNode(item.text);
+        
+        li.appendChild(icon);
+        li.appendChild(text);
+        
+        li.addEventListener('click', function() {
+          window.location.href = item.path;
+          closeDrawer();
+        });
+        
+        return li;
+      }
+      
+      // Toggle drawer
+      menuToggle.addEventListener('click', function() {
+        drawer.classList.toggle('open');
+        overlay.classList.toggle('show');
+      });
+      
+      // Close drawer when clicking overlay or main content
+      overlay.addEventListener('click', closeDrawer);
+      drawerClose.addEventListener('click', closeDrawer);
+      
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+      
+      // Login button
+      loginBtn.addEventListener('click', function() {
+        window.location.href = '/login';
+      });
+      
+      // Initialize the app
+      function init() {
+        renderNavigation();
+        
+        // Fetch categories for the dropdown
+        fetchCategories();
+        
+        // Load initial leaderboard (overall)
+        loadLeaderboard('overall');
+        
+        // Setup leaderboard tabs
+        setupLeaderboardTabs();
+        
+        // Setup category select
+        setupCategorySelect();
+      }
+      
+      // Fetch categories for the dropdown
+      async function fetchCategories() {
+        try {
+          const response = await fetch('/api/categories');
+          if (!response.ok) {
+            throw new Error('Failed to fetch categories');
+          }
+          
+          const categories = await response.json();
+          populateCategoryDropdown(categories);
+        } catch (error) {
+          console.error('Error fetching categories:', error);
+        }
+      }
+      
+      // Populate category dropdown
+      function populateCategoryDropdown(categories) {
+        const categorySelect = document.getElementById('category-select');
+        
+        categories.forEach(category => {
+          const option = document.createElement('option');
+          option.value = category.id;
+          option.textContent = category.name;
+          categorySelect.appendChild(option);
+        });
+      }
+      
+      // Setup leaderboard tabs
+      function setupLeaderboardTabs() {
+        const tabs = document.querySelectorAll('.leaderboard-tab');
+        
+        tabs.forEach(tab => {
+          tab.addEventListener('click', function() {
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Load leaderboard data for the selected tab
+            const tabType = this.getAttribute('data-tab');
+            loadLeaderboard(tabType);
+          });
+        });
+      }
+      
+      // Setup category select
+      function setupCategorySelect() {
+        const categorySelect = document.getElementById('category-select');
+        
+        categorySelect.addEventListener('change', function() {
+          const categoryId = this.value;
+          const activeTab = document.querySelector('.leaderboard-tab.active').getAttribute('data-tab');
+          
+          loadLeaderboard(activeTab, categoryId);
+        });
+      }
+      
+      // Load leaderboard data
+      async function loadLeaderboard(tabType, categoryId = null) {
+        const leaderboardContent = document.getElementById('leaderboard-content');
+        leaderboardContent.innerHTML = '<div class="loading">Loading leaderboard data...</div>';
+        
+        try {
+          let url;
+          
+          if (categoryId) {
+            // Load category-specific leaderboard
+            url = `/api/leaderboards/category/${categoryId}`;
+          } else {
+            // For demo purposes, let's use the first leaderboard
+            url = '/api/leaderboards/mock-comp-1';
+          }
+          
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('Failed to fetch leaderboard data');
+          }
+          
+          const leaderboardData = await response.json();
+          renderLeaderboard(leaderboardData);
+        } catch (error) {
+          console.error('Error loading leaderboard:', error);
+          leaderboardContent.innerHTML = '<div class="no-entries">Failed to load leaderboard data. Please try again later.</div>';
+        }
+      }
+      
+      // Render leaderboard
+      function renderLeaderboard(leaderboardData) {
+        const leaderboardContent = document.getElementById('leaderboard-content');
+        
+        if (!leaderboardData.entries || leaderboardData.entries.length === 0) {
+          leaderboardContent.innerHTML = '<div class="no-entries">No entries found for this leaderboard.</div>';
+          return;
+        }
+        
+        const table = document.createElement('table');
+        table.className = 'leaderboard-table';
+        
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        const headers = ['Rank', 'Submission', 'Rating', 'Votes'];
+        headers.forEach(headerText => {
+          const th = document.createElement('th');
+          th.textContent = headerText;
+          headerRow.appendChild(th);
+        });
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        leaderboardData.entries.forEach(entry => {
+          const row = document.createElement('tr');
+          
+          // Rank cell
+          const rankCell = document.createElement('td');
+          const rankDiv = document.createElement('div');
+          rankDiv.className = `rank ${entry.rank <= 3 ? 'top-' + entry.rank : ''}`;
+          rankDiv.textContent = '#' + entry.rank;
+          rankCell.appendChild(rankDiv);
+          row.appendChild(rankCell);
+          
+          // Submission cell
+          const submissionCell = document.createElement('td');
+          const submissionDiv = document.createElement('div');
+          submissionDiv.className = 'submission-info';
+          
+          const img = document.createElement('img');
+          img.src = 'https://via.placeholder.com/50'; // Placeholder image
+          img.alt = entry.username;
+          
+          const detailsDiv = document.createElement('div');
+          detailsDiv.className = 'details';
+          
+          const titleDiv = document.createElement('div');
+          titleDiv.className = 'title';
+          titleDiv.textContent = entry.title;
+          
+          const usernameDiv = document.createElement('div');
+          usernameDiv.className = 'username';
+          usernameDiv.textContent = '@' + entry.username;
+          
+          detailsDiv.appendChild(titleDiv);
+          detailsDiv.appendChild(usernameDiv);
+          
+          submissionDiv.appendChild(img);
+          submissionDiv.appendChild(detailsDiv);
+          
+          submissionCell.appendChild(submissionDiv);
+          row.appendChild(submissionCell);
+          
+          // Rating cell
+          const ratingCell = document.createElement('td');
+          const ratingDiv = document.createElement('div');
+          ratingDiv.className = 'rating';
+          
+          const starIcon = document.createElement('span');
+          starIcon.className = 'material-icons star';
+          starIcon.textContent = 'star';
+          
+          const ratingText = document.createTextNode(entry.average_rating.toFixed(1));
+          
+          ratingDiv.appendChild(starIcon);
+          ratingDiv.appendChild(ratingText);
+          
+          ratingCell.appendChild(ratingDiv);
+          row.appendChild(ratingCell);
+          
+          // Votes cell
+          const votesCell = document.createElement('td');
+          const votesDiv = document.createElement('div');
+          votesDiv.className = 'votes';
+          votesDiv.textContent = entry.vote_count + ' votes';
+          
+          votesCell.appendChild(votesDiv);
+          row.appendChild(votesCell);
+          
+          tbody.appendChild(row);
+        });
+        
+        table.appendChild(tbody);
+        
+        // Clear previous content and append table
+        leaderboardContent.innerHTML = '';
+        leaderboardContent.appendChild(table);
+        
+        // Add "Vote Now" button
+        const voteNowDiv = document.createElement('div');
+        voteNowDiv.className = 'vote-now';
+        const voteNowBtn = document.createElement('button');
+        voteNowBtn.className = 'btn btn-primary';
+        voteNowBtn.textContent = 'Vote on Submissions';
+        voteNowBtn.addEventListener('click', function() {
+          window.location.href = '/competitions';
+        });
+        
+        voteNowDiv.appendChild(voteNowBtn);
+        leaderboardContent.appendChild(voteNowDiv);
+      }
+      
+      // Start the app
+      init();
+    });
+  </script>
+</body>
+</html>
