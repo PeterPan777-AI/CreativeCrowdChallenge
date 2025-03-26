@@ -2697,6 +2697,16 @@
       if (screenElement) {
         screenElement.style.display = 'block';
         console.log("Showing screen:", fullScreenName);
+        
+        // Special handling for analytics screen
+        if (fullScreenName === 'analytics-screen') {
+          // Change header for analytics screen
+          document.getElementById('main-header').innerHTML = `
+            <h1>Business Analytics Dashboard</h1>
+            <p>Insights and performance metrics</p>
+          `;
+          console.log("Activated analytics screen");
+        }
       } else {
         console.error("Screen not found:", fullScreenName);
       }
@@ -4029,13 +4039,16 @@
         }
       }
       
-      // If this is an admin analytics view, automatically show the analytics tab
+      // If this is an admin analytics view, directly show the analytics screen
       if (isAdminAnalytics || isAnalyticsDemo) {
-        // Select analytics tab and show analytics screen
-        const analyticsTab = document.querySelector('.tab[data-screen="analytics"]');
-        if (analyticsTab) {
-          analyticsTab.click();
-        }
+        // Directly show the analytics screen instead of trying to click a non-existent tab
+        showScreen('analytics-screen');
+        // Initialize analytics immediately
+        initializeAnalytics();
+        // Add a little delay to ensure the screen is fully shown before rendering charts
+        setTimeout(() => {
+          loadBusinessAnalytics();
+        }, 100);
       }
       
       // Initialize analytics if user visits that tab
@@ -4477,12 +4490,17 @@
     }
     
     function loadBusinessAnalytics() {
+      console.log('Loading business analytics, hasAnalyticsAccess:', window.hasAnalyticsAccess, 'userRole:', currentUser?.role);
+      
       // Check if user has analytics access
-      if (!window.hasAnalyticsAccess && currentUser?.role !== 'admin') {
+      if (!window.hasAnalyticsAccess && currentUser?.role !== 'admin' && currentUser?.role !== 'business') {
         console.log('Unauthorized access attempt to analytics dashboard');
         showRequestAnalyticsForm();
         return;
       }
+      
+      // Debug log for analytics access
+      console.log('Analytics access granted: URL parameter or appropriate user role');
       
       const businessId = document.getElementById('business-selector').value;
       const timelinePeriod = document.getElementById('timeline-period')?.value || '30days';
