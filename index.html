@@ -53,7 +53,10 @@
     <div class="hero">
       <h1 class="hero-title">Welcome to Creative Crowd Challenge</h1>
       <p class="hero-subtitle">Discover and participate in exciting creative competitions!</p>
-      <button class="btn btn-secondary" id="explore-competitions">Explore Competitions</button>
+      <div class="hero-actions">
+        <button class="btn btn-secondary" id="explore-competitions">Explore Competitions</button>
+        <a href="/submission-demo" class="btn btn-accent" style="margin-left: 10px;">Try Submission Demo</a>
+      </div>
     </div>
 
     <section>
@@ -183,7 +186,8 @@
       const navItems = [
         { path: '/', text: 'Home', icon: 'home' },
         { path: '/competitions', text: 'Competitions', icon: 'emoji_events' },
-        { path: '/submission', text: 'Submit Entry', icon: 'add_circle_outline' }
+        { path: '/submission', text: 'Submit Entry', icon: 'add_circle_outline' },
+        { path: '/submission-demo', text: 'Submission Demo', icon: 'file_upload' }
       ];
       
       const authItems = isAuthenticated ? [
@@ -258,8 +262,11 @@
       
       // SPA Navigation
       function navigateTo(path) {
-        // Check if the path ends with .html - this means it's an external page
-        if (path.endsWith('.html')) {
+        // These paths are served directly as HTML pages, not through the SPA
+        const externalPaths = ['/submission-demo', '/business-subscription', '/login.html'];
+        
+        // Check if this is an external page path
+        if (path.endsWith('.html') || externalPaths.includes(path)) {
           window.location.href = path; // Navigate to the external page
           return;
         }

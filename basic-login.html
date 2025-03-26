@@ -147,6 +147,18 @@
     const successMessage = document.getElementById('successMessage');
     const submitButton = document.getElementById('submitButton');
     
+    // Adding an info banner about test credentials
+    const testCredentialsInfo = document.createElement('div');
+    testCredentialsInfo.innerHTML = `
+      <div style="margin-bottom: 1.5rem; padding: 1rem; background-color: #e3f2fd; border-radius: 4px; border-left: 4px solid #2196f3;">
+        <h4 style="margin-top: 0; color: #0d47a1;">Test Credentials</h4>
+        <p><strong>Individual User:</strong> user@example.com / password123</p>
+        <p><strong>Business User:</strong> business@example.com / password123</p>
+        <p>You can also register a new account by entering any other email.</p>
+      </div>
+    `;
+    authForm.insertBefore(testCredentialsInfo, authForm.firstChild);
+    
     let isRegistering = false;
     
     // Handle form submission
@@ -172,8 +184,8 @@
       if (!isRegistering) {
         // Simulate checking if user exists
         if (email === 'user@example.com' && password === 'password123') {
-          // Successful login
-          showSuccess('Login successful! Redirecting...');
+          // Successful login as individual user
+          showSuccess('Individual user login successful! Redirecting...');
           setTimeout(() => {
             window.location.href = '/';
           }, 1500);
