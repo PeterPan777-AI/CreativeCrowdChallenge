@@ -650,9 +650,7 @@
       <div class="card">
         <h2>Platform Analytics</h2>
         <p>Monitor and analyze platform-wide metrics and performance data.</p>
-        <div class="message info">Analytics dashboard functionality is coming soon!</div>
-        <!-- Removed redirect button that was causing issues -->
-        <!-- <button onclick="viewPlatformAnalytics()" class="action-button">View Full Analytics Dashboard</button> -->
+        <button onclick="viewPlatformAnalytics()" class="action-button">View Full Analytics Dashboard</button>
       </div>
       
       <div class="card">
@@ -695,10 +693,10 @@
         // Already logged in, so no need for further login actions
         console.log('Admin already logged in');
         
-        // Load competitions instead of analytics for the admin dashboard
+        // Load both competitions and analytics requests for the admin dashboard
         setTimeout(() => {
           loadCompetitions();
-          // loadAnalyticsRequests(); // Commented out to prevent redirection
+          loadAnalyticsRequests();
         }, 300);
       }
       
@@ -748,11 +746,9 @@
                 loginSection.style.display = 'none';
                 adminDashboard.style.display = 'block';
                 
-                // Load competitions instead of analytics
+                // Load both competitions and analytics for the dashboard
                 loadCompetitions();
-                
-                // Also load analytics requests
-                // loadAnalyticsRequests(); // Commented out to prevent redirection
+                loadAnalyticsRequests();
               }, 1000);
             } else {
               showNotification('This account does not have admin privileges.', 'error');
@@ -1879,7 +1875,7 @@
       
       window.viewPlatformAnalytics = function() {
         // Navigate to the platform-wide analytics dashboard
-        window.location.href = '/?adminAnalytics=true';
+        window.location.href = '/simple-test.html?analyticsDemo=true';
       };
       
       window.logout = function() {
