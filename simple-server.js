@@ -97,10 +97,28 @@ const server = http.createServer(async (req, res) => {
   
   // Serve static files - default to simple-test.html for the root
   let filePath;
-  if (req.url === '/' || req.url === '/index.html') {
+  
+  // Check for competitions route (without .html) to redirect
+  if (req.url === '/competitions') {
+    console.log('Redirecting from /competitions to /competitions.html');
+    res.writeHead(302, { 'Location': '/competitions.html' });
+    res.end();
+    return;
+  } else if (req.url === '/' || req.url === '/index.html') {
     filePath = path.join(__dirname, 'simple-test.html');
   } else {
     filePath = path.join(__dirname, req.url);
+  }
+  
+  // Check for analytics demo mode in query parameters
+  if (req.url.includes('analyticsDemo=true')) {
+    console.log('Analytics demo mode detected!');
+    const queryParams = new URLSearchParams(req.url.split('?')[1] || '');
+    const params = {};
+    for(const [key, value] of queryParams.entries()) {
+      params[key] = value;
+    }
+    console.log(`Serving HTML file with query parameters: ${JSON.stringify(params)}`);
   }
   
   serveFile(res, filePath);

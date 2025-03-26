@@ -279,9 +279,14 @@
       const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
       const daysText = daysRemaining > 0 ? `${daysRemaining} days remaining` : 'Ended';
 
-      // Format dates for display
-      const startDate = competition.startDate ? new Date(competition.startDate).toLocaleDateString() : '';
-      const endDate = (competition.endDate || competition.deadline) ? new Date(competition.endDate || competition.deadline).toLocaleDateString() : '';
+      // Format dates for display in more compact format (MM/DD/YY)
+      const formatCompactDate = (dateStr) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substr(2)}`;
+      };
+      const startDate = competition.startDate ? formatCompactDate(competition.startDate) : '';
+      const endDate = (competition.endDate || competition.deadline) ? formatCompactDate(competition.endDate || competition.deadline) : '';
       
       // Generate placeholder image based on category
       const category = competition.category || '';
