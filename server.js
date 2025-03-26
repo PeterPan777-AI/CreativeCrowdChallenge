@@ -292,8 +292,8 @@ const MOCK_DATA = {
   competitions: [
     {
       id: 'mock-comp-1',
-      title: 'Logo Design Challenge',
-      description: 'Create a modern logo for a tech startup',
+      title: 'AI Tool Innovation Challenge',
+      description: 'Design an innovative AI tool for business productivity',
       prize: '$500',
       deadline: '2025-04-30',
       category: 'cat-b1',  // Best AI Tool
@@ -386,8 +386,8 @@ const MOCK_DATA = {
       competition_id: 'mock-comp-1',
       user_id: 'user-1',
       username: 'creativePro',
-      title: 'Modern Tech Logo',
-      description: 'A sleek, minimalist logo representing innovation',
+      title: 'Productivity AI Tool',
+      description: 'An innovative AI tool for enhancing business productivity',
       media_url: 'https://via.placeholder.com/300',
       media_type: 'image',
       created_at: '2025-03-18',
@@ -403,8 +403,8 @@ const MOCK_DATA = {
       competition_id: 'mock-comp-1',
       user_id: 'user-2',
       username: 'designGuru',
-      title: 'Geometric Startup Brand',
-      description: 'A geometric approach to modern branding',
+      title: 'AI Assistant Dashboard',
+      description: 'An intuitive dashboard for controlling AI assistants',
       media_url: 'https://via.placeholder.com/300',
       media_type: 'image',
       created_at: '2025-03-19',
@@ -420,8 +420,8 @@ const MOCK_DATA = {
       competition_id: 'mock-comp-1',
       user_id: 'user-3',
       username: 'artisanCreator',
-      title: 'Colorful Tech Identity',
-      description: 'Vibrant colors representing diverse technology',
+      title: 'Smart AI Content Generator',
+      description: 'Versatile AI tool that creates various types of content automatically',
       media_url: 'https://via.placeholder.com/300',
       media_type: 'image',
       created_at: '2025-03-20',
@@ -538,9 +538,9 @@ const MOCK_DATA = {
       category_name: 'Best AI Tool',
       updated_at: new Date().toISOString(),
       entries: [
-        { rank: 1, submission_id: 'submission-3', average_rating: 8.0, vote_count: 31, title: 'Colorful Tech Identity', username: 'artisanCreator' },
-        { rank: 2, submission_id: 'submission-1', average_rating: 7.7, vote_count: 24, title: 'Modern Tech Logo', username: 'creativePro' },
-        { rank: 3, submission_id: 'submission-2', average_rating: 7.0, vote_count: 18, title: 'Geometric Startup Brand', username: 'designGuru' }
+        { rank: 1, submission_id: 'submission-3', average_rating: 8.0, vote_count: 31, title: 'Smart AI Content Generator', username: 'artisanCreator' },
+        { rank: 2, submission_id: 'submission-1', average_rating: 7.7, vote_count: 24, title: 'Productivity AI Tool', username: 'creativePro' },
+        { rank: 3, submission_id: 'submission-2', average_rating: 7.0, vote_count: 18, title: 'AI Assistant Dashboard', username: 'designGuru' }
       ]
     },
     {
@@ -609,7 +609,7 @@ const MOCK_DATA = {
       totalViews: '865',
       avgEngagement: '32%',
       competitions: [
-        { title: 'Logo Design Challenge', submissions: 24, views: 487, engagementRate: '4.9%' },
+        { title: 'AI Tool Innovation Challenge', submissions: 24, views: 487, engagementRate: '4.9%' },
         { title: 'Marketing Campaign Concept', submissions: 18, views: 378, engagementRate: '4.8%' }
       ],
       demographics: {
