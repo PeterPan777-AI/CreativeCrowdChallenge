@@ -4053,8 +4053,21 @@
         return canvas;
       }
       
+      // For specific charts that have fixed IDs in the HTML
+      if (canvasId === 'engagement-line-chart' || canvasId === 'traffic-sources-chart' || canvasId === 'device-usage-chart') {
+        canvas = document.getElementById(canvasId);
+        if (canvas) {
+          // Clear any existing Chart instance
+          console.log(`Found static canvas element: ${canvasId}`);
+          return canvas;
+        }
+      }
+      
       // Otherwise, look for a container and create a canvas inside it
-      const container = document.getElementById(canvasId.replace('-canvas', ''));
+      const containerId = canvasId.replace('-canvas', '');
+      console.log(`Looking for container with ID: ${containerId}`);
+      const container = document.getElementById(containerId);
+      
       if (container) {
         // Clear the container completely
         container.innerHTML = '';
@@ -4063,7 +4076,7 @@
         canvas = document.createElement('canvas');
         canvas.id = canvasId; // Use the exact ID that was requested
         canvas.style.width = '100%';
-        canvas.style.height = '100%';
+        canvas.style.height = '300px'; // Set a fixed height
         container.appendChild(canvas);
         
         console.log(`Created new canvas in container: ${container.id}`);
@@ -4072,10 +4085,7 @@
       
       // If we get here, we couldn't find either the canvas or a suitable container
       console.error(`Neither canvas nor container found for: ${canvasId}`);
-      console.log('Available elements:', 
-        Array.from(document.querySelectorAll('.chart-container'))
-          .map(el => el.id || 'unnamed-container')
-      );
+      console.log('Available containers:', Array.from(document.querySelectorAll('.chart-container')).map(el => el.id || 'unnamed-container').join(', '));
       return null;
     }
     
