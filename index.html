@@ -323,13 +323,12 @@
         { path: '/submission-demo', text: 'Submission Demo', icon: 'file_upload' }
       ];
       
+      // For logged in users, show profile and logout
+      // For logged out users, don't show login/register in side menu (it's in header)
       const authItems = isAuthenticated ? [
         { path: '/profile', text: 'Profile', icon: 'person' },
         { path: '/logout', text: 'Logout', icon: 'logout' }
-      ] : [
-        { path: '/login', text: 'Login', icon: 'login' },
-        { path: '/login', text: 'Register', icon: 'person_add' }
-      ];
+      ] : [];
       
       // Create Navigation List
       function renderNavigation() {
@@ -341,16 +340,19 @@
           navList.appendChild(li);
         });
         
-        // Divider
-        const divider = document.createElement('li');
-        divider.className = 'nav-divider';
-        navList.appendChild(divider);
-        
-        // Auth navigation items
-        authItems.forEach(item => {
-          const li = createNavItem(item);
-          navList.appendChild(li);
-        });
+        // Only show divider and auth items if there are any auth items
+        if (authItems.length > 0) {
+          // Divider
+          const divider = document.createElement('li');
+          divider.className = 'nav-divider';
+          navList.appendChild(divider);
+          
+          // Auth navigation items
+          authItems.forEach(item => {
+            const li = createNavItem(item);
+            navList.appendChild(li);
+          });
+        }
       }
       
       // Create a single navigation item
