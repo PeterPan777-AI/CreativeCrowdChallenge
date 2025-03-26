@@ -127,8 +127,29 @@ const server = http.createServer((req, res) => {
   
   // Serve static files
   // Parse URL to separate path from query parameters
-  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
-  const pathname = parsedUrl.pathname;
+  let parsedUrl, pathname;
+  
+  // Handle both encoded and non-encoded URLs
+  try {
+    parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+    pathname = parsedUrl.pathname;
+  } catch (error) {
+    console.error('URL parsing error:', error);
+    // Fallback handling for malformed URLs
+    const urlParts = req.url.split('?');
+    pathname = urlParts[0];
+    console.log('Fallback pathname:', pathname);
+  }
+  
+  // Additional safety check for encoded characters in the pathname
+  if (pathname.includes('%')) {
+    try {
+      pathname = decodeURIComponent(pathname);
+      console.log('Decoded pathname:', pathname);
+    } catch (error) {
+      console.error('Failed to decode pathname:', error);
+    }
+  }
   
   let filePath;
   if (pathname === '/' || pathname === '/index.html') {
