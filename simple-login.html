@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreativeCrowdChallenge - Simple Login</title>
+  <link rel="stylesheet" href="/assets/main.css">
+  <style>
+    .auth-container {
+      max-width: 480px;
+      margin: 50px auto;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    .btn-primary {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-primary:hover {
+      background-color: #2980b9;
+    }
+    
+    .error-message {
+      color: red;
+      margin-top: 1rem;
+      display: none;
+    }
+    
+    .success-message {
+      color: green;
+      margin-top: 1rem;
+      display: none;
+    }
+    
+    .user-type {
+      margin-top: 1rem;
+      display: none;
+    }
+    
+    .user-type label {
+      margin-right: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="/">
+            <h1>CreativeCrowdChallenge</h1>
+          </a>
+        </div>
+        <nav class="navigation">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <div class="container">
+      <div class="auth-container">
+        <h2>Login or Sign Up</h2>
+        <p>Enter your information to continue</p>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password">
+        </div>
+        
+        <div id="userType" class="user-type">
+          <h3>Select Account Type</h3>
+          <div>
+            <input type="radio" id="individual" name="userType" value="individual" checked>
+            <label for="individual">Individual (Free)</label>
+            
+            <input type="radio" id="business" name="userType" value="business">
+            <label for="business">Business ($79.99/month)</label>
+          </div>
+        </div>
+        
+        <p id="errorMessage" class="error-message"></p>
+        <p id="successMessage" class="success-message"></p>
+        
+        <button id="loginButton" class="btn-primary">Continue</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <h2>CreativeCrowdChallenge</h2>
+          <p>Connecting creative minds with innovative businesses</p>
+        </div>
+        <div class="footer-links">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact Us</h3>
+          <p>Email: info@creativecrowdchallenge.com</p>
+          <p>Phone: (123) 456-7890</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5ajskMWCzDm5m5BxtAV5843aYgpnYZVc",
+      authDomain: "creativecrowdchallenge.firebaseapp.com", 
+      projectId: "creativecrowdchallenge",
+      storageBucket: "creativecrowdchallenge.firebasestorage.app",
+      messagingSenderId: "73698226096",
+      appId: "1:73698226096:web:2ae4a7a2f24054236cb075"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    
+    // DOM elements
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const userTypeDiv = document.getElementById('userType');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const loginButton = document.getElementById('loginButton');
+    
+    // Flag to track if we're in signup mode
+    let isSigningUp = false;
+    
+    // Add event listener to login button
+    loginButton.addEventListener('click', handleAuth);
+    
+    // Function to handle authentication
+    function handleAuth() {
+      // Clear previous messages
+      errorMessage.style.display = 'none';
+      successMessage.style.display = 'none';
+      
+      // Get input values
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      // Basic validation
+      if (!email || !password) {
+        showError('Please enter both email and password');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters');
+        return;
+      }
+      
+      // If we're not in signup mode, check if the user exists
+      if (!isSigningUp) {
+        // Check if user exists
+        firebase.auth().fetchSignInMethodsForEmail(email)
+          .then((methods) => {
+            if (methods && methods.length > 0) {
+              // User exists, try to sign in
+              signInUser(email, password);
+            } else {
+              // User doesn't exist, switch to signup mode
+              isSigningUp = true;
+              userTypeDiv.style.display = 'block';
+              loginButton.textContent = 'Sign Up';
+              showError('Email not found. Please sign up.');
+            }
+          })
+          .catch((error) => {
+            showError('Error checking email: ' + error.message);
+          });
+      } else {
+        // We're in signup mode, create the user
+        const userType = document.querySelector('input[name="userType"]:checked').value;
+        createUser(email, password, userType);
+      }
+    }
+    
+    // Function to sign in existing user
+    function signInUser(email, password) {
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Signed in successfully
+          showSuccess('Login successful! Redirecting...');
+          
+          // Get user info from Firestore
+          const user = userCredential.user;
+          firebase.firestore().collection('users').doc(user.uid).get()
+            .then((doc) => {
+              if (doc.exists) {
+                const userData = doc.data();
+                // If business user without subscription, redirect to subscription page
+                if (userData.userType === 'business' && !userData.isSubscribed) {
+                  setTimeout(() => {
+                    window.location.href = '/business-subscription';
+                  }, 1500);
+                } else {
+                  // Otherwise, redirect to home page
+                  setTimeout(() => {
+                    window.location.href = '/';
+                  }, 1500);
+                }
+              } else {
+                // No user data found, redirect to home
+                setTimeout(() => {
+                  window.location.href = '/';
+                }, 1500);
+              }
+            })
+            .catch((error) => {
+              console.error('Error getting user data:', error);
+              // Still redirect to home on error
+              setTimeout(() => {
+                window.location.href = '/';
+              }, 1500);
+            });
+        })
+        .catch((error) => {
+          // Handle signin errors
+          if (error.code === 'auth/wrong-password') {
+            showError('Incorrect password. Please try again.');
+          } else if (error.code === 'auth/user-not-found') {
+            isSigningUp = true;
+            userTypeDiv.style.display = 'block';
+            loginButton.textContent = 'Sign Up';
+            showError('Email not found. Please sign up.');
+          } else {
+            showError('Login error: ' + error.message);
+          }
+        });
+    }
+    
+    // Function to create new user
+    function createUser(email, password, userType) {
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // User created successfully
+          const user = userCredential.user;
+          
+          // Save user type to Firestore
+          return firebase.firestore().collection('users').doc(user.uid).set({
+            email: email,
+            userType: userType,
+            isSubscribed: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        })
+        .then(() => {
+          showSuccess('Account created successfully! Redirecting...');
+          
+          // If business user, redirect to subscription page
+          if (userType === 'business') {
+            setTimeout(() => {
+              window.location.href = '/business-subscription';
+            }, 1500);
+          } else {
+            // Otherwise, redirect to home page
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 1500);
+          }
+        })
+        .catch((error) => {
+          // Handle signup errors
+          if (error.code === 'auth/email-already-in-use') {
+            showError('Email is already in use. Please login instead.');
+            isSigningUp = false;
+            userTypeDiv.style.display = 'none';
+            loginButton.textContent = 'Continue';
+          } else if (error.code === 'auth/invalid-email') {
+            showError('Please enter a valid email address.');
+          } else if (error.code === 'auth/weak-password') {
+            showError('Password must be at least 6 characters.');
+          } else {
+            showError('Signup error: ' + error.message);
+          }
+        });
+    }
+    
+    // Function to show error message
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      successMessage.style.display = 'none';
+    }
+    
+    // Function to show success message
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.style.display = 'block';
+      errorMessage.style.display = 'none';
+    }
+    
+    // Check if user is already logged in
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in
+        showSuccess('You are already logged in. Redirecting...');
+        
+        // Get user info from Firestore
+        firebase.firestore().collection('users').doc(user.uid).get()
+          .then((doc) => {
+            if (doc.exists) {
+              const userData = doc.data();
+              // If business user without subscription, redirect to subscription page
+              if (userData.userType === 'business' && !userData.isSubscribed) {
+                setTimeout(() => {
+                  window.location.href = '/business-subscription';
+                }, 1500);
+              } else {
+                // Otherwise, redirect to home page
+                setTimeout(() => {
+                  window.location.href = '/';
+                }, 1500);
+              }
+            } else {
+              // No user data found, redirect to home
+              setTimeout(() => {
+                window.location.href = '/';
+              }, 1500);
+            }
+          })
+          .catch((error) => {
+            console.error('Error getting user data:', error);
+            // Still redirect to home on error
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 1500);
+          });
+      }
+    });
+  </script>
+</body>
+</html>

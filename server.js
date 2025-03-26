@@ -134,11 +134,14 @@ const server = http.createServer((req, res) => {
     // Serve admin login page
     filePath = path.join(__dirname, 'admin.html');
   } else if (pathname === '/login' || pathname === '/login.html') {
-    // Serve login page
-    filePath = path.join(__dirname, 'login-fixed.html');
+    // Serve simple login page
+    filePath = path.join(__dirname, 'simple-login.html');
   } else if (pathname === '/login-fixed' || pathname === '/login-fixed.html') {
     // Serve fixed login page
     filePath = path.join(__dirname, 'login-fixed.html');
+  } else if (pathname === '/simple-login' || pathname === '/simple-login.html') {
+    // Serve simple login page
+    filePath = path.join(__dirname, 'simple-login.html');
   } else if (pathname === '/profile' || pathname === '/profile.html') {
     // Serve profile page
     filePath = path.join(__dirname, 'profile.html');
