@@ -24,8 +24,9 @@
         <span class="material-icons">menu</span>
       </button>
       <h1 class="header-title">Creative Crowd Challenge</h1>
-      <div class="header-actions">
-        <a href="/login" class="btn btn-primary">Login / Sign Up</a>
+      <div class="header-actions" id="header-auth-section">
+        <a href="/login" class="btn btn-primary" id="header-login-btn">Login / Sign Up</a>
+        <!-- Profile button will be shown when user is logged in (added by JavaScript) -->
       </div>
     </header>
 
@@ -221,6 +222,91 @@
     document.addEventListener('DOMContentLoaded', function() {
       // Navigation State
       let isAuthenticated = false;
+      
+      // Check if user is already logged in with Firebase
+      function checkAuthState() {
+        // Try to get Firebase auth if it exists
+        if (window.firebase && window.firebase.auth) {
+          const auth = firebase.auth();
+          
+          auth.onAuthStateChanged(user => {
+            if (user) {
+              // User is signed in
+              isAuthenticated = true;
+              updateAuthUI(user);
+            } else {
+              // User is signed out
+              isAuthenticated = false;
+              updateAuthUI(null);
+            }
+          });
+        } else {
+          console.log('Firebase auth not available, using demo authentication');
+        }
+      }
+      
+      // Update UI based on authentication state
+      function updateAuthUI(user) {
+        const headerAuthSection = document.getElementById('header-auth-section');
+        const headerLoginBtn = document.getElementById('header-login-btn');
+        
+        if (isAuthenticated && user) {
+          // User is logged in, update the header
+          if (headerLoginBtn) {
+            headerLoginBtn.style.display = 'none'; // Hide login button
+          }
+          
+          // Create profile button if it doesn't exist
+          if (!document.getElementById('header-profile-btn')) {
+            const profileBtn = document.createElement('a');
+            profileBtn.id = 'header-profile-btn';
+            profileBtn.href = '/profile';
+            profileBtn.className = 'btn btn-primary';
+            profileBtn.innerHTML = '<span class="material-icons" style="margin-right: 5px;">person</span> My Account';
+            
+            if (headerAuthSection) {
+              headerAuthSection.appendChild(profileBtn);
+            }
+          }
+          
+          // Update navigation items
+          const authItemsNew = [
+            { path: '/profile', text: 'Profile', icon: 'person' },
+            { path: '/logout', text: 'Logout', icon: 'logout' }
+          ];
+          
+          // Replace auth items
+          authItems.length = 0;
+          authItemsNew.forEach(item => authItems.push(item));
+          
+          // Re-render navigation
+          renderNavigation();
+        } else {
+          // User is logged out, show login button
+          if (headerLoginBtn) {
+            headerLoginBtn.style.display = 'inline-block';
+          }
+          
+          // Remove profile button if it exists
+          const profileBtn = document.getElementById('header-profile-btn');
+          if (profileBtn) {
+            profileBtn.remove();
+          }
+          
+          // Update navigation items
+          const authItemsNew = [
+            { path: '/login', text: 'Login', icon: 'login' },
+            { path: '/login', text: 'Register', icon: 'person_add' }
+          ];
+          
+          // Replace auth items
+          authItems.length = 0;
+          authItemsNew.forEach(item => authItems.push(item));
+          
+          // Re-render navigation
+          renderNavigation();
+        }
+      }
       
       // UI Elements
       const drawer = document.getElementById('drawer');

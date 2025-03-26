@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreativeCrowdChallenge - Competitions</title>
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="manifest" href="/manifest.json">
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <button class="menu-button" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </button>
+    <h1 class="header-title">Creative Crowd Challenge</h1>
+    <div class="header-actions">
+      <a href="/login" class="btn btn-primary">Login / Sign Up</a>
+    </div>
+  </header>
+
+  <!-- Drawer Navigation -->
+  <nav class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h2>Menu</h2>
+    </div>
+    <div class="drawer-content">
+      <ul class="nav-list" id="nav-list">
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">home</span>
+          <a href="/">Home</a>
+        </li>
+        <li class="nav-item active">
+          <span class="material-icons nav-item-icon">emoji_events</span>
+          <a href="/competitions">Competitions</a>
+        </li>
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">file_upload</span>
+          <a href="/submission-demo">Submission Demo</a>
+        </li>
+        <li class="nav-divider"></li>
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">login</span>
+          <a href="/login">Login</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Overlay for drawer -->
+  <div class="overlay" id="overlay"></div>
+
+  <main class="main-container">
+    <div class="container">
+      <h1 class="page-title">Competitions</h1>
+      
+      <div class="filter-section">
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label for="competition-type">Type:</label>
+            <select id="competition-type" class="filter-select">
+              <option value="all">All Types</option>
+              <option value="individual">Individual</option>
+              <option value="business">Business</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="competition-category">Category:</label>
+            <select id="competition-category" class="filter-select">
+              <option value="all">All Categories</option>
+              <option value="design">Design</option>
+              <option value="writing">Writing</option>
+              <option value="photography">Photography</option>
+              <option value="marketing">Marketing</option>
+              <option value="crafts">Crafts</option>
+              <option value="technology">Technology</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="competition-sort">Sort By:</label>
+            <select id="competition-sort" class="filter-select">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="deadline">Deadline</option>
+              <option value="prize">Prize</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="competitions-list" class="competitions-grid">
+        <!-- Competitions will be loaded here via JavaScript -->
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Loading competitions...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <h2>CreativeCrowdChallenge</h2>
+        <p>Unleash creativity through competition</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-links-column">
+          <h3>Platform</h3>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-column">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="/terms">Terms of Service</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/copyright">Copyright Info</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-column">
+          <h3>Support</h3>
+          <ul>
+            <li><a href="/help">Help Center</a></li>
+            <li><a href="/faq">FAQs</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/admin.html">Admin</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize menu toggle functionality
+      const menuToggle = document.getElementById('menu-toggle');
+      const drawer = document.getElementById('drawer');
+      const overlay = document.getElementById('overlay');
+      
+      if (menuToggle && drawer && overlay) {
+        menuToggle.addEventListener('click', function() {
+          drawer.classList.toggle('open');
+          overlay.classList.toggle('show');
+        });
+        
+        overlay.addEventListener('click', function() {
+          drawer.classList.remove('open');
+          overlay.classList.remove('show');
+        });
+      }
+
+      // Fetch competitions and display them
+      fetchCompetitions();
+    });
+
+    function fetchCompetitions() {
+      fetch('/api/competitions')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          displayCompetitions(data);
+        })
+        .catch(error => {
+          console.error('Error fetching competitions:', error);
+          document.getElementById('competitions-list').innerHTML = `
+            <div class="error-message">
+              <span class="material-icons">error</span>
+              <p>Failed to load competitions. Please try again later.</p>
+            </div>
+          `;
+        });
+    }
+
+    function displayCompetitions(competitions) {
+      const competitionsList = document.getElementById('competitions-list');
+      competitionsList.innerHTML = '';
+
+      if (!competitions || competitions.length === 0) {
+        competitionsList.innerHTML = `
+          <div class="empty-state">
+            <span class="material-icons">event_busy</span>
+            <p>No competitions found. Please check back later.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Apply filters from select elements (implement later if needed)
+      const typeFilter = document.getElementById('competition-type').value;
+      const categoryFilter = document.getElementById('competition-category').value;
+      const sortBy = document.getElementById('competition-sort').value;
+
+      // Simple filtering and sorting can be added here
+
+      competitions.forEach(competition => {
+        const competitionCard = createCompetitionCard(competition);
+        competitionsList.appendChild(competitionCard);
+      });
+
+      // Add event listeners to filter controls
+      document.getElementById('competition-type').addEventListener('change', function() {
+        displayCompetitions(competitions);
+      });
+      
+      document.getElementById('competition-category').addEventListener('change', function() {
+        displayCompetitions(competitions);
+      });
+      
+      document.getElementById('competition-sort').addEventListener('change', function() {
+        displayCompetitions(competitions);
+      });
+    }
+
+    function createCompetitionCard(competition) {
+      const card = document.createElement('div');
+      card.className = 'competition-card';
+      card.dataset.id = competition.id;
+      card.dataset.type = competition.type || 'individual';
+      card.dataset.category = competition.category || '';
+
+      // Calculate days remaining for deadline
+      const deadlineDate = new Date(competition.endDate || competition.deadline);
+      const today = new Date();
+      const timeDiff = deadlineDate - today;
+      const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      const daysText = daysRemaining > 0 ? `${daysRemaining} days remaining` : 'Ended';
+
+      // Format dates for display
+      const startDate = competition.startDate ? new Date(competition.startDate).toLocaleDateString() : '';
+      const endDate = (competition.endDate || competition.deadline) ? new Date(competition.endDate || competition.deadline).toLocaleDateString() : '';
+
+      card.innerHTML = `
+        <div class="competition-card-header">
+          <span class="competition-type ${competition.type || 'individual'}">${competition.type || 'Individual'}</span>
+          <span class="competition-category">${competition.category || ''}</span>
+        </div>
+        <div class="competition-card-content">
+          <h3 class="competition-title">${competition.title}</h3>
+          <p class="competition-description">${competition.description}</p>
+          <div class="competition-details">
+            <div class="competition-detail">
+              <span class="material-icons">date_range</span>
+              <span>${startDate} - ${endDate}</span>
+            </div>
+            <div class="competition-detail">
+              <span class="material-icons">timer</span>
+              <span>${daysText}</span>
+            </div>
+            <div class="competition-detail">
+              <span class="material-icons">card_giftcard</span>
+              <span>Prize: ${competition.prize || 'TBD'}</span>
+            </div>
+          </div>
+        </div>
+        <div class="competition-card-footer">
+          <a href="/competitions/${competition.id}" class="btn btn-primary">View Details</a>
+        </div>
+      `;
+
+      card.addEventListener('click', function(e) {
+        // Prevent navigation if clicking on the button (it will handle its own navigation)
+        if (!e.target.closest('.btn')) {
+          window.location.href = `/competitions/${competition.id}`;
+        }
+      });
+
+      return card;
+    }
+  </script>
+</body>
+</html>
