@@ -154,6 +154,9 @@ const server = http.createServer((req, res) => {
   } else if (pathname === '/submission-demo' || pathname === '/submission-demo.html') {
     // Serve submission demo page with drag & drop functionality
     filePath = path.join(__dirname, 'submission-demo.html');
+  } else if (pathname === '/competitions' || pathname === '/competitions.html') {
+    // Serve competitions page
+    filePath = path.join(__dirname, 'competitions.html');
   } else {
     filePath = path.join(__dirname, pathname);
   }

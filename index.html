@@ -327,8 +327,8 @@
         { path: '/profile', text: 'Profile', icon: 'person' },
         { path: '/logout', text: 'Logout', icon: 'logout' }
       ] : [
-        { path: '/login.html', text: 'Login', icon: 'login' },
-        { path: '/login.html', text: 'Register', icon: 'person_add' }
+        { path: '/login', text: 'Login', icon: 'login' },
+        { path: '/login', text: 'Register', icon: 'person_add' }
       ];
       
       // Create Navigation List
@@ -396,7 +396,7 @@
       // SPA Navigation
       function navigateTo(path) {
         // These paths are served directly as HTML pages, not through the SPA
-        const externalPaths = ['/submission-demo', '/business-subscription', '/login.html'];
+        const externalPaths = ['/submission-demo', '/business-subscription', '/login', '/competitions'];
         
         // Check if this is an external page path
         if (path.endsWith('.html') || externalPaths.includes(path)) {
@@ -708,9 +708,31 @@
         renderNavigation();
         renderContent(window.location.pathname);
         
+        // Check authentication state and update UI
+        checkAuthState();
+        
+        // Fix login and competition links
+        updateNavigationLinks();
+        
         // Handle browser back/forward navigation
         window.addEventListener('popstate', function() {
           renderContent(window.location.pathname);
+        });
+      }
+      
+      // Update navigation links to correct paths
+      function updateNavigationLinks() {
+        // Fix login links to point to /login instead of /login.html
+        document.querySelectorAll('a[href="/login.html"]').forEach(link => {
+          link.setAttribute('href', '/login');
+        });
+        
+        // Fix competition links
+        document.querySelectorAll('a[href="/competitions"]').forEach(link => {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/competitions';
+          });
         });
       }
       
