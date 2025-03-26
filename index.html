@@ -226,24 +226,33 @@
       
       // Check if user is already logged in with Firebase
       function checkAuthState() {
-        // Try to get Firebase auth if it exists
-        if (window.firebase && window.firebase.auth) {
-          const auth = firebase.auth();
-          
-          auth.onAuthStateChanged(user => {
-            if (user) {
-              // User is signed in
-              isAuthenticated = true;
-              updateAuthUI(user);
+        // Firebase initialization happens at the end of the body now, so we need to
+        // wait a moment to ensure it's loaded properly
+        setTimeout(() => {
+          try {
+            // Try to get Firebase auth if it exists
+            if (window.firebase && window.firebase.auth) {
+              const auth = firebase.auth();
+              
+              auth.onAuthStateChanged(user => {
+                if (user) {
+                  // User is signed in
+                  isAuthenticated = true;
+                  updateAuthUI(user);
+                } else {
+                  // User is signed out
+                  isAuthenticated = false;
+                  updateAuthUI(null);
+                }
+              });
             } else {
-              // User is signed out
-              isAuthenticated = false;
-              updateAuthUI(null);
+              console.log('Firebase auth not available, using demo authentication');
             }
-          });
-        } else {
-          console.log('Firebase auth not available, using demo authentication');
-        }
+          } catch (error) {
+            console.error('Error in checkAuthState:', error);
+            console.log('Using demo authentication instead');
+          }
+        }, 500); // Small delay to ensure Firebase is loaded
       }
       
       // Update UI based on authentication state
@@ -743,6 +752,32 @@
       // Start the app
       init();
     });
+  </script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5ajskMWCzDm5m5BxtAV5843aYgpnYZVc",
+      authDomain: "creativecrowdchallenge.firebaseapp.com", 
+      projectId: "creativecrowdchallenge",
+      storageBucket: "creativecrowdchallenge.firebasestorage.app",
+      messagingSenderId: "73698226096",
+      appId: "1:73698226096:web:2ae4a7a2f24054236cb075",
+      measurementId: "G-PG3RNP0RCM"
+    };
+    
+    // Initialize Firebase
+    try {
+      firebase.initializeApp(firebaseConfig);
+      console.log('Firebase initialized successfully');
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+    }
   </script>
 </body>
 </html>
