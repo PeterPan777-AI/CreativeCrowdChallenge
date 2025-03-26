@@ -296,7 +296,8 @@ const MOCK_DATA = {
       description: 'Create a modern logo for a tech startup',
       prize: '$500',
       deadline: '2025-04-30',
-      category: 'design',
+      category: 'cat-b1',  // Best AI Tool
+      category_name: 'Best AI Tool',
       business_id: 'mock-business-1',
       created_at: '2025-03-15',
       status: 'active',
@@ -310,7 +311,8 @@ const MOCK_DATA = {
       description: 'Design an intuitive mobile interface for a fitness app',
       prize: '$750',
       deadline: '2025-05-15',
-      category: 'design',
+      category: 'cat-b2',  // Most Innovative Gadget
+      category_name: 'Most Innovative Gadget',
       business_id: 'mock-business-2',
       created_at: '2025-03-10',
       status: 'active',
@@ -324,7 +326,8 @@ const MOCK_DATA = {
       description: 'Develop a creative marketing campaign for an eco-friendly product line',
       prize: '$1000',
       deadline: '2025-06-01',
-      category: 'marketing',
+      category: 'cat-b3',  // Top Eco-Friendly Product
+      category_name: 'Top Eco-Friendly Product',
       business_id: 'mock-business-1',
       created_at: '2025-03-05',
       status: 'active',
@@ -338,7 +341,8 @@ const MOCK_DATA = {
       description: 'Capture the essence of urban living through creative photography',
       prize: '$300',
       deadline: '2025-05-20',
-      category: 'photography',
+      category: 'cat-i6',  // Best DIY Craft vs. Art
+      category_name: 'Best DIY Craft vs. Art',
       created_at: '2025-03-18',
       status: 'active',
       type: 'individual',
@@ -351,7 +355,8 @@ const MOCK_DATA = {
       description: 'Write a compelling short story in under 2000 words on the theme of "Discovery"',
       prize: '$400',
       deadline: '2025-05-25',
-      category: 'writing',
+      category: 'cat-i2',  // Best Lyrics (Music or Poetry)
+      category_name: 'Best Lyrics (Music or Poetry)',
       created_at: '2025-03-20',
       status: 'active',
       type: 'individual',
@@ -364,7 +369,8 @@ const MOCK_DATA = {
       description: 'Create an innovative home decoration using recycled materials',
       prize: '$250',
       deadline: '2025-04-15',
-      category: 'crafts',
+      category: 'cat-i6',  // Best DIY Craft vs. Art
+      category_name: 'Best DIY Craft vs. Art',
       created_at: '2025-03-01',
       status: 'active',
       type: 'individual',
@@ -529,6 +535,7 @@ const MOCK_DATA = {
       id: 'leaderboard-comp-1',
       competition_id: 'mock-comp-1',
       category_id: 'cat-b1', // Best AI Tool
+      category_name: 'Best AI Tool',
       updated_at: new Date().toISOString(),
       entries: [
         { rank: 1, submission_id: 'submission-3', average_rating: 8.0, vote_count: 31, title: 'Colorful Tech Identity', username: 'artisanCreator' },
@@ -539,7 +546,8 @@ const MOCK_DATA = {
     {
       id: 'leaderboard-comp-2',
       competition_id: 'mock-comp-2',
-      category_id: 'cat-b4', // Best Pet Innovation
+      category_id: 'cat-b2', // Most Innovative Gadget
+      category_name: 'Most Innovative Gadget',
       updated_at: new Date().toISOString(),
       entries: [
         { rank: 1, submission_id: 'submission-5', average_rating: 8.0, vote_count: 22, title: 'Energetic Exercise Tracker', username: 'uiMaster' },
@@ -550,11 +558,45 @@ const MOCK_DATA = {
     {
       id: 'leaderboard-comp-3',
       competition_id: 'mock-comp-3',
-      category_id: 'cat-i3', // Cutest Cat
+      category_id: 'cat-b3', // Top Eco-Friendly Product
+      category_name: 'Top Eco-Friendly Product',
       updated_at: new Date().toISOString(),
       entries: [
         { rank: 1, submission_id: 'submission-7', average_rating: 8.0, vote_count: 32, title: 'Natural World Connection', username: 'ecoDesigner' },
         { rank: 2, submission_id: 'submission-6', average_rating: 7.5, vote_count: 28, title: 'Eco-Friendly Brand Campaign', username: 'designGuru' }
+      ]
+    },
+    {
+      id: 'leaderboard-comp-4',
+      competition_id: 'mock-comp-4',
+      category_id: 'cat-i6', // Best DIY Craft vs. Art
+      category_name: 'Best DIY Craft vs. Art',
+      updated_at: new Date().toISOString(),
+      entries: [
+        { rank: 1, submission_id: 'submission-9', average_rating: 7.8, vote_count: 20, title: 'Urban Architecture', username: 'photoArtist' },
+        { rank: 2, submission_id: 'submission-10', average_rating: 7.5, vote_count: 18, title: 'City Lights', username: 'urbanShooter' }
+      ]
+    },
+    {
+      id: 'leaderboard-comp-5',
+      competition_id: 'mock-comp-5',
+      category_id: 'cat-i2', // Best Lyrics (Music or Poetry)
+      category_name: 'Best Lyrics (Music or Poetry)',
+      updated_at: new Date().toISOString(),
+      entries: [
+        { rank: 1, submission_id: 'submission-11', average_rating: 8.2, vote_count: 25, title: 'Echoes of Time', username: 'wordsmith' },
+        { rank: 2, submission_id: 'submission-12', average_rating: 7.9, vote_count: 21, title: 'New Horizons', username: 'poetryMaster' }
+      ]
+    },
+    {
+      id: 'leaderboard-comp-6',
+      competition_id: 'mock-comp-6',
+      category_id: 'cat-i6', // Best DIY Craft vs. Art
+      category_name: 'Best DIY Craft vs. Art',
+      updated_at: new Date().toISOString(),
+      entries: [
+        { rank: 1, submission_id: 'submission-13', average_rating: 8.4, vote_count: 28, title: 'Recycled Modern Lamp', username: 'craftGenius' },
+        { rank: 2, submission_id: 'submission-14', average_rating: 7.8, vote_count: 24, title: 'Eco-Shelf Design', username: 'greenCreator' }
       ]
     }
   ],
