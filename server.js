@@ -82,7 +82,7 @@ const MIME_TYPES = {
 };
 
 // Function to serve static files
-const serveFile = (res, filePath) => {
+const serveFile = (res, filePath, queryParams = null) => {
   fs.readFile(filePath, (err, data) => {
     if (err) {
       console.error(`Error reading file: ${filePath}`, err);
@@ -93,6 +93,14 @@ const serveFile = (res, filePath) => {
 
     const ext = path.extname(filePath);
     const contentType = MIME_TYPES[ext] || 'text/plain';
+    
+    // For HTML files, we can add special handling for query parameters if needed
+    if (ext === '.html' && queryParams && Object.keys(queryParams).length > 0) {
+      console.log(`Serving HTML file with query parameters: ${JSON.stringify(queryParams)}`);
+      
+      // In a more advanced implementation, we could modify the HTML content based on query parameters
+      // For now, we'll just pass the content as-is
+    }
     
     res.writeHead(200, { 'Content-Type': contentType });
     res.end(data);
@@ -114,31 +122,50 @@ const server = http.createServer((req, res) => {
     // Serve the service worker with special headers
     res.setHeader('Service-Worker-Allowed', '/');
     res.setHeader('Cache-Control', 'no-cache');
-    serveFile(res, path.join(__dirname, 'service-worker.js'));
+    serveFile(res, path.join(__dirname, 'service-worker.js'), null);
     return;
   }
   
   if (req.url === '/manifest.json') {
     // Serve the manifest file
     res.setHeader('Cache-Control', 'max-age=86400');
-    serveFile(res, path.join(__dirname, 'manifest.json'));
+    serveFile(res, path.join(__dirname, 'manifest.json'), null);
     return;
   }
   
   // Serve static files
   // Parse URL to separate path from query parameters
-  let parsedUrl, pathname;
+  let parsedUrl, pathname, queryParams = null;
   
   // Handle both encoded and non-encoded URLs
   try {
     parsedUrl = new URL(req.url, `http://${req.headers.host}`);
     pathname = parsedUrl.pathname;
+    // Get query parameters
+    queryParams = {};
+    for (const [key, value] of parsedUrl.searchParams) {
+      queryParams[key] = value;
+    }
+    console.log('Query parameters:', queryParams);
   } catch (error) {
     console.error('URL parsing error:', error);
     // Fallback handling for malformed URLs
     const urlParts = req.url.split('?');
     pathname = urlParts[0];
     console.log('Fallback pathname:', pathname);
+    
+    // Try to parse query parameters from the URL
+    if (urlParts.length > 1) {
+      queryParams = {};
+      const searchParams = urlParts[1].split('&');
+      for (const param of searchParams) {
+        const [key, value] = param.split('=');
+        if (key && value) {
+          queryParams[key] = decodeURIComponent(value);
+        }
+      }
+      console.log('Fallback query parameters:', queryParams);
+    }
   }
   
   // Additional safety check for encoded characters in the pathname
@@ -188,13 +215,23 @@ const server = http.createServer((req, res) => {
     // Serve rating component page
     filePath = path.join(__dirname, 'rating-component.html');
   } else if (pathname === '/simple-test' || pathname === '/simple-test.html') {
-    // Serve simple test page with analytics demo support
+    // Special handling for the analytics dashboard
     filePath = path.join(__dirname, 'simple-test.html');
+    
+    // Check if this is the analytics demo mode
+    if (queryParams && queryParams.analyticsDemo === 'true') {
+      console.log('Analytics demo mode detected!');
+      // We could modify server behavior based on this parameter if needed
+    }
+  } else if (pathname === '/offline.html') {
+    // Serve offline page
+    filePath = path.join(__dirname, 'offline.html');
   } else {
     filePath = path.join(__dirname, pathname);
   }
   
-  serveFile(res, filePath);
+  // Pass query parameters to the file serving function
+  serveFile(res, filePath, queryParams);
 });
 
 // Parse request body helper function
