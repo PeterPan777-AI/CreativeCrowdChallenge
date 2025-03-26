@@ -6,6 +6,8 @@
   <title>CreativeCrowdChallenge - Login</title>
   <link rel="stylesheet" href="/assets/main.css">
   <link rel="manifest" href="/manifest.json">
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     .auth-container {
       max-width: 480px;
@@ -145,26 +147,49 @@
   </style>
 </head>
 <body>
+  <!-- Header -->
   <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <div class="logo">
-          <a href="/">
-            <h2>CreativeCrowdChallenge</h2>
-          </a>
-        </div>
-        <nav class="nav">
-          <ul class="nav-list">
-            <li><a href="/">Home</a></li>
-            <li><a href="/competitions">Competitions</a></li>
-            <li><a href="/login" class="active">Login / Sign Up</a></li>
-          </ul>
-        </nav>
-      </div>
+    <button class="menu-button" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </button>
+    <h1 class="header-title">Creative Crowd Challenge</h1>
+    <div class="header-actions">
+      <a href="/login" class="btn btn-primary">Login / Sign Up</a>
     </div>
   </header>
 
-  <main class="main-content">
+  <!-- Drawer Navigation -->
+  <nav class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h2>Menu</h2>
+    </div>
+    <div class="drawer-content">
+      <ul class="nav-list" id="nav-list">
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">home</span>
+          <a href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">emoji_events</span>
+          <a href="/competitions">Competitions</a>
+        </li>
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">file_upload</span>
+          <a href="/submission-demo">Submission Demo</a>
+        </li>
+        <li class="nav-divider"></li>
+        <li class="nav-item active">
+          <span class="material-icons nav-item-icon">login</span>
+          <a href="/login.html">Login</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Overlay for drawer -->
+  <div class="overlay" id="overlay"></div>
+
+  <main class="main-container">
     <div class="container">
       <section class="section">
         <div class="auth-container text-center">
@@ -220,10 +245,42 @@
   </div>
 
   <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <h2>CreativeCrowdChallenge</h2>
+        <p>Unleash creativity through competition</p>
       </div>
+      <div class="footer-links">
+        <div class="footer-links-column">
+          <h3>Platform</h3>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-column">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="/terms">Terms of Service</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/copyright">Copyright Info</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-column">
+          <h3>Support</h3>
+          <ul>
+            <li><a href="/help">Help Center</a></li>
+            <li><a href="/faq">FAQs</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/admin.html">Admin</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
     </div>
   </footer>
 
@@ -329,7 +386,26 @@
     }
     
     // Initialize auth when the page loads
-    document.addEventListener('DOMContentLoaded', initAuth);
+    document.addEventListener('DOMContentLoaded', function() {
+      initAuth();
+      
+      // Add menu toggle functionality
+      const menuToggle = document.getElementById('menu-toggle');
+      const drawer = document.getElementById('drawer');
+      const overlay = document.getElementById('overlay');
+      
+      if (menuToggle && drawer && overlay) {
+        menuToggle.addEventListener('click', function() {
+          drawer.classList.toggle('open');
+          overlay.classList.toggle('show');
+        });
+        
+        overlay.addEventListener('click', function() {
+          drawer.classList.remove('open');
+          overlay.classList.remove('show');
+        });
+      }
+    });
     
     // Functions
     function openAuthModal() {
