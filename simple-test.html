@@ -1875,6 +1875,9 @@
         <h2>Business Analytics</h2>
         <p>Track engagement and performance for your competitions.</p>
         
+        <!-- Error message placeholder for Chart.js or other analytics errors -->
+        <div id="analytics-error-message"></div>
+        
         <div id="business-selector-container" class="form-group">
           <label for="business-selector">Select Business</label>
           <select id="business-selector" onchange="loadBusinessAnalytics()">
@@ -4077,32 +4080,67 @@
     
     function initializeAnalytics() {
       console.log('Initializing analytics dashboard');
+      console.log('Chart.js version:', typeof Chart !== 'undefined' ? Chart.version : 'not loaded');
       
-      // Set up event listeners for business selector and export buttons
-      const businessSelector = document.getElementById('business-selector');
-      if (businessSelector) {
-        businessSelector.addEventListener('change', loadBusinessAnalytics);
-        // Load initial data after a short delay to ensure DOM is fully ready
-        setTimeout(() => {
-          // Load default business analytics
-          loadBusinessAnalytics();
-        }, 100);
+      // Check if Chart.js is available
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded. Loading from CDN...');
+        
+        // Dynamically load Chart.js from CDN if not already available
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
+        script.onload = function() {
+          console.log('Chart.js loaded dynamically!');
+          continueInitialization();
+        };
+        script.onerror = function() {
+          console.error('Failed to load Chart.js from CDN');
+          document.getElementById('analytics-error-message').innerHTML = 
+            '<div class="error-message">Failed to load Chart.js. Please try refreshing the page.</div>';
+        };
+        document.head.appendChild(script);
+      } else {
+        // Chart.js is already available, continue initialization
+        continueInitialization();
       }
       
-      // Connect export buttons
-      const exportButtons = document.querySelectorAll('.export-button');
-      exportButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          const format = this.getAttribute('data-format');
-          exportAnalytics(format);
+      function continueInitialization() {
+        // Set up event listeners for business selector and export buttons
+        const businessSelector = document.getElementById('business-selector');
+        if (businessSelector) {
+          businessSelector.addEventListener('change', loadBusinessAnalytics);
+          // Load initial data after a short delay to ensure DOM is fully ready
+          setTimeout(() => {
+            // Load default business analytics
+            loadBusinessAnalytics();
+          }, 200); // Increased timeout to ensure DOM is ready
+        } else {
+          console.error('Business selector not found');
+        }
+        
+        // Connect export buttons
+        const exportButtons = document.querySelectorAll('.export-button');
+        exportButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const format = this.getAttribute('data-format');
+            exportAnalytics(format);
+          });
         });
-      });
-      
-      // Initialize analytics request form
-      initializeAnalyticsRequestForm();
-      
-      // Load user's existing analytics requests
-      loadUserAnalyticsRequests();
+        
+        // Initialize analytics request form
+        try {
+          initializeAnalyticsRequestForm();
+        } catch (error) {
+          console.error('Error initializing analytics request form:', error);
+        }
+        
+        // Load user's existing analytics requests
+        try {
+          loadUserAnalyticsRequests();
+        } catch (error) {
+          console.error('Error loading user analytics requests:', error);
+        }
+      }
     }
     
     // Initialize the analytics request form with the user's competitions
@@ -4788,22 +4826,22 @@
     }
     
     function createDeviceUsageChart(deviceData) {
-      // First, check if we need to create or reset the canvas
-      const deviceChartContainer = document.getElementById('device-usage-chart');
-      if (!deviceChartContainer) {
+      console.log('Creating device usage chart');
+      
+      // Find the device usage chart container
+      const chartContainer = document.getElementById('device-usage-section');
+      if (!chartContainer) {
         console.error('Device usage chart container not found');
         return;
       }
       
-      // Create a canvas if it doesn't exist
-      let canvas = document.getElementById('device-usage-chart-canvas');
-      if (!canvas) {
-        // Clear the container and add a new canvas
-        deviceChartContainer.innerHTML = '';
-        canvas = document.createElement('canvas');
-        canvas.id = 'device-usage-chart-canvas';
-        deviceChartContainer.appendChild(canvas);
-      }
+      // Clear any previous chart content
+      chartContainer.innerHTML = '';
+      
+      // Create a fresh canvas element
+      const canvas = document.createElement('canvas');
+      canvas.id = 'device-usage-chart';
+      chartContainer.appendChild(canvas);
       
       // Get 2D context
       const ctx = canvas.getContext('2d');
@@ -4812,61 +4850,86 @@
         return;
       }
       
-      // Clear any existing chart
+      // Destroy previous chart instance if it exists
       if (deviceChart) {
         deviceChart.destroy();
+        deviceChart = null;
+      }
+      
+      // Default data if not provided
+      if (!deviceData) {
+        deviceData = {
+          mobile: 63,
+          desktop: 24,
+          tablet: 13
+        };
       }
       
       console.log('Creating device usage chart with data:', deviceData);
       
-      // Create the new chart
-      deviceChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Mobile', 'Desktop', 'Tablet'],
-          datasets: [{
-            data: [deviceData.mobile, deviceData.desktop, deviceData.tablet],
-            backgroundColor: [
-              'rgba(59, 130, 246, 0.7)', // Blue for mobile
-              'rgba(16, 185, 129, 0.7)', // Green for desktop
-              'rgba(245, 158, 11, 0.7)'  // Orange for tablet
-            ],
-            borderColor: [
-              'rgba(59, 130, 246, 1)',
-              'rgba(16, 185, 129, 1)',
-              'rgba(245, 158, 11, 1)'
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return `${context.label}: ${context.raw}%`;
+      try {
+        // Create the new chart
+        deviceChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Mobile', 'Desktop', 'Tablet'],
+            datasets: [{
+              data: [deviceData.mobile, deviceData.desktop, deviceData.tablet],
+              backgroundColor: [
+                'rgba(59, 130, 246, 0.7)', // Blue for mobile
+                'rgba(16, 185, 129, 0.7)', // Green for desktop
+                'rgba(245, 158, 11, 0.7)'  // Orange for tablet
+              ],
+              borderColor: [
+                'rgba(59, 130, 246, 1)',
+                'rgba(16, 185, 129, 1)',
+                'rgba(245, 158, 11, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.label}: ${context.raw}%`;
+                  }
                 }
               }
-            }
-          },
-          cutout: '60%'
-        }
-      });
+            },
+            cutout: '60%'
+          }
+        });
+        console.log('Device usage chart created successfully');
+      } catch (error) {
+        console.error('Error creating device usage chart:', error);
+        chartContainer.innerHTML = '<div class="error-message">Failed to create chart. Please try refreshing the page.</div>';
+      }
     }
     
     function createTrafficSourcesChart(sourcesData) {
-      // Get canvas element
-      const canvas = document.getElementById('traffic-sources-chart');
-      if (!canvas) {
-        console.error('Traffic sources chart canvas not found');
-        console.log('Looking for ID:', 'traffic-sources-chart');
+      console.log('Creating traffic sources chart');
+      
+      // Make sure the chart container exists
+      const chartContainer = document.getElementById('sources-chart');
+      if (!chartContainer) {
+        console.error('Traffic sources chart container not found');
         return;
       }
+      
+      // Clear any previous chart content
+      chartContainer.innerHTML = '';
+      
+      // Create a fresh canvas element
+      const canvas = document.createElement('canvas');
+      canvas.id = 'traffic-sources-chart';
+      chartContainer.appendChild(canvas);
       
       // Get 2D context
       const ctx = canvas.getContext('2d');
@@ -4875,8 +4938,10 @@
         return;
       }
       
+      // Destroy previous chart instance if it exists
       if (sourcesChart) {
         sourcesChart.destroy();
+        sourcesChart = null;
       }
       
       // Default data if not provided
@@ -4891,96 +4956,119 @@
       
       console.log('Creating traffic sources chart with data:', sources);
       
-      sourcesChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: sources.map(source => source.name),
-          datasets: [{
-            data: sources.map(source => source.percentage),
-            backgroundColor: [
-              'rgba(59, 130, 246, 0.7)',
-              'rgba(16, 185, 129, 0.7)',
-              'rgba(245, 158, 11, 0.7)',
-              'rgba(239, 68, 68, 0.7)'
-            ],
-            borderColor: [
-              'rgba(59, 130, 246, 1)',
-              'rgba(16, 185, 129, 1)',
-              'rgba(245, 158, 11, 1)',
-              'rgba(239, 68, 68, 1)'
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
+      try {
+        sourcesChart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: sources.map(source => source.name),
+            datasets: [{
+              data: sources.map(source => source.percentage),
+              backgroundColor: [
+                'rgba(59, 130, 246, 0.7)',
+                'rgba(16, 185, 129, 0.7)',
+                'rgba(245, 158, 11, 0.7)',
+                'rgba(239, 68, 68, 0.7)'
+              ],
+              borderColor: [
+                'rgba(59, 130, 246, 1)',
+                'rgba(16, 185, 129, 1)',
+                'rgba(245, 158, 11, 1)',
+                'rgba(239, 68, 68, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
             }
           }
-        }
-      });
+        });
+        console.log('Traffic sources chart created successfully');
+      } catch (error) {
+        console.error('Error creating traffic sources chart:', error);
+        chartContainer.innerHTML = '<div class="error-message">Failed to create chart. Please try refreshing the page.</div>';
+      }
     }
     
     function createCompetitionsChart(competitions) {
-      console.log('Starting competitions chart creation');
+      console.log('Creating competitions chart');
       
-      // Get canvas element
-      const canvas = document.getElementById('competitions-chart-canvas');
-      console.log('Looking for canvas with ID:', 'competitions-chart-canvas');
-      console.log('Canvas found:', Boolean(canvas));
-      
-      if (!canvas) {
-        console.error('Competition chart canvas not found');
-        console.log('Available chart containers:', document.querySelectorAll('.chart-container').length);
-        console.log('Contents of competitions-chart div:', document.getElementById('competitions-chart')?.innerHTML);
+      // Find the chart container
+      const chartContainer = document.getElementById('competitions-chart');
+      if (!chartContainer) {
+        console.error('Competitions chart container not found');
         return;
       }
+      
+      // Clear any previous chart content
+      chartContainer.innerHTML = '';
+      
+      // Create a fresh canvas element
+      const canvas = document.createElement('canvas');
+      canvas.id = 'competitions-chart-canvas';
+      chartContainer.appendChild(canvas);
       
       // Get 2D context
       const ctx = canvas.getContext('2d');
-      console.log('Canvas context available:', Boolean(ctx));
-      
       if (!ctx) {
-        console.error('Could not get 2D context for competition chart');
+        console.error('Could not get 2D context for competitions chart');
         return;
       }
       
+      // Destroy previous chart instance if it exists
       if (competitionsChart) {
         competitionsChart.destroy();
+        competitionsChart = null;
+      }
+      
+      // Check if we have valid data
+      if (!competitions || !Array.isArray(competitions) || competitions.length === 0) {
+        console.error('Invalid competitions data for chart');
+        chartContainer.innerHTML = '<div class="error-message">No competition data available</div>';
+        return;
       }
       
       console.log('Creating competitions chart with data:', competitions);
-      competitionsChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: competitions.map(comp => comp.title),
-          datasets: [{
-            label: 'Submissions',
-            data: competitions.map(comp => comp.submissions),
-            backgroundColor: 'rgba(59, 130, 246, 0.6)',
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 1
-          }, {
-            label: 'Views (divided by 10)',
-            data: competitions.map(comp => comp.views / 10),
-            backgroundColor: 'rgba(16, 185, 129, 0.6)',
-            borderColor: 'rgba(16, 185, 129, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true
+      
+      try {
+        competitionsChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: competitions.map(comp => comp.title),
+            datasets: [{
+              label: 'Submissions',
+              data: competitions.map(comp => comp.submissions),
+              backgroundColor: 'rgba(59, 130, 246, 0.6)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 1
+            }, {
+              label: 'Views (divided by 10)',
+              data: competitions.map(comp => comp.views / 10),
+              backgroundColor: 'rgba(16, 185, 129, 0.6)',
+              borderColor: 'rgba(16, 185, 129, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
             }
           }
-        }
-      });
+        });
+        console.log('Competitions chart created successfully');
+      } catch (error) {
+        console.error('Error creating competitions chart:', error);
+        chartContainer.innerHTML = '<div class="error-message">Failed to create chart. Please try refreshing the page.</div>';
+      }
     }
     
     function createDemographicsChart(demographics) {
