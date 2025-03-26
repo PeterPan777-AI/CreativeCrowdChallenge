@@ -1650,6 +1650,361 @@ async function handleApiRequest(req, res) {
     return;
   }
   
+  // POST /api/competitions - Create new competition
+  if (endpoint === '/competitions' && req.method === 'POST') {
+    try {
+      const body = await parseRequestBody(req);
+      const { title, description, category, start_date, end_date, prize, sponsor_id } = body;
+      
+      // Validate required fields
+      if (!title || !description || !category || !start_date || !end_date) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Missing required fields' }));
+        return;
+      }
+      
+      // Check if the user is admin
+      const userId = req.headers['x-user-id'];
+      const userRole = req.headers['x-user-role'];
+      
+      if (userRole !== 'admin') {
+        res.writeHead(403);
+        res.end(JSON.stringify({ error: 'Only admins can create competitions' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log('Supabase not available, simulating competition creation');
+        // Generate a mock ID
+        const mockId = `comp-${Date.now()}`;
+        const newCompetition = {
+          id: mockId,
+          title,
+          description,
+          category,
+          start_date,
+          end_date,
+          prize: prize || null,
+          sponsor_id: sponsor_id || null,
+          created_at: new Date().toISOString(),
+          submissions_count: 0
+        };
+        
+        // Add to mock data
+        MOCK_DATA.competitions.push(newCompetition);
+        
+        console.log(`Created mock competition: ${title}`);
+        res.writeHead(201);
+        res.end(JSON.stringify(newCompetition));
+        return;
+      }
+      
+      try {
+        const { data, error } = await supabase
+          .from('competitions')
+          .insert([{
+            title,
+            description,
+            category,
+            start_date,
+            end_date,
+            prize: prize || null,
+            sponsor_id: sponsor_id || null,
+            created_by: userId
+          }])
+          .select();
+          
+        if (error) {
+          console.error('Error creating competition:', error);
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: error.message }));
+          return;
+        }
+        
+        console.log(`Competition created: ${title}`);
+        res.writeHead(201);
+        res.end(JSON.stringify(data[0]));
+      } catch (error) {
+        console.error('Supabase error during competition creation:', error);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Competition creation failed' }));
+      }
+    } catch (error) {
+      console.error('Error processing competition creation:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Internal server error' }));
+    }
+    return;
+  }
+  
+  // PUT /api/competitions/:id - Update competition
+  if (endpoint.match(/^\/competitions\/[\w-]+$/) && req.method === 'PUT') {
+    try {
+      const competitionId = endpoint.split('/').pop();
+      const body = await parseRequestBody(req);
+      const { title, description, category, status, start_date, end_date, prize, sponsor_id } = body;
+      
+      // Validate required fields
+      if (!title || !description || !category || !start_date || !end_date) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Missing required fields' }));
+        return;
+      }
+      
+      // Check if the user is admin
+      const userRole = req.headers['x-user-role'];
+      
+      if (userRole !== 'admin') {
+        res.writeHead(403);
+        res.end(JSON.stringify({ error: 'Only admins can update competitions' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log(`Supabase not available, simulating competition update for ID: ${competitionId}`);
+        
+        // Find the competition in our mock data
+        const competitionIndex = MOCK_DATA.competitions.findIndex(comp => comp.id === competitionId);
+        
+        if (competitionIndex === -1) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Competition not found' }));
+          return;
+        }
+        
+        // Update the competition
+        const updatedCompetition = {
+          ...MOCK_DATA.competitions[competitionIndex],
+          title,
+          description,
+          category,
+          status: status || MOCK_DATA.competitions[competitionIndex].status,
+          start_date,
+          end_date,
+          prize: prize || null,
+          sponsor_id: sponsor_id || null,
+          updated_at: new Date().toISOString()
+        };
+        
+        MOCK_DATA.competitions[competitionIndex] = updatedCompetition;
+        
+        console.log(`Updated mock competition: ${title}`);
+        res.writeHead(200);
+        res.end(JSON.stringify(updatedCompetition));
+        return;
+      }
+      
+      try {
+        const { data, error } = await supabase
+          .from('competitions')
+          .update({
+            title,
+            description,
+            category,
+            status: status || 'active',
+            start_date,
+            end_date,
+            prize: prize || null,
+            sponsor_id: sponsor_id || null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', competitionId)
+          .select();
+          
+        if (error) {
+          console.error('Error updating competition:', error);
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: error.message }));
+          return;
+        }
+        
+        if (!data || data.length === 0) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Competition not found' }));
+          return;
+        }
+        
+        console.log(`Competition updated: ${title}`);
+        res.writeHead(200);
+        res.end(JSON.stringify(data[0]));
+      } catch (error) {
+        console.error('Supabase error during competition update:', error);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Competition update failed' }));
+      }
+    } catch (error) {
+      console.error('Error processing competition update:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Internal server error' }));
+    }
+    return;
+  }
+  
+  // DELETE /api/competitions/:id - Delete competition
+  if (endpoint.match(/^\/competitions\/[\w-]+$/) && req.method === 'DELETE') {
+    try {
+      const competitionId = endpoint.split('/').pop();
+      
+      // Check if the user is admin
+      const userRole = req.headers['x-user-role'];
+      
+      if (userRole !== 'admin') {
+        res.writeHead(403);
+        res.end(JSON.stringify({ error: 'Only admins can delete competitions' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log(`Supabase not available, simulating competition deletion for ID: ${competitionId}`);
+        
+        // Find the competition in our mock data
+        const competitionIndex = MOCK_DATA.competitions.findIndex(comp => comp.id === competitionId);
+        
+        if (competitionIndex === -1) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Competition not found' }));
+          return;
+        }
+        
+        // Remove the competition
+        MOCK_DATA.competitions.splice(competitionIndex, 1);
+        
+        console.log(`Deleted mock competition with ID: ${competitionId}`);
+        res.writeHead(200);
+        res.end(JSON.stringify({ success: true, message: 'Competition deleted successfully' }));
+        return;
+      }
+      
+      try {
+        // First check if the competition exists
+        const { data: existingData, error: existingError } = await supabase
+          .from('competitions')
+          .select('id')
+          .eq('id', competitionId)
+          .single();
+          
+        if (existingError || !existingData) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Competition not found' }));
+          return;
+        }
+        
+        // Delete the competition
+        const { error } = await supabase
+          .from('competitions')
+          .delete()
+          .eq('id', competitionId);
+          
+        if (error) {
+          console.error('Error deleting competition:', error);
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: error.message }));
+          return;
+        }
+        
+        console.log(`Competition deleted with ID: ${competitionId}`);
+        res.writeHead(200);
+        res.end(JSON.stringify({ success: true, message: 'Competition deleted successfully' }));
+      } catch (error) {
+        console.error('Supabase error during competition deletion:', error);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Competition deletion failed' }));
+      }
+    } catch (error) {
+      console.error('Error processing competition deletion:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Internal server error' }));
+    }
+    return;
+  }
+  
+  // PUT /api/submissions/:id/status - Update submission status
+  if (endpoint.match(/^\/submissions\/[\w-]+\/status$/) && req.method === 'PUT') {
+    try {
+      const submissionId = endpoint.split('/')[2];
+      const body = await parseRequestBody(req);
+      const { status } = body;
+      
+      if (!status || !['approved', 'rejected', 'pending'].includes(status)) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Invalid or missing status' }));
+        return;
+      }
+      
+      // Check if the user is admin
+      const userRole = req.headers['x-user-role'];
+      
+      if (userRole !== 'admin') {
+        res.writeHead(403);
+        res.end(JSON.stringify({ error: 'Only admins can update submission status' }));
+        return;
+      }
+      
+      if (!supabase) {
+        console.log(`Supabase not available, simulating submission status update for ID: ${submissionId}`);
+        
+        // Find the submission in our mock data
+        const submissionIndex = MOCK_DATA.submissions.findIndex(sub => sub.id === submissionId);
+        
+        if (submissionIndex === -1) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Submission not found' }));
+          return;
+        }
+        
+        // Update the submission status
+        MOCK_DATA.submissions[submissionIndex].status = status;
+        MOCK_DATA.submissions[submissionIndex].updated_at = new Date().toISOString();
+        
+        console.log(`Updated mock submission status to ${status} for ID: ${submissionId}`);
+        res.writeHead(200);
+        res.end(JSON.stringify({ 
+          success: true, 
+          submission: MOCK_DATA.submissions[submissionIndex]
+        }));
+        return;
+      }
+      
+      try {
+        // Update the submission status
+        const { data, error } = await supabase
+          .from('submissions')
+          .update({
+            status,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', submissionId)
+          .select();
+          
+        if (error) {
+          console.error('Error updating submission status:', error);
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: error.message }));
+          return;
+        }
+        
+        if (!data || data.length === 0) {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Submission not found' }));
+          return;
+        }
+        
+        console.log(`Submission status updated to ${status} for ID: ${submissionId}`);
+        res.writeHead(200);
+        res.end(JSON.stringify({ success: true, submission: data[0] }));
+      } catch (error) {
+        console.error('Supabase error during submission status update:', error);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Submission status update failed' }));
+      }
+    } catch (error) {
+      console.error('Error processing submission status update:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Internal server error' }));
+    }
+    return;
+  }
+  
   // GET /api/competitions/:id/submissions
   if (endpoint.match(/^\/competitions\/[\w-]+\/submissions$/) && req.method === 'GET') {
     const competitionId = endpoint.split('/')[2];
