@@ -1,0 +1,45 @@
+I need assistance in setting up a leaderboard system for my app, VoteNest, where users will be able to vote on entries in various competition categories (e.g., Best AI Tool, Cutest Cat, etc.) on a 0-10 scale. I want to have separate leaderboards for each category to display the top-rated entries based on user votes.
+
+Here’s what I need help with:
+
+Category-based Leaderboards:
+
+Each competition category (e.g., Best AI Tool, Cutest Cat, etc.) needs its own leaderboard.
+
+Ranking Based on 0-10 Voting Scale:
+
+Each user will rate submissions on a scale from 0 to 10.
+
+I need to calculate the average rating for each submission to determine the ranking (e.g., total score / number of votes).
+
+Total Votes and Average Rating:
+
+The leaderboard should display the total votes a submission has received and the average rating (to prevent single high votes from skewing the rankings).
+
+A weighting system (optional) could be used if you want to give more weight to higher-quality votes, such as those from verified or premium users.
+
+Real-time Updates:
+
+The leaderboard should update dynamically as users cast their votes. Users should see the updated rankings in real-time without needing to refresh the page.
+
+Top Entries:
+
+The leaderboard should only show the Top 10 or Top 5 entries for each category. This keeps the display clean and manageable.
+
+I want to make sure the entries are sorted by average rating, and optionally, by the number of votes if that’s a factor.
+
+User Profiles and Rankings:
+
+I’d like users to see their current ranking within a category, along with the number of votes their submission has received and their average score.
+
+Leaderboard Layout:
+
+Each leaderboard should show the submission’s name, average rating, total votes, and user profile (including their picture and username).
+
+Please guide me on how to:
+
+Set up the database structure to track votes, ratings, and rankings.
+
+Handle the logic to compute average ratings and total votes.
+
+Create the API calls to update the leaderboards in real-time as users vote.

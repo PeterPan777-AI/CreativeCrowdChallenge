@@ -364,77 +364,181 @@ const MOCK_DATA = {
     }
   ],
   
-  // Mock submissions data
+  // Mock submissions data with enhanced voting and rating data
   submissions: [
     {
       id: 'submission-1',
       competition_id: 'mock-comp-1',
       user_id: 'user-1',
+      username: 'creativePro',
       title: 'Modern Tech Logo',
       description: 'A sleek, minimalist logo representing innovation',
-      image_url: 'https://via.placeholder.com/300',
+      media_url: 'https://via.placeholder.com/300',
+      media_type: 'image',
       created_at: '2025-03-18',
-      votes: 12
+      vote_count: 24,
+      total_rating: 185,
+      average_rating: 7.7,
+      rank: 2,
+      status: 'approved',
+      profile_image: 'https://via.placeholder.com/50'
     },
     {
       id: 'submission-2',
       competition_id: 'mock-comp-1',
       user_id: 'user-2',
+      username: 'designGuru',
       title: 'Geometric Startup Brand',
       description: 'A geometric approach to modern branding',
-      image_url: 'https://via.placeholder.com/300',
+      media_url: 'https://via.placeholder.com/300',
+      media_type: 'image',
       created_at: '2025-03-19',
-      votes: 8
+      vote_count: 18,
+      total_rating: 126,
+      average_rating: 7.0,
+      rank: 3,
+      status: 'approved',
+      profile_image: 'https://via.placeholder.com/50'
     },
     {
       id: 'submission-3',
       competition_id: 'mock-comp-1',
       user_id: 'user-3',
+      username: 'artisanCreator',
       title: 'Colorful Tech Identity',
       description: 'Vibrant colors representing diverse technology',
-      image_url: 'https://via.placeholder.com/300',
+      media_url: 'https://via.placeholder.com/300',
+      media_type: 'image',
       created_at: '2025-03-20',
-      votes: 15
+      vote_count: 31,
+      total_rating: 248,
+      average_rating: 8.0,
+      rank: 1,
+      status: 'approved',
+      profile_image: 'https://via.placeholder.com/50'
     },
     {
       id: 'submission-4',
       competition_id: 'mock-comp-2',
       user_id: 'user-1',
+      username: 'creativePro',
       title: 'Clean Fitness App UI',
       description: 'Intuitive interface for workout tracking',
-      image_url: 'https://via.placeholder.com/300',
+      media_url: 'https://via.placeholder.com/300',
+      media_type: 'image',
       created_at: '2025-03-15',
-      votes: 6
+      vote_count: 15,
+      total_rating: 105,
+      average_rating: 7.0,
+      rank: 3,
+      status: 'approved',
+      profile_image: 'https://via.placeholder.com/50'
     },
     {
       id: 'submission-5',
       competition_id: 'mock-comp-2',
       user_id: 'user-4',
+      username: 'uiMaster',
       title: 'Energetic Exercise Tracker',
       description: 'Bold and motivational fitness interface',
-      image_url: 'https://via.placeholder.com/300',
+      media_url: 'https://via.placeholder.com/300',
+      media_type: 'image',
       created_at: '2025-03-16',
-      votes: 9
+      vote_count: 22,
+      total_rating: 176,
+      average_rating: 8.0,
+      rank: 1,
+      status: 'approved',
+      profile_image: 'https://via.placeholder.com/50'
     },
     {
       id: 'submission-6',
       competition_id: 'mock-comp-3',
       user_id: 'user-2',
+      username: 'designGuru',
       title: 'Eco-Friendly Brand Campaign',
       description: 'Green marketing strategy emphasizing sustainability',
-      image_url: 'https://via.placeholder.com/300',
+      media_url: 'https://via.placeholder.com/300',
+      media_type: 'image',
       created_at: '2025-03-10',
-      votes: 11
+      vote_count: 28,
+      total_rating: 210,
+      average_rating: 7.5,
+      rank: 2,
+      status: 'approved',
+      profile_image: 'https://via.placeholder.com/50'
     },
     {
       id: 'submission-7',
       competition_id: 'mock-comp-3',
       user_id: 'user-5',
+      username: 'ecoDesigner',
       title: 'Natural World Connection',
       description: 'Connecting product with environmental values',
-      image_url: 'https://via.placeholder.com/300',
+      media_url: 'https://via.placeholder.com/300',
+      media_type: 'image',
       created_at: '2025-03-12',
-      votes: 7
+      vote_count: 32,
+      total_rating: 256,
+      average_rating: 8.0,
+      rank: 1,
+      status: 'approved',
+      profile_image: 'https://via.placeholder.com/50'
+    }
+  ],
+  
+  // Mock votes data
+  votes: [
+    // We'll just store the most recent votes for reference
+    // In a real database, we'd have all votes
+    { id: 'vote-1', submission_id: 'submission-1', user_id: 'voter-1', rating: 8, created_at: '2025-03-22T14:30:00Z' },
+    { id: 'vote-2', submission_id: 'submission-1', user_id: 'voter-2', rating: 7, created_at: '2025-03-22T15:45:00Z' },
+    { id: 'vote-3', submission_id: 'submission-2', user_id: 'voter-1', rating: 6, created_at: '2025-03-22T16:15:00Z' },
+    { id: 'vote-4', submission_id: 'submission-3', user_id: 'voter-3', rating: 9, created_at: '2025-03-22T17:20:00Z' }
+  ],
+  
+  // Mock categories
+  categories: [
+    { id: 'cat-1', name: 'Best AI Tool', description: 'Innovative AI-powered applications', icon: 'smart_toy', is_active: true },
+    { id: 'cat-2', name: 'Cutest Cat', description: 'Adorable feline photography', icon: 'pets', is_active: true },
+    { id: 'cat-3', name: 'Web Design', description: 'Creative and functional website designs', icon: 'web', is_active: true },
+    { id: 'cat-4', name: 'Mobile Apps', description: 'Innovative mobile applications', icon: 'smartphone', is_active: true },
+    { id: 'cat-5', name: 'Photography', description: 'Stunning photographic work', icon: 'photo_camera', is_active: true }
+  ],
+  
+  // Mock leaderboards - pre-calculated based on submission data
+  leaderboards: [
+    {
+      id: 'leaderboard-comp-1',
+      competition_id: 'mock-comp-1',
+      category_id: 'cat-3', // Web Design
+      updated_at: new Date().toISOString(),
+      entries: [
+        { rank: 1, submission_id: 'submission-3', average_rating: 8.0, vote_count: 31, title: 'Colorful Tech Identity', username: 'artisanCreator' },
+        { rank: 2, submission_id: 'submission-1', average_rating: 7.7, vote_count: 24, title: 'Modern Tech Logo', username: 'creativePro' },
+        { rank: 3, submission_id: 'submission-2', average_rating: 7.0, vote_count: 18, title: 'Geometric Startup Brand', username: 'designGuru' }
+      ]
+    },
+    {
+      id: 'leaderboard-comp-2',
+      competition_id: 'mock-comp-2',
+      category_id: 'cat-4', // Mobile Apps
+      updated_at: new Date().toISOString(),
+      entries: [
+        { rank: 1, submission_id: 'submission-5', average_rating: 8.0, vote_count: 22, title: 'Energetic Exercise Tracker', username: 'uiMaster' },
+        { rank: 2, submission_id: 'submission-8', average_rating: 7.5, vote_count: 18, title: 'Fitness Tracker Pro', username: 'mobileDesigner' },
+        { rank: 3, submission_id: 'submission-4', average_rating: 7.0, vote_count: 15, title: 'Clean Fitness App UI', username: 'creativePro' }
+      ]
+    },
+    {
+      id: 'leaderboard-comp-3',
+      competition_id: 'mock-comp-3',
+      category_id: 'cat-1', // Best AI Tool 
+      updated_at: new Date().toISOString(),
+      entries: [
+        { rank: 1, submission_id: 'submission-7', average_rating: 8.0, vote_count: 32, title: 'Natural World Connection', username: 'ecoDesigner' },
+        { rank: 2, submission_id: 'submission-6', average_rating: 7.5, vote_count: 28, title: 'Eco-Friendly Brand Campaign', username: 'designGuru' }
+      ]
     }
   ],
   
