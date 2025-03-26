@@ -2180,6 +2180,21 @@
     </div>
     
     <style>
+      /* Error message styles */
+      #analytics-error-message {
+        margin-bottom: 15px;
+      }
+      
+      .error-message {
+        background-color: #fef2f2;
+        border: 1px solid #fee2e2;
+        color: #ef4444;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        font-weight: 500;
+      }
+      
       /* Enhanced Analytics Styles */
       .metrics-container {
         display: flex;
@@ -4080,28 +4095,75 @@
     
     function initializeAnalytics() {
       console.log('Initializing analytics dashboard');
+      
+      // Clear any existing error messages
+      document.getElementById('analytics-error-message').innerHTML = '';
+      
+      // Test Chart.js presence and version
       console.log('Chart.js version:', typeof Chart !== 'undefined' ? Chart.version : 'not loaded');
       
-      // Check if Chart.js is available
-      if (typeof Chart === 'undefined') {
-        console.error('Chart.js is not loaded. Loading from CDN...');
+      // Verify Chart.js is available and working
+      try {
+        // Quick test - if this fails, Chart is not working properly
+        if (typeof Chart === 'undefined') {
+          throw new Error('Chart.js not loaded');
+        }
         
-        // Dynamically load Chart.js from CDN if not already available
+        // Try to create a tiny test chart to validate Chart.js is fully functional
+        const testCanvas = document.createElement('canvas');
+        testCanvas.width = 1;
+        testCanvas.height = 1;
+        testCanvas.style.display = 'none';
+        document.body.appendChild(testCanvas);
+        
+        try {
+          const testChart = new Chart(testCanvas, {
+            type: 'bar',
+            data: {
+              labels: ['Test'],
+              datasets: [{
+                label: 'Test Dataset',
+                data: [1],
+                backgroundColor: '#ccc'
+              }]
+            },
+            options: {
+              responsive: false
+            }
+          });
+          
+          // Clean up test chart
+          testChart.destroy();
+          document.body.removeChild(testCanvas);
+          console.log('Chart.js verified and working correctly');
+          
+          // Continue with actual chart initialization
+          continueInitialization();
+        } catch (chartError) {
+          console.error('Chart.js initialization test failed:', chartError);
+          throw chartError;
+        }
+      } catch (error) {
+        console.error('Chart.js validation failed:', error);
+        
+        // Clear any previous error message
+        document.getElementById('analytics-error-message').innerHTML = 
+          '<div class="error-message">Failed to initialize Chart.js. Attempting to reload from CDN...</div>';
+          
+        // Attempt to dynamically load Chart.js from CDN as fallback
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
         script.onload = function() {
           console.log('Chart.js loaded dynamically!');
-          continueInitialization();
+          document.getElementById('analytics-error-message').innerHTML = '';
+          setTimeout(continueInitialization, 100); // Give it a moment to initialize
         };
         script.onerror = function() {
           console.error('Failed to load Chart.js from CDN');
           document.getElementById('analytics-error-message').innerHTML = 
-            '<div class="error-message">Failed to load Chart.js. Please try refreshing the page.</div>';
+            '<div class="error-message">Failed to load Chart.js. Please try refreshing the page or check your internet connection.</div>';
         };
         document.head.appendChild(script);
-      } else {
-        // Chart.js is already available, continue initialization
-        continueInitialization();
       }
       
       function continueInitialization() {
