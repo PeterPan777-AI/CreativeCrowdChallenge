@@ -16,78 +16,84 @@
   <link rel="stylesheet" href="/assets/main.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <button class="menu-button" id="menu-toggle">
-      <span class="material-icons">menu</span>
-    </button>
-    <h1 class="header-title">Creative Crowd Challenge</h1>
-    <div class="header-actions">
-      <a href="/login" class="btn btn-primary">Login / Sign Up</a>
-    </div>
-  </header>
-
-  <!-- Drawer Navigation -->
-  <nav class="drawer" id="drawer">
-    <div class="drawer-header">
-      <h2>Menu</h2>
-    </div>
-    <div class="drawer-content">
-      <ul class="nav-list" id="nav-list">
-        <!-- Navigation links will be added here by JavaScript -->
-      </ul>
-    </div>
-  </nav>
-
-  <!-- Overlay for drawer -->
-  <div class="overlay" id="overlay"></div>
-
-  <!-- Main Content Container -->
-  <main class="main-container" id="main-content">
-    <!-- The page content will be loaded here -->
-    <div id="loading">Loading...</div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-logo">
-        <h2>CreativeCrowdChallenge</h2>
-        <p>Unleash creativity through competition</p>
+  <!-- App Wrapper - For proper layout -->
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="header">
+      <button class="menu-button" id="menu-toggle">
+        <span class="material-icons">menu</span>
+      </button>
+      <h1 class="header-title">Creative Crowd Challenge</h1>
+      <div class="header-actions">
+        <a href="/login" class="btn btn-primary">Login / Sign Up</a>
       </div>
-      <div class="footer-links">
-        <div class="footer-links-column">
-          <h3>Platform</h3>
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/competitions">Competitions</a></li>
-            <li><a href="/about">About Us</a></li>
-            <li><a href="/blog">Blog</a></li>
-          </ul>
-        </div>
-        <div class="footer-links-column">
-          <h3>Legal</h3>
-          <ul>
-            <li><a href="/terms">Terms of Service</a></li>
-            <li><a href="/privacy">Privacy Policy</a></li>
-            <li><a href="/copyright">Copyright Info</a></li>
-          </ul>
-        </div>
-        <div class="footer-links-column">
-          <h3>Support</h3>
-          <ul>
-            <li><a href="/help">Help Center</a></li>
-            <li><a href="/faq">FAQs</a></li>
-            <li><a href="/contact">Contact Us</a></li>
-            <li><a href="/admin.html">Admin</a></li>
-          </ul>
-        </div>
+    </header>
+
+    <!-- Drawer Navigation -->
+    <nav class="drawer" id="drawer">
+      <div class="drawer-header">
+        <h2>Menu</h2>
       </div>
+      <div class="drawer-content">
+        <ul class="nav-list" id="nav-list">
+          <!-- Navigation links will be added here by JavaScript -->
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Overlay for drawer -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Content Wrapper - Contains main content and keeps footer at bottom -->
+    <div class="content-wrapper">
+      <!-- Main Content Container -->
+      <main class="main-container" id="main-content">
+        <!-- The page content will be loaded here -->
+        <div id="loading">Loading...</div>
+      </main>
+      
+      <!-- Footer always visible at bottom -->
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="footer-logo">
+            <h2>CreativeCrowdChallenge</h2>
+            <p>Unleash creativity through competition</p>
+          </div>
+          <div class="footer-links">
+            <div class="footer-links-column">
+              <h3>Platform</h3>
+              <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/competitions">Competitions</a></li>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/blog">Blog</a></li>
+              </ul>
+            </div>
+            <div class="footer-links-column">
+              <h3>Legal</h3>
+              <ul>
+                <li><a href="/terms">Terms of Service</a></li>
+                <li><a href="/privacy">Privacy Policy</a></li>
+                <li><a href="/copyright">Copyright Info</a></li>
+              </ul>
+            </div>
+            <div class="footer-links-column">
+              <h3>Support</h3>
+              <ul>
+                <li><a href="/help">Help Center</a></li>
+                <li><a href="/faq">FAQs</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+                <li><a href="/admin.html">Admin</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
-    <div class="footer-bottom">
-      <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
-    </div>
-  </footer>
+  </div>
 
   <!-- Templates for different pages -->
   <template id="home-template">
@@ -373,9 +379,6 @@
           
           // Setup page-specific functionality
           initPageFunctionality(path);
-          
-          // Make sure footer is visible when content changes
-          document.querySelector('.footer').style.display = 'block';
         }
       }
       
@@ -618,12 +621,6 @@
       function init() {
         renderNavigation();
         renderContent(window.location.pathname);
-        
-        // Make sure footer is visible on initial load
-        const footer = document.querySelector('.footer');
-        if (footer) {
-          footer.style.display = 'block';
-        }
         
         // Handle browser back/forward navigation
         window.addEventListener('popstate', function() {

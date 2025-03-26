@@ -24,6 +24,20 @@ body {
   min-height: 100vh;
 }
 
+/* App structural layout */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 /* Header/Navbar styling */
 .header {
   position: fixed;
@@ -400,12 +414,12 @@ body {
 /* Footer styling */
 .footer {
   background-color: #f5f5f5;
-  padding: 3rem 1rem;
-  margin-top: 2rem;
-  position: relative;
-  bottom: 0;
+  padding: 2rem 1rem;
+  margin-top: auto;
   width: 100%;
   z-index: 10;
+  clear: both;
+  position: static;
 }
 
 .footer-content {
