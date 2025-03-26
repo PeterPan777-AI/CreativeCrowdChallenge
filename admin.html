@@ -650,7 +650,9 @@
       <div class="card">
         <h2>Platform Analytics</h2>
         <p>Monitor and analyze platform-wide metrics and performance data.</p>
-        <button onclick="viewPlatformAnalytics()" class="action-button">View Full Analytics Dashboard</button>
+        <div class="message info">Analytics dashboard functionality is coming soon!</div>
+        <!-- Removed redirect button that was causing issues -->
+        <!-- <button onclick="viewPlatformAnalytics()" class="action-button">View Full Analytics Dashboard</button> -->
       </div>
       
       <div class="card">
@@ -693,9 +695,10 @@
         // Already logged in, so no need for further login actions
         console.log('Admin already logged in');
         
-        // Load analytics requests for the admin dashboard
+        // Load competitions instead of analytics for the admin dashboard
         setTimeout(() => {
-          loadAnalyticsRequests();
+          loadCompetitions();
+          // loadAnalyticsRequests(); // Commented out to prevent redirection
         }, 300);
       }
       
@@ -745,8 +748,11 @@
                 loginSection.style.display = 'none';
                 adminDashboard.style.display = 'block';
                 
-                // Load analytics requests
-                loadAnalyticsRequests();
+                // Load competitions instead of analytics
+                loadCompetitions();
+                
+                // Also load analytics requests
+                // loadAnalyticsRequests(); // Commented out to prevent redirection
               }, 1000);
             } else {
               showNotification('This account does not have admin privileges.', 'error');
@@ -777,8 +783,11 @@
                 loginSection.style.display = 'none';
                 adminDashboard.style.display = 'block';
                 
-                // Load analytics requests for demo admin
-                loadAnalyticsRequests();
+                // Load competitions instead of analytics for demo admin
+                loadCompetitions();
+                
+                // Load analytics requests for demo admin (commented out to prevent redirect)
+                // loadAnalyticsRequests();
               }, 1000);
             } else {
               showNotification('Please use an admin account (containing "admin" in the email).', 'error');
