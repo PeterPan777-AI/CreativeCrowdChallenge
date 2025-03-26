@@ -4810,42 +4810,76 @@
     }
     
     function createEngagementChart(engagementData) {
-      console.log('Chart.js version:', typeof Chart !== 'undefined' ? Chart.version : 'not loaded');
+      console.log('Creating engagement chart...');
       
-      // Make sure the chart container exists and has the correct structure
+      // First verify Chart.js is available
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not available for engagement chart creation');
+        const errorContainer = document.getElementById('analytics-error-message');
+        if (errorContainer) {
+          errorContainer.innerHTML = '<div class="error-message">Chart library failed to load. Please refresh the page to try again.</div>';
+        }
+        return null;
+      }
+      console.log('Chart.js version:', Chart.version);
+      
+      // Make sure the chart container exists
       const chartContainer = document.getElementById('engagement-chart');
       if (!chartContainer) {
         console.error('Engagement chart container not found');
-        return;
+        return null;
       }
-      
-      // Clear any previous chart content
-      chartContainer.innerHTML = '';
-      
-      // Create a fresh canvas element
-      const canvas = document.createElement('canvas');
-      canvas.id = 'engagement-line-chart';
-      chartContainer.appendChild(canvas);
-      
-      // Get 2D context
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        console.error('Could not get 2D context for engagement chart');
-        return;
-      }
-      
-      // Destroy previous chart instance if it exists
-      if (engagementChart) {
-        engagementChart.destroy();
-      }
-      
-      // Default data if not provided
-      const dailyData = engagementData && engagementData.daily ? engagementData.daily : [12, 18, 22, 15, 25, 30, 28];
-      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      
-      console.log('Creating engagement chart with daily data:', dailyData);
       
       try {
+        // Clear any previous chart content
+        chartContainer.innerHTML = '';
+        
+        // Create a fresh canvas element with proper attributes
+        const canvas = document.createElement('canvas');
+        canvas.id = 'engagement-line-chart';
+        canvas.width = chartContainer.clientWidth;
+        canvas.height = 300; // Set a reasonable default height
+        canvas.style.width = '100%';
+        canvas.style.height = '300px';
+        chartContainer.appendChild(canvas);
+        
+        // Verify canvas was added to DOM correctly
+        if (!document.getElementById('engagement-line-chart')) {
+          throw new Error('Canvas element could not be properly attached to DOM');
+        }
+        
+        // Get 2D context
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error('Could not get 2D context for engagement chart');
+        }
+        
+        // Destroy previous chart instance if it exists
+        if (engagementChart) {
+          try {
+            engagementChart.destroy();
+            console.log('Previous engagement chart instance destroyed');
+          } catch (destroyError) {
+            console.warn('Error destroying previous chart:', destroyError);
+            // Continue anyway - we've already cleared the container
+          }
+        }
+        
+        // Safety check on engagement data
+        if (!engagementData) {
+          console.warn('No engagement data provided, using placeholder data');
+          engagementData = {
+            daily: [0, 0, 0, 0, 0, 0, 0]  // Zero values as placeholder
+          };
+        }
+        
+        // Prepare chart data
+        const dailyData = engagementData.daily || [0, 0, 0, 0, 0, 0, 0];
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        
+        console.log('Creating engagement chart with daily data:', dailyData);
+        
+        // Create the chart with proper error handling
         engagementChart = new Chart(ctx, {
           type: 'line',
           data: {
@@ -4864,7 +4898,10 @@
           options: {
             scales: {
               y: {
-                beginAtZero: true
+                beginAtZero: true,
+                ticks: {
+                  precision: 0  // Ensure we only show whole numbers
+                }
               }
             },
             responsive: true,
@@ -4880,57 +4917,91 @@
             }
           }
         });
+        
         console.log('Engagement chart created successfully');
+        return engagementChart;
       } catch (error) {
         console.error('Error creating engagement chart:', error);
-        chartContainer.innerHTML = '<div class="error-message">Failed to create chart. Please try refreshing the page.</div>';
+        chartContainer.innerHTML = '<div class="error-message">Failed to create engagement chart. Please try refreshing the page.</div>';
+        
+        // Also update the main error message area
+        const errorContainer = document.getElementById('analytics-error-message');
+        if (errorContainer) {
+          errorContainer.innerHTML = '<div class="error-message">Some charts failed to load. Try refreshing the page.</div>';
+        }
+        return null;
       }
     }
     
     function createDeviceUsageChart(deviceData) {
-      console.log('Creating device usage chart');
+      console.log('Creating device usage chart...');
+      
+      // First verify Chart.js is available
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not available for device usage chart creation');
+        const errorContainer = document.getElementById('analytics-error-message');
+        if (errorContainer) {
+          errorContainer.innerHTML = '<div class="error-message">Chart library failed to load. Please refresh the page to try again.</div>';
+        }
+        return null;
+      }
       
       // Find the device usage chart container
       const chartContainer = document.getElementById('device-usage-section');
       if (!chartContainer) {
         console.error('Device usage chart container not found');
-        return;
+        return null;
       }
-      
-      // Clear any previous chart content
-      chartContainer.innerHTML = '';
-      
-      // Create a fresh canvas element
-      const canvas = document.createElement('canvas');
-      canvas.id = 'device-usage-chart';
-      chartContainer.appendChild(canvas);
-      
-      // Get 2D context
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        console.error('Could not get 2D context for device usage chart');
-        return;
-      }
-      
-      // Destroy previous chart instance if it exists
-      if (deviceChart) {
-        deviceChart.destroy();
-        deviceChart = null;
-      }
-      
-      // Default data if not provided
-      if (!deviceData) {
-        deviceData = {
-          mobile: 63,
-          desktop: 24,
-          tablet: 13
-        };
-      }
-      
-      console.log('Creating device usage chart with data:', deviceData);
       
       try {
-        // Create the new chart
+        // Clear any previous chart content
+        chartContainer.innerHTML = '';
+        
+        // Create a fresh canvas element with proper attributes
+        const canvas = document.createElement('canvas');
+        canvas.id = 'device-usage-chart';
+        canvas.width = chartContainer.clientWidth;
+        canvas.height = 300; // Set a reasonable default height
+        canvas.style.width = '100%';
+        canvas.style.height = '300px';
+        chartContainer.appendChild(canvas);
+        
+        // Verify canvas was added to DOM correctly
+        if (!document.getElementById('device-usage-chart')) {
+          throw new Error('Canvas element could not be properly attached to DOM');
+        }
+        
+        // Get 2D context
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error('Could not get 2D context for device usage chart');
+        }
+        
+        // Destroy previous chart instance if it exists
+        if (deviceChart) {
+          try {
+            deviceChart.destroy();
+            console.log('Previous device chart instance destroyed');
+          } catch (destroyError) {
+            console.warn('Error destroying previous device chart:', destroyError);
+            // Continue anyway - we've already cleared the container
+          }
+          deviceChart = null;
+        }
+        
+        // Safety check on device data
+        if (!deviceData) {
+          console.warn('No device data provided, using default distribution');
+          deviceData = {
+            mobile: 63,
+            desktop: 24,
+            tablet: 13
+          };
+        }
+        
+        console.log('Creating device usage chart with data:', deviceData);
+        
+        // Create the new chart with error handling
         deviceChart = new Chart(ctx, {
           type: 'doughnut',
           data: {
@@ -4968,10 +5039,42 @@
             cutout: '60%'
           }
         });
+        
         console.log('Device usage chart created successfully');
+        
+        // Update device metrics display
+        const deviceMetricsContainer = document.querySelector('.device-metrics');
+        if (deviceMetricsContainer) {
+          deviceMetricsContainer.innerHTML = `
+            <div class="device-metric">
+              <div class="device-icon">📱</div>
+              <div class="device-percentage">${deviceData.mobile}%</div>
+              <div>Mobile</div>
+            </div>
+            <div class="device-metric">
+              <div class="device-icon">💻</div>
+              <div class="device-percentage">${deviceData.desktop}%</div>
+              <div>Desktop</div>
+            </div>
+            <div class="device-metric">
+              <div class="device-icon">📟</div>
+              <div class="device-percentage">${deviceData.tablet}%</div>
+              <div>Tablet</div>
+            </div>
+          `;
+        }
+        
+        return deviceChart;
       } catch (error) {
         console.error('Error creating device usage chart:', error);
-        chartContainer.innerHTML = '<div class="error-message">Failed to create chart. Please try refreshing the page.</div>';
+        chartContainer.innerHTML = '<div class="error-message">Failed to create device usage chart. Please try refreshing the page.</div>';
+        
+        // Also update the main error message area
+        const errorContainer = document.getElementById('analytics-error-message');
+        if (errorContainer && !errorContainer.innerHTML) {
+          errorContainer.innerHTML = '<div class="error-message">Some charts failed to load. Try refreshing the page.</div>';
+        }
+        return null;
       }
     }
     
