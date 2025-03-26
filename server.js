@@ -376,6 +376,107 @@ const MOCK_DATA = {
       type: 'individual',
       startDate: '2025-03-01', 
       endDate: '2025-04-15'
+    },
+    {
+      id: 'mock-comp-7',
+      title: 'Pet Innovation Product Design',
+      description: 'Design an innovative product to improve pet care and well-being',
+      prize: '$800',
+      deadline: '2025-06-30',
+      category: 'cat-b4',  // Best Pet Innovation
+      category_name: 'Best Pet Innovation',
+      business_id: 'mock-business-2',
+      created_at: '2025-03-22',
+      status: 'active',
+      type: 'business',
+      startDate: '2025-03-22', 
+      endDate: '2025-06-30'
+    },
+    {
+      id: 'mock-comp-8',
+      title: 'Startup Pitch Competition',
+      description: 'Present your innovative startup idea for a chance to win funding',
+      prize: '$1500',
+      deadline: '2025-07-15',
+      category: 'cat-b5',  // Most Innovative Startup Idea
+      category_name: 'Most Innovative Startup Idea',
+      business_id: 'mock-business-1',
+      created_at: '2025-03-25',
+      status: 'active',
+      type: 'business',
+      startDate: '2025-03-25', 
+      endDate: '2025-07-15'
+    },
+    {
+      id: 'mock-comp-9',
+      title: 'Indie Fashion Collection',
+      description: 'Design a unique fashion collection for independent designers',
+      prize: '$1200',
+      deadline: '2025-08-01',
+      category: 'cat-b6',  // Best Indie Fashion Brand
+      category_name: 'Best Indie Fashion Brand',
+      business_id: 'mock-business-2',
+      created_at: '2025-04-01',
+      status: 'active',
+      type: 'business',
+      startDate: '2025-04-01', 
+      endDate: '2025-08-01'
+    },
+    {
+      id: 'mock-comp-10',
+      title: 'Original Music Composition',
+      description: 'Compose an original music piece in any genre',
+      prize: '$350',
+      deadline: '2025-06-15',
+      category: 'cat-i1',  // New Music Score
+      category_name: 'New Music Score',
+      created_at: '2025-03-12',
+      status: 'active',
+      type: 'individual',
+      startDate: '2025-03-12', 
+      endDate: '2025-06-15'
+    },
+    {
+      id: 'mock-comp-11',
+      title: 'Cutest Cat Photo Contest',
+      description: 'Share the most adorable photos of your feline friend',
+      prize: '$200',
+      deadline: '2025-05-10',
+      category: 'cat-i3',  // Cutest Cat
+      category_name: 'Cutest Cat',
+      created_at: '2025-03-15',
+      status: 'active',
+      type: 'individual',
+      startDate: '2025-03-15', 
+      endDate: '2025-05-10'
+    },
+    {
+      id: 'mock-comp-12',
+      title: 'Cutest Dog Photo Contest',
+      description: 'Share the most adorable photos of your canine companion',
+      prize: '$200',
+      deadline: '2025-05-10',
+      category: 'cat-i4',  // Cutest Dog
+      category_name: 'Cutest Dog',
+      created_at: '2025-03-15',
+      status: 'active',
+      type: 'individual',
+      startDate: '2025-03-15', 
+      endDate: '2025-05-10'
+    },
+    {
+      id: 'mock-comp-13',
+      title: 'Funny Pet Video Challenge',
+      description: 'Submit hilarious videos of your pets doing funny things',
+      prize: '$300',
+      deadline: '2025-06-05',
+      category: 'cat-i5',  // Funniest Pet Video
+      category_name: 'Funniest Pet Video',
+      created_at: '2025-03-20',
+      status: 'active',
+      type: 'individual',
+      startDate: '2025-03-20', 
+      endDate: '2025-06-05'
     }
   ],
   
