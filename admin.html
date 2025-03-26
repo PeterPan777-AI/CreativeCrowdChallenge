@@ -474,6 +474,178 @@
         </div>
       </div>
       
+      <!-- Competition Management Section -->
+      <div class="card">
+        <h2>Competition Management</h2>
+        <p>Create, edit, and manage competitions across the platform.</p>
+        
+        <div style="display: flex; margin-bottom: 20px;">
+          <button onclick="showNewCompetitionForm()" class="action-button" style="margin-right: 10px;">Create New Competition</button>
+          <button onclick="refreshCompetitions()" class="action-button">Refresh Competitions</button>
+        </div>
+        
+        <!-- Competition List -->
+        <div id="competitions-container">
+          <p>Loading competitions...</p>
+        </div>
+        
+        <!-- New Competition Form -->
+        <div id="new-competition-form" style="display: none; border-top: 1px solid #e5e7eb; margin-top: 20px; padding-top: 20px;">
+          <h3>Create New Competition</h3>
+          <form id="create-competition-form">
+            <div class="form-group">
+              <label for="competition-title">Title</label>
+              <input type="text" id="competition-title" required placeholder="Enter competition title">
+            </div>
+            
+            <div class="form-group">
+              <label for="competition-description">Description</label>
+              <textarea id="competition-description" required placeholder="Enter competition description" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="competition-category">Category</label>
+              <select id="competition-category" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="">Select a category</option>
+                <optgroup label="Business Categories">
+                  <option value="cat-b1">Best AI Tool</option>
+                  <option value="cat-b2">Most Innovative Gadget</option>
+                  <option value="cat-b3">Best Marketing Campaign</option>
+                  <option value="cat-b4">Best Software Solution</option>
+                  <option value="cat-b5">Most Innovative Startup</option>
+                  <option value="cat-b6">Best E-Commerce Platform</option>
+                </optgroup>
+                <optgroup label="Individual Categories">
+                  <option value="cat-i1">New Music Score</option>
+                  <option value="cat-i2">Best Lyrics</option>
+                  <option value="cat-i3">Best Short Film</option>
+                  <option value="cat-i4">Best Photography</option>
+                  <option value="cat-i5">Most Creative Art Piece</option>
+                  <option value="cat-i6">Best Short Story</option>
+                </optgroup>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="competition-start-date">Start Date</label>
+              <input type="date" id="competition-start-date" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div class="form-group">
+              <label for="competition-end-date">End Date</label>
+              <input type="date" id="competition-end-date" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div class="form-group">
+              <label for="competition-prize">Prize Description</label>
+              <input type="text" id="competition-prize" placeholder="Enter prize details (optional)">
+            </div>
+            
+            <div class="form-group">
+              <label for="competition-sponsor">Sponsor (Business Account)</label>
+              <input type="text" id="competition-sponsor" placeholder="Enter business sponsor (if any)">
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+              <button type="button" onclick="hideNewCompetitionForm()" style="background-color: #6B7280; margin-right: 10px;">Cancel</button>
+              <button type="submit">Create Competition</button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Edit Competition Form -->
+        <div id="edit-competition-form" style="display: none; border-top: 1px solid #e5e7eb; margin-top: 20px; padding-top: 20px;">
+          <h3>Edit Competition</h3>
+          <form id="update-competition-form">
+            <input type="hidden" id="edit-competition-id">
+            
+            <div class="form-group">
+              <label for="edit-competition-title">Title</label>
+              <input type="text" id="edit-competition-title" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-competition-description">Description</label>
+              <textarea id="edit-competition-description" required rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-competition-category">Category</label>
+              <select id="edit-competition-category" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                <optgroup label="Business Categories">
+                  <option value="cat-b1">Best AI Tool</option>
+                  <option value="cat-b2">Most Innovative Gadget</option>
+                  <option value="cat-b3">Best Marketing Campaign</option>
+                  <option value="cat-b4">Best Software Solution</option>
+                  <option value="cat-b5">Most Innovative Startup</option>
+                  <option value="cat-b6">Best E-Commerce Platform</option>
+                </optgroup>
+                <optgroup label="Individual Categories">
+                  <option value="cat-i1">New Music Score</option>
+                  <option value="cat-i2">Best Lyrics</option>
+                  <option value="cat-i3">Best Short Film</option>
+                  <option value="cat-i4">Best Photography</option>
+                  <option value="cat-i5">Most Creative Art Piece</option>
+                  <option value="cat-i6">Best Short Story</option>
+                </optgroup>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-competition-status">Status</label>
+              <select id="edit-competition-status" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-competition-start-date">Start Date</label>
+              <input type="date" id="edit-competition-start-date" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-competition-end-date">End Date</label>
+              <input type="date" id="edit-competition-end-date" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-competition-prize">Prize Description</label>
+              <input type="text" id="edit-competition-prize">
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-competition-sponsor">Sponsor (Business Account)</label>
+              <input type="text" id="edit-competition-sponsor">
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+              <button type="button" onclick="deleteCompetition()" style="background-color: #EF4444; width: auto;">Delete Competition</button>
+              <div>
+                <button type="button" onclick="hideEditCompetitionForm()" style="background-color: #6B7280; margin-right: 10px;">Cancel</button>
+                <button type="submit">Update Competition</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <!-- View Submissions Modal -->
+        <div id="submissions-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+          <div style="background-color: white; border-radius: 8px; margin: 50px auto; padding: 20px; max-width: 800px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h2 id="submissions-modal-title">Competition Submissions</h2>
+              <button onclick="closeSubmissionsModal()" style="background-color: transparent; color: #6B7280; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div id="submissions-container">
+              <p>Loading submissions...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <!-- Main Analytics Dashboard -->
       <div class="card">
         <h2>Platform Analytics</h2>
@@ -1097,6 +1269,605 @@
         }
       };
 
+      // Competition Management Functions
+      
+      // Initialize competition management when page loads
+      setTimeout(() => {
+        loadCompetitions();
+      }, 500);
+      
+      // Load competitions from API
+      async function loadCompetitions() {
+        const competitionsContainer = document.getElementById('competitions-container');
+        competitionsContainer.innerHTML = '<p>Loading competitions...</p>';
+        
+        try {
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          const response = await fetch('/api/competitions', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to load competitions');
+          }
+          
+          const competitions = await response.json();
+          
+          // Clear the container
+          competitionsContainer.innerHTML = '';
+          
+          // Group competitions by status
+          const activeCompetitions = competitions.filter(c => 
+            new Date(c.end_date) > new Date() && new Date(c.start_date) <= new Date()
+          );
+          
+          const upcomingCompetitions = competitions.filter(c => 
+            new Date(c.start_date) > new Date()
+          );
+          
+          const completedCompetitions = competitions.filter(c => 
+            new Date(c.end_date) <= new Date()
+          );
+          
+          // Create sections for each status
+          if (activeCompetitions.length > 0) {
+            createCompetitionSection('Active Competitions', activeCompetitions, competitionsContainer);
+          }
+          
+          if (upcomingCompetitions.length > 0) {
+            createCompetitionSection('Upcoming Competitions', upcomingCompetitions, competitionsContainer);
+          }
+          
+          if (completedCompetitions.length > 0) {
+            createCompetitionSection('Completed Competitions', completedCompetitions, competitionsContainer);
+          }
+          
+          if (competitions.length === 0) {
+            competitionsContainer.innerHTML = '<p>No competitions found. Create a new competition to get started.</p>';
+          }
+        } catch (error) {
+          console.error('Error loading competitions:', error);
+          competitionsContainer.innerHTML = '<p class="error">Failed to load competitions. Please try again later.</p>';
+        }
+      }
+      
+      // Create a section for competitions with a specific status
+      function createCompetitionSection(title, competitions, container) {
+        const section = document.createElement('div');
+        section.className = 'request-section';
+        
+        const heading = document.createElement('h3');
+        heading.textContent = title;
+        
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = competitions.length;
+        heading.appendChild(badge);
+        
+        section.appendChild(heading);
+        
+        // Add each competition to the section
+        competitions.forEach(competition => {
+          const card = createCompetitionCard(competition);
+          section.appendChild(card);
+        });
+        
+        container.appendChild(section);
+      }
+      
+      // Create a competition card
+      function createCompetitionCard(competition) {
+        const card = document.createElement('div');
+        card.className = 'request-card';
+        card.dataset.competitionId = competition.id;
+        
+        // Get category type (business or individual)
+        const isBusiness = competition.category && competition.category.startsWith('cat-b');
+        
+        // Add specific styling based on category type
+        if (isBusiness) {
+          card.classList.add('business');
+          card.style.borderLeft = '4px solid #3B82F6';
+        } else {
+          card.classList.add('individual');
+          card.style.borderLeft = '4px solid #10B981';
+        }
+        
+        // Format dates for display
+        const startDate = new Date(competition.start_date);
+        const endDate = new Date(competition.end_date);
+        const formattedStartDate = startDate.toLocaleDateString();
+        const formattedEndDate = endDate.toLocaleDateString();
+        
+        // Calculate remaining days if competition is active
+        let remainingDays = '';
+        if (startDate <= new Date() && endDate > new Date()) {
+          const days = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+          remainingDays = ` (${days} days remaining)`;
+        }
+        
+        // Competition header with title and date range
+        const header = document.createElement('div');
+        header.className = 'request-header';
+        header.innerHTML = `
+          <h4>${competition.title}</h4>
+          <span class="request-date">${formattedStartDate} - ${formattedEndDate}${remainingDays}</span>
+        `;
+        
+        // Competition details
+        const details = document.createElement('div');
+        details.className = 'request-details';
+        details.innerHTML = `
+          <p><strong>Category:</strong> ${getCategoryName(competition.category)}</p>
+          <p><strong>Description:</strong> ${competition.description.substring(0, 100)}${competition.description.length > 100 ? '...' : ''}</p>
+          <p><strong>Submissions:</strong> ${competition.submissions_count || 0}</p>
+          ${competition.prize ? `<p><strong>Prize:</strong> ${competition.prize}</p>` : ''}
+        `;
+        
+        // Competition actions
+        const actions = document.createElement('div');
+        actions.className = 'request-actions';
+        
+        // Edit button
+        const editButton = document.createElement('button');
+        editButton.className = 'view-btn';
+        editButton.textContent = 'Edit Competition';
+        editButton.onclick = function() {
+          editCompetition(competition.id);
+        };
+        actions.appendChild(editButton);
+        
+        // View submissions button
+        const submissionsButton = document.createElement('button');
+        submissionsButton.className = 'approve-btn';
+        submissionsButton.textContent = 'View Submissions';
+        submissionsButton.onclick = function() {
+          viewSubmissions(competition.id, competition.title);
+        };
+        actions.appendChild(submissionsButton);
+        
+        // Assemble the card
+        card.appendChild(header);
+        card.appendChild(details);
+        card.appendChild(actions);
+        
+        return card;
+      }
+      
+      // Get category name from category ID
+      function getCategoryName(categoryId) {
+        const categories = {
+          'cat-b1': 'Best AI Tool',
+          'cat-b2': 'Most Innovative Gadget',
+          'cat-b3': 'Best Marketing Campaign',
+          'cat-b4': 'Best Software Solution',
+          'cat-b5': 'Most Innovative Startup',
+          'cat-b6': 'Best E-Commerce Platform',
+          'cat-i1': 'New Music Score',
+          'cat-i2': 'Best Lyrics',
+          'cat-i3': 'Best Short Film',
+          'cat-i4': 'Best Photography',
+          'cat-i5': 'Most Creative Art Piece',
+          'cat-i6': 'Best Short Story'
+        };
+        
+        return categories[categoryId] || 'Unknown Category';
+      }
+      
+      // Show New Competition Form
+      window.showNewCompetitionForm = function() {
+        document.getElementById('new-competition-form').style.display = 'block';
+        document.getElementById('edit-competition-form').style.display = 'none';
+        
+        // Set default dates (today and 30 days from today)
+        const today = new Date();
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 30);
+        
+        document.getElementById('competition-start-date').value = formatDateForInput(today);
+        document.getElementById('competition-end-date').value = formatDateForInput(futureDate);
+      };
+      
+      // Hide New Competition Form
+      window.hideNewCompetitionForm = function() {
+        document.getElementById('new-competition-form').style.display = 'none';
+      };
+      
+      // Handle Create Competition Form Submission
+      document.getElementById('create-competition-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const title = document.getElementById('competition-title').value;
+        const description = document.getElementById('competition-description').value;
+        const category = document.getElementById('competition-category').value;
+        const startDate = document.getElementById('competition-start-date').value;
+        const endDate = document.getElementById('competition-end-date').value;
+        const prize = document.getElementById('competition-prize').value;
+        const sponsor = document.getElementById('competition-sponsor').value;
+        
+        // Validate dates
+        if (new Date(endDate) <= new Date(startDate)) {
+          showNotification('End date must be after start date.', 'error');
+          return;
+        }
+        
+        try {
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          const response = await fetch('/api/competitions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            },
+            body: JSON.stringify({
+              title,
+              description,
+              category,
+              start_date: startDate,
+              end_date: endDate,
+              prize: prize || null,
+              sponsor_id: sponsor || null
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to create competition');
+          }
+          
+          // Competition created successfully
+          showNotification('Competition created successfully!', 'success');
+          
+          // Hide form and refresh competitions
+          hideNewCompetitionForm();
+          loadCompetitions();
+          
+          // Reset form
+          document.getElementById('create-competition-form').reset();
+        } catch (error) {
+          console.error('Error creating competition:', error);
+          showNotification(error.message || 'Failed to create competition. Please try again later.', 'error');
+        }
+      });
+      
+      // Edit Competition - Populate Form
+      window.editCompetition = async function(competitionId) {
+        try {
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          const response = await fetch(`/api/competitions/${competitionId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch competition details');
+          }
+          
+          const competition = await response.json();
+          
+          // Populate the edit form
+          document.getElementById('edit-competition-id').value = competition.id;
+          document.getElementById('edit-competition-title').value = competition.title;
+          document.getElementById('edit-competition-description').value = competition.description;
+          document.getElementById('edit-competition-category').value = competition.category;
+          document.getElementById('edit-competition-status').value = getCompetitionStatus(competition);
+          document.getElementById('edit-competition-start-date').value = formatDateForInput(new Date(competition.start_date));
+          document.getElementById('edit-competition-end-date').value = formatDateForInput(new Date(competition.end_date));
+          document.getElementById('edit-competition-prize').value = competition.prize || '';
+          document.getElementById('edit-competition-sponsor').value = competition.sponsor_id || '';
+          
+          // Show edit form, hide new competition form
+          document.getElementById('edit-competition-form').style.display = 'block';
+          document.getElementById('new-competition-form').style.display = 'none';
+          
+          // Scroll to the form
+          document.getElementById('edit-competition-form').scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+          console.error('Error fetching competition details:', error);
+          showNotification('Failed to load competition details. Please try again later.', 'error');
+        }
+      };
+      
+      // Hide Edit Competition Form
+      window.hideEditCompetitionForm = function() {
+        document.getElementById('edit-competition-form').style.display = 'none';
+      };
+      
+      // Handle Update Competition Form Submission
+      document.getElementById('update-competition-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const competitionId = document.getElementById('edit-competition-id').value;
+        const title = document.getElementById('edit-competition-title').value;
+        const description = document.getElementById('edit-competition-description').value;
+        const category = document.getElementById('edit-competition-category').value;
+        const status = document.getElementById('edit-competition-status').value;
+        const startDate = document.getElementById('edit-competition-start-date').value;
+        const endDate = document.getElementById('edit-competition-end-date').value;
+        const prize = document.getElementById('edit-competition-prize').value;
+        const sponsor = document.getElementById('edit-competition-sponsor').value;
+        
+        // Validate dates
+        if (new Date(endDate) <= new Date(startDate)) {
+          showNotification('End date must be after start date.', 'error');
+          return;
+        }
+        
+        try {
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          const response = await fetch(`/api/competitions/${competitionId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            },
+            body: JSON.stringify({
+              title,
+              description,
+              category,
+              status,
+              start_date: startDate,
+              end_date: endDate,
+              prize: prize || null,
+              sponsor_id: sponsor || null
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update competition');
+          }
+          
+          // Competition updated successfully
+          showNotification('Competition updated successfully!', 'success');
+          
+          // Hide form and refresh competitions
+          hideEditCompetitionForm();
+          loadCompetitions();
+        } catch (error) {
+          console.error('Error updating competition:', error);
+          showNotification(error.message || 'Failed to update competition. Please try again later.', 'error');
+        }
+      });
+      
+      // Delete Competition
+      window.deleteCompetition = async function() {
+        const competitionId = document.getElementById('edit-competition-id').value;
+        
+        if (!confirm('Are you sure you want to delete this competition? This action cannot be undone.')) {
+          return;
+        }
+        
+        try {
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          const response = await fetch(`/api/competitions/${competitionId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            }
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to delete competition');
+          }
+          
+          // Competition deleted successfully
+          showNotification('Competition deleted successfully!', 'success');
+          
+          // Hide form and refresh competitions
+          hideEditCompetitionForm();
+          loadCompetitions();
+        } catch (error) {
+          console.error('Error deleting competition:', error);
+          showNotification(error.message || 'Failed to delete competition. Please try again later.', 'error');
+        }
+      };
+      
+      // View Submissions
+      window.viewSubmissions = async function(competitionId, competitionTitle) {
+        const submissionsContainer = document.getElementById('submissions-container');
+        const modalTitle = document.getElementById('submissions-modal-title');
+        
+        // Set modal title
+        modalTitle.textContent = `Submissions: ${competitionTitle}`;
+        
+        // Show modal
+        document.getElementById('submissions-modal').style.display = 'block';
+        
+        // Loading message
+        submissionsContainer.innerHTML = '<p>Loading submissions...</p>';
+        
+        try {
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          const response = await fetch(`/api/competitions/${competitionId}/submissions`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch submissions');
+          }
+          
+          const submissions = await response.json();
+          
+          // Display submissions
+          if (submissions.length === 0) {
+            submissionsContainer.innerHTML = '<p>No submissions found for this competition.</p>';
+            return;
+          }
+          
+          // Clear container
+          submissionsContainer.innerHTML = '';
+          
+          // Sort submissions by average rating (descending)
+          submissions.sort((a, b) => {
+            const aRating = a.average_rating || 0;
+            const bRating = b.average_rating || 0;
+            return bRating - aRating;
+          });
+          
+          // Create submission cards
+          submissions.forEach((submission, index) => {
+            const submissionCard = document.createElement('div');
+            submissionCard.className = 'request-card';
+            submissionCard.style.marginBottom = '15px';
+            
+            // Determine ranking style
+            let rankingStyle = '';
+            if (index === 0) {
+              rankingStyle = 'background-color: #FFD700; color: black;'; // Gold
+            } else if (index === 1) {
+              rankingStyle = 'background-color: #C0C0C0; color: black;'; // Silver
+            } else if (index === 2) {
+              rankingStyle = 'background-color: #CD7F32; color: white;'; // Bronze
+            }
+            
+            // Submission header
+            const header = document.createElement('div');
+            header.className = 'request-header';
+            header.innerHTML = `
+              <h4>${submission.title}</h4>
+              <span class="request-date" style="display: flex; align-items: center;">
+                <span style="margin-right: 10px; padding: 2px 8px; border-radius: 4px; ${rankingStyle}">
+                  #${index + 1}
+                </span>
+                Submitted: ${new Date(submission.created_at).toLocaleDateString()}
+              </span>
+            `;
+            
+            // Submission details
+            const details = document.createElement('div');
+            details.className = 'request-details';
+            details.innerHTML = `
+              <p><strong>User:</strong> ${submission.user_name || 'Anonymous'}</p>
+              <p><strong>Description:</strong> ${submission.description}</p>
+              <p>
+                <strong>Rating:</strong> 
+                <span style="color: #10B981; font-weight: bold;">${submission.average_rating ? submission.average_rating.toFixed(1) : 'Not rated'}</span> 
+                (${submission.votes_count || 0} votes)
+              </p>
+            `;
+            
+            // Submission actions
+            const actions = document.createElement('div');
+            actions.className = 'request-actions';
+            
+            const toggleStatusButton = document.createElement('button');
+            toggleStatusButton.className = submission.status === 'approved' ? 'decline-btn' : 'approve-btn';
+            toggleStatusButton.textContent = submission.status === 'approved' ? 'Reject Submission' : 'Approve Submission';
+            toggleStatusButton.onclick = function() {
+              updateSubmissionStatus(submission.id, submission.status === 'approved' ? 'rejected' : 'approved');
+            };
+            actions.appendChild(toggleStatusButton);
+            
+            // Assemble the card
+            submissionCard.appendChild(header);
+            submissionCard.appendChild(details);
+            submissionCard.appendChild(actions);
+            
+            submissionsContainer.appendChild(submissionCard);
+          });
+        } catch (error) {
+          console.error('Error fetching submissions:', error);
+          submissionsContainer.innerHTML = '<p class="error">Failed to load submissions. Please try again later.</p>';
+        }
+      };
+      
+      // Close Submissions Modal
+      window.closeSubmissionsModal = function() {
+        document.getElementById('submissions-modal').style.display = 'none';
+      };
+      
+      // Update Submission Status
+      async function updateSubmissionStatus(submissionId, newStatus) {
+        try {
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          const response = await fetch(`/api/submissions/${submissionId}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUser.id,
+              'X-User-Role': 'admin'
+            },
+            body: JSON.stringify({
+              status: newStatus
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update submission status');
+          }
+          
+          // Submission status updated successfully
+          showNotification(`Submission ${newStatus === 'approved' ? 'approved' : 'rejected'} successfully!`, 'success');
+          
+          // Close modal and refresh submissions
+          closeSubmissionsModal();
+        } catch (error) {
+          console.error('Error updating submission status:', error);
+          showNotification(error.message || 'Failed to update submission status. Please try again later.', 'error');
+        }
+      }
+      
+      // Refresh Competitions
+      window.refreshCompetitions = function() {
+        loadCompetitions();
+        showNotification('Competitions refreshed.', 'success');
+      };
+      
+      // Helper function to format date for input elements
+      function formatDateForInput(date) {
+        const d = new Date(date);
+        let month = '' + (d.getMonth() + 1);
+        let day = '' + d.getDate();
+        const year = d.getFullYear();
+        
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+        
+        return [year, month, day].join('-');
+      }
+      
+      // Helper function to determine competition status based on dates
+      function getCompetitionStatus(competition) {
+        const now = new Date();
+        const startDate = new Date(competition.start_date);
+        const endDate = new Date(competition.end_date);
+        
+        if (competition.status === 'cancelled') {
+          return 'cancelled';
+        }
+        
+        if (now < startDate) {
+          return 'upcoming';
+        }
+        
+        if (now > endDate) {
+          return 'completed';
+        }
+        
+        return 'active';
+      }
+      
       window.viewPlatformAnalytics = function() {
         // Navigate to the platform-wide analytics dashboard
         window.location.href = '/?adminAnalytics=true';
