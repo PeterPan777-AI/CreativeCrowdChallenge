@@ -528,7 +528,7 @@ const MOCK_DATA = {
     {
       id: 'leaderboard-comp-1',
       competition_id: 'mock-comp-1',
-      category_id: 'cat-3', // Web Design
+      category_id: 'cat-b1', // Best AI Tool
       updated_at: new Date().toISOString(),
       entries: [
         { rank: 1, submission_id: 'submission-3', average_rating: 8.0, vote_count: 31, title: 'Colorful Tech Identity', username: 'artisanCreator' },
@@ -539,7 +539,7 @@ const MOCK_DATA = {
     {
       id: 'leaderboard-comp-2',
       competition_id: 'mock-comp-2',
-      category_id: 'cat-4', // Mobile Apps
+      category_id: 'cat-b4', // Best Pet Innovation
       updated_at: new Date().toISOString(),
       entries: [
         { rank: 1, submission_id: 'submission-5', average_rating: 8.0, vote_count: 22, title: 'Energetic Exercise Tracker', username: 'uiMaster' },
@@ -550,7 +550,7 @@ const MOCK_DATA = {
     {
       id: 'leaderboard-comp-3',
       competition_id: 'mock-comp-3',
-      category_id: 'cat-1', // Best AI Tool 
+      category_id: 'cat-i3', // Cutest Cat
       updated_at: new Date().toISOString(),
       entries: [
         { rank: 1, submission_id: 'submission-7', average_rating: 8.0, vote_count: 32, title: 'Natural World Connection', username: 'ecoDesigner' },

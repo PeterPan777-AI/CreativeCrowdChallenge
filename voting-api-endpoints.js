@@ -6,19 +6,28 @@
 // Mock database for testing purposes
 const mockDatabase = {
   categories: [
-    { id: 'cat-1', name: 'Graphic Design' },
-    { id: 'cat-2', name: 'Web Development' },
-    { id: 'cat-3', name: 'Mobile App Design' },
-    { id: 'cat-4', name: 'Logo Design' },
-    { id: 'cat-5', name: 'UI/UX Design' }
+    // Business Categories
+    { id: 'cat-b1', name: 'Best AI Tool', description: 'Developers, startups, and companies with AI-powered software, chatbots, and productivity tools', is_business: true },
+    { id: 'cat-b2', name: 'Most Innovative Gadget', description: 'Tech brands and inventors launching groundbreaking consumer electronics', is_business: true },
+    { id: 'cat-b3', name: 'Top Eco-Friendly Product', description: 'Brands promoting sustainability through innovative products', is_business: true },
+    { id: 'cat-b4', name: 'Best Pet Innovation', description: 'Companies developing products that enhance pet care and well-being', is_business: true },
+    { id: 'cat-b5', name: 'Most Innovative Startup Idea', description: 'Early-stage startups looking for funding and recognition', is_business: true },
+    { id: 'cat-b6', name: 'Best Indie Fashion Brand', description: 'Independent designers and fashion startups', is_business: true },
+    // Individual Categories
+    { id: 'cat-i1', name: 'New Music Score', description: 'Original music compositions, whether instrumental or with lyrics', is_business: false },
+    { id: 'cat-i2', name: 'Best Lyrics (Music or Poetry)', description: 'Your original song lyrics or poetry', is_business: false },
+    { id: 'cat-i3', name: 'Cutest Cat', description: 'Adorable pictures or videos of your cat', is_business: false },
+    { id: 'cat-i4', name: 'Cutest Dog', description: 'Photos or videos of your lovable pup', is_business: false },
+    { id: 'cat-i5', name: 'Funniest Pet Video', description: 'Hilarious clips of pets doing funny things', is_business: false },
+    { id: 'cat-i6', name: 'Best DIY Craft vs. Art', description: 'Handmade crafts, paintings, digital artwork, or unique creations', is_business: false }
   ],
   
   competitions: [
     {
       id: 'mock-comp-1',
-      title: 'Modern Logo Design Challenge',
+      title: 'Modern Logo Design for AI Startup',
       description: 'Create a modern logo for a tech startup focused on AI solutions.',
-      category_id: 'cat-4',
+      category_id: 'cat-b1',
       start_date: '2025-03-10T00:00:00.000Z',
       end_date: '2025-04-15T00:00:00.000Z',
       prize: '$500',
@@ -28,13 +37,37 @@ const mockDatabase = {
     },
     {
       id: 'mock-comp-2',
-      title: 'Mobile App UI Design',
-      description: 'Design a clean and intuitive UI for a fitness tracking mobile application.',
-      category_id: 'cat-3',
+      title: 'Pet Health Monitoring App',
+      description: 'Design a user-friendly monitoring app to track pet health and wellness.',
+      category_id: 'cat-b4',
       start_date: '2025-03-05T00:00:00.000Z',
       end_date: '2025-04-05T00:00:00.000Z',
+      prize: '$750',
+      created_by: 'business-user-1',
+      is_business: true,
+      status: 'active'
+    },
+    {
+      id: 'mock-comp-3',
+      title: 'Cutest Cat Photo Competition',
+      description: 'Share photos of your adorable feline friend for a chance to win.',
+      category_id: 'cat-i3',
+      start_date: '2025-03-15T00:00:00.000Z',
+      end_date: '2025-04-20T00:00:00.000Z',
       prize: 'Recognition Award',
       created_by: 'user-2',
+      is_business: false,
+      status: 'active'
+    },
+    {
+      id: 'mock-comp-4',
+      title: 'Original Music Competition',
+      description: 'Submit your best original music composition and get feedback from the community.',
+      category_id: 'cat-i1',
+      start_date: '2025-03-01T00:00:00.000Z',
+      end_date: '2025-04-10T00:00:00.000Z',
+      prize: 'Featured Artist Spotlight',
+      created_by: 'user-3',
       is_business: false,
       status: 'active'
     }
