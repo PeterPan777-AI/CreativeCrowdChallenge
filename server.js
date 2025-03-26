@@ -5,6 +5,9 @@ const path = require('path');
 // Import recommendation engine
 const recommendationEngine = require('./recommendation-engine.js');
 
+// Import voting API endpoints
+const { registerVotingApiRoutes } = require('./voting-api-endpoints.js');
+
 // Handle loading Supabase with care
 let createClient, supabase = null;
 try {
@@ -157,6 +160,12 @@ const server = http.createServer((req, res) => {
   } else if (pathname === '/competitions' || pathname === '/competitions.html') {
     // Serve competitions page
     filePath = path.join(__dirname, 'competitions.html');
+  } else if (pathname === '/leaderboard' || pathname === '/leaderboard.html') {
+    // Serve leaderboard page
+    filePath = path.join(__dirname, 'leaderboard.html');
+  } else if (pathname === '/rating-component' || pathname === '/rating-component.html') {
+    // Serve rating component page
+    filePath = path.join(__dirname, 'rating-component.html');
   } else {
     filePath = path.join(__dirname, pathname);
   }
@@ -690,6 +699,109 @@ async function handleApiRequest(req, res) {
   const endpoint = url.pathname.replace('/api', '');
   
   res.setHeader('Content-Type', 'application/json');
+  
+  // Check if there's a handler registered by our Express-like interface
+  if (expressLikeInterface.routes) {
+    const methodRoutes = expressLikeInterface.routes[req.method.toLowerCase()];
+    
+    if (methodRoutes) {
+      // Check for exact match first
+      if (methodRoutes[endpoint]) {
+        try {
+          // For POST, PUT, DELETE requests, we need to parse the request body
+          if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
+            const body = await parseRequestBody(req);
+            req.body = body;
+          }
+          
+          // Create Express-like response object
+          const expressRes = {
+            json: (data) => {
+              res.writeHead(200);
+              res.end(JSON.stringify(data));
+            },
+            status: (statusCode) => {
+              res.writeHead(statusCode);
+              return {
+                json: (data) => {
+                  res.end(JSON.stringify(data));
+                }
+              };
+            },
+            send: (data) => {
+              res.writeHead(200);
+              res.end(typeof data === 'object' ? JSON.stringify(data) : data);
+            }
+          };
+          
+          // Call the registered handler
+          methodRoutes[endpoint](req, expressRes);
+          return;
+        } catch (error) {
+          console.error(`Error handling route ${req.method} ${endpoint}:`, error);
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: 'Internal server error' }));
+          return;
+        }
+      }
+      
+      // Check for pattern routes (like '/user/:userId')
+      for (const pattern in methodRoutes) {
+        if (pattern.includes(':')) {
+          const regexPattern = pattern.replace(/:[^/]+/g, '([^/]+)');
+          const regex = new RegExp(`^${regexPattern}$`);
+          const match = endpoint.match(regex);
+          
+          if (match) {
+            try {
+              // Extract params
+              const paramNames = pattern.match(/:[^/]+/g).map(param => param.substring(1));
+              req.params = {};
+              
+              paramNames.forEach((paramName, index) => {
+                req.params[paramName] = match[index + 1];
+              });
+              
+              // For POST, PUT, DELETE requests, we need to parse the request body
+              if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
+                const body = await parseRequestBody(req);
+                req.body = body;
+              }
+              
+              // Create Express-like response object
+              const expressRes = {
+                json: (data) => {
+                  res.writeHead(200);
+                  res.end(JSON.stringify(data));
+                },
+                status: (statusCode) => {
+                  res.writeHead(statusCode);
+                  return {
+                    json: (data) => {
+                      res.end(JSON.stringify(data));
+                    }
+                  };
+                },
+                send: (data) => {
+                  res.writeHead(200);
+                  res.end(typeof data === 'object' ? JSON.stringify(data) : data);
+                }
+              };
+              
+              // Call the registered handler
+              methodRoutes[pattern](req, expressRes);
+              return;
+            } catch (error) {
+              console.error(`Error handling route ${req.method} ${endpoint}:`, error);
+              res.writeHead(500);
+              res.end(JSON.stringify({ error: 'Internal server error' }));
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
   
   // GET /api/firebase-config - Get Firebase configuration
   if (endpoint === '/firebase-config' && req.method === 'GET') {
@@ -2831,6 +2943,37 @@ async function handleApiRequest(req, res) {
   res.writeHead(404);
   res.end(JSON.stringify({ error: 'Not found' }));
 }
+
+// Create an Express-like interface for our API endpoints
+const expressLikeInterface = {
+  get: (path, handler) => {
+    // This will be used in handleApiRequest
+    expressLikeInterface.routes = expressLikeInterface.routes || {};
+    expressLikeInterface.routes.get = expressLikeInterface.routes.get || {};
+    expressLikeInterface.routes.get[path] = handler;
+  },
+  post: (path, handler) => {
+    // This will be used in handleApiRequest
+    expressLikeInterface.routes = expressLikeInterface.routes || {};
+    expressLikeInterface.routes.post = expressLikeInterface.routes.post || {};
+    expressLikeInterface.routes.post[path] = handler;
+  },
+  put: (path, handler) => {
+    // This will be used in handleApiRequest
+    expressLikeInterface.routes = expressLikeInterface.routes || {};
+    expressLikeInterface.routes.put = expressLikeInterface.routes.put || {};
+    expressLikeInterface.routes.put[path] = handler;
+  },
+  delete: (path, handler) => {
+    // This will be used in handleApiRequest
+    expressLikeInterface.routes = expressLikeInterface.routes || {};
+    expressLikeInterface.routes.delete = expressLikeInterface.routes.delete || {};
+    expressLikeInterface.routes.delete[path] = handler;
+  }
+};
+
+// Register voting API routes
+registerVotingApiRoutes(expressLikeInterface);
 
 // Start the server
 server.listen(PORT, '0.0.0.0', () => {
