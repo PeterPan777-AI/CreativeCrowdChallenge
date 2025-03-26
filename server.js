@@ -506,13 +506,21 @@ const MOCK_DATA = {
     { id: 'vote-4', submission_id: 'submission-3', user_id: 'voter-3', rating: 9, created_at: '2025-03-22T17:20:00Z' }
   ],
   
-  // Mock categories
+  // Mock categories - Business Competitions
   categories: [
-    { id: 'cat-1', name: 'Best AI Tool', description: 'Innovative AI-powered applications', icon: 'smart_toy', is_active: true },
-    { id: 'cat-2', name: 'Cutest Cat', description: 'Adorable feline photography', icon: 'pets', is_active: true },
-    { id: 'cat-3', name: 'Web Design', description: 'Creative and functional website designs', icon: 'web', is_active: true },
-    { id: 'cat-4', name: 'Mobile Apps', description: 'Innovative mobile applications', icon: 'smartphone', is_active: true },
-    { id: 'cat-5', name: 'Photography', description: 'Stunning photographic work', icon: 'photo_camera', is_active: true }
+    { id: 'cat-b1', name: 'Best AI Tool', description: 'Developers, startups, and companies with AI-powered software, chatbots, and productivity tools', icon: 'smart_toy', is_active: true, is_business: true },
+    { id: 'cat-b2', name: 'Most Innovative Gadget', description: 'Tech brands and inventors launching groundbreaking consumer electronics', icon: 'devices', is_active: true, is_business: true },
+    { id: 'cat-b3', name: 'Top Eco-Friendly Product', description: 'Brands promoting sustainability through innovative products', icon: 'eco', is_active: true, is_business: true },
+    { id: 'cat-b4', name: 'Best Pet Innovation', description: 'Companies developing products that enhance pet care and well-being', icon: 'pets', is_active: true, is_business: true },
+    { id: 'cat-b5', name: 'Most Innovative Startup Idea', description: 'Early-stage startups looking for funding and recognition', icon: 'lightbulb', is_active: true, is_business: true },
+    { id: 'cat-b6', name: 'Best Indie Fashion Brand', description: 'Independent designers and fashion startups', icon: 'checkroom', is_active: true, is_business: true },
+    // Individual Competitions
+    { id: 'cat-i1', name: 'New Music Score', description: 'Original music compositions, whether instrumental or with lyrics', icon: 'music_note', is_active: true, is_business: false },
+    { id: 'cat-i2', name: 'Best Lyrics (Music or Poetry)', description: 'Your original song lyrics or poetry', icon: 'edit', is_active: true, is_business: false },
+    { id: 'cat-i3', name: 'Cutest Cat', description: 'Adorable pictures or videos of your cat', icon: 'pets', is_active: true, is_business: false },
+    { id: 'cat-i4', name: 'Cutest Dog', description: 'Photos or videos of your lovable pup', icon: 'pets', is_active: true, is_business: false },
+    { id: 'cat-i5', name: 'Funniest Pet Video', description: 'Hilarious clips of pets doing funny things', icon: 'videocam', is_active: true, is_business: false },
+    { id: 'cat-i6', name: 'Best DIY Craft vs. Art', description: 'Handmade crafts, paintings, digital artwork, or unique creations', icon: 'palette', is_active: true, is_business: false }
   ],
   
   // Mock leaderboards - pre-calculated based on submission data
