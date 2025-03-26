@@ -166,6 +166,9 @@ const server = http.createServer((req, res) => {
   } else if (pathname === '/rating-component' || pathname === '/rating-component.html') {
     // Serve rating component page
     filePath = path.join(__dirname, 'rating-component.html');
+  } else if (pathname === '/simple-test' || pathname === '/simple-test.html') {
+    // Serve simple test page with analytics demo support
+    filePath = path.join(__dirname, 'simple-test.html');
   } else {
     filePath = path.join(__dirname, pathname);
   }
