@@ -70,12 +70,20 @@
             <label for="competition-category">Category:</label>
             <select id="competition-category" class="filter-select">
               <option value="all">All Categories</option>
-              <option value="design">Design</option>
-              <option value="writing">Writing</option>
-              <option value="photography">Photography</option>
-              <option value="marketing">Marketing</option>
-              <option value="crafts">Crafts</option>
-              <option value="technology">Technology</option>
+              <!-- Business Categories -->
+              <option value="cat-b1">Best AI Tool</option>
+              <option value="cat-b2">Most Innovative Gadget</option>
+              <option value="cat-b3">Top Eco-Friendly Product</option>
+              <option value="cat-b4">Best Pet Innovation</option>
+              <option value="cat-b5">Most Innovative Startup Idea</option>
+              <option value="cat-b6">Best Indie Fashion Brand</option>
+              <!-- Individual Categories -->
+              <option value="cat-i1">New Music Score</option>
+              <option value="cat-i2">Best Lyrics (Music or Poetry)</option>
+              <option value="cat-i3">Cutest Cat</option>
+              <option value="cat-i4">Cutest Dog</option>
+              <option value="cat-i5">Funniest Pet Video</option>
+              <option value="cat-i6">Best DIY Craft vs. Art</option>
             </select>
           </div>
           <div class="filter-group">
@@ -199,14 +207,41 @@
         return;
       }
 
-      // Apply filters from select elements (implement later if needed)
+      // Apply filters from select elements
       const typeFilter = document.getElementById('competition-type').value;
       const categoryFilter = document.getElementById('competition-category').value;
       const sortBy = document.getElementById('competition-sort').value;
 
-      // Simple filtering and sorting can be added here
+      // Filter competitions based on selected filters
+      let filteredCompetitions = [...competitions];
 
-      competitions.forEach(competition => {
+      // Filter by type
+      if (typeFilter !== 'all') {
+        filteredCompetitions = filteredCompetitions.filter(comp => comp.type === typeFilter);
+      }
+
+      // Filter by category
+      if (categoryFilter !== 'all') {
+        filteredCompetitions = filteredCompetitions.filter(comp => comp.category === categoryFilter);
+      }
+
+      // Sort competitions
+      if (sortBy === 'newest') {
+        filteredCompetitions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      } else if (sortBy === 'oldest') {
+        filteredCompetitions.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      } else if (sortBy === 'deadline') {
+        filteredCompetitions.sort((a, b) => new Date(a.endDate || a.deadline) - new Date(b.endDate || b.deadline));
+      } else if (sortBy === 'prize') {
+        filteredCompetitions.sort((a, b) => {
+          const prizeA = parseInt(a.prize?.replace(/[^0-9]/g, '')) || 0;
+          const prizeB = parseInt(b.prize?.replace(/[^0-9]/g, '')) || 0;
+          return prizeB - prizeA;
+        });
+      }
+
+      // Display filtered competitions
+      filteredCompetitions.forEach(competition => {
         const competitionCard = createCompetitionCard(competition);
         competitionsList.appendChild(competitionCard);
       });
@@ -246,7 +281,7 @@
       card.innerHTML = `
         <div class="competition-card-header">
           <span class="competition-type ${competition.type || 'individual'}">${competition.type || 'Individual'}</span>
-          <span class="competition-category">${competition.category || ''}</span>
+          <span class="competition-category">${competition.category_name || competition.category || ''}</span>
         </div>
         <div class="competition-card-content">
           <h3 class="competition-title">${competition.title}</h3>
