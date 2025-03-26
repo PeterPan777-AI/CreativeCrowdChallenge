@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreativeCrowdChallenge - Login</title>
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    .auth-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 480px;
+      width: 100%;
+      position: relative;
+    }
+    
+    .close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-color-dark);
+    }
+    
+    .hide {
+      display: none;
+    }
+    
+    .error-message {
+      color: red;
+      margin-top: 1rem;
+    }
+    
+    .user-type-container {
+      margin-top: 1.5rem;
+    }
+    
+    .user-type-options {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    
+    .user-type-option {
+      border: 2px solid #ddd;
+      padding: 1rem;
+      border-radius: 4px;
+      flex: 1;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .user-type-option:hover {
+      border-color: var(--primary-color);
+    }
+    
+    .user-type-option.selected {
+      border-color: var(--primary-color);
+      background-color: var(--primary-color-light);
+    }
+    
+    .user-type-option h3 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="/">
+            <h1>CreativeCrowdChallenge</h1>
+          </a>
+        </div>
+        <nav class="navigation">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><button id="loginBtn" class="btn btn-primary">Login / Sign Up</button></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModalBtn" class="close">&times;</span>
+      <h2>Welcome to CreativeCrowdChallenge</h2>
+      <p>Enter your email to continue</p>
+      
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email">
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password">
+      </div>
+      
+      <div id="userTypeContainer" class="user-type-container hide">
+        <h3>Select Account Type</h3>
+        <div class="user-type-options">
+          <div class="user-type-option" data-type="individual">
+            <h3>Individual</h3>
+            <p>Participate in competitions and submit your creative work</p>
+            <p><strong>Free</strong></p>
+          </div>
+          <div class="user-type-option" data-type="business">
+            <h3>Business</h3>
+            <p>Create competitions and get creative solutions from our community</p>
+            <p><strong>$79.99/month</strong></p>
+          </div>
+        </div>
+      </div>
+      
+      <p id="authError" class="error-message hide"></p>
+      
+      <button id="continueBtn" class="btn-primary">Continue</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <div class="container">
+      <div class="auth-container">
+        <h2>Welcome Back!</h2>
+        <p>Login to your account to access all the features of CreativeCrowdChallenge.</p>
+        <p>Click the "Login / Sign Up" button in the top menu to get started.</p>
+        <button id="loginBtn2" class="btn-primary">Login / Sign Up</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <h2>CreativeCrowdChallenge</h2>
+          <p>Connecting creative minds with innovative businesses</p>
+        </div>
+        <div class="footer-links">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact Us</h3>
+          <p>Email: info@creativecrowdchallenge.com</p>
+          <p>Phone: (123) 456-7890</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5ajskMWCzDm5m5BxtAV5843aYgpnYZVc",
+      authDomain: "creativecrowdchallenge.firebaseapp.com", 
+      projectId: "creativecrowdchallenge",
+      storageBucket: "creativecrowdchallenge.firebasestorage.app",
+      messagingSenderId: "73698226096",
+      appId: "1:73698226096:web:2ae4a7a2f24054236cb075",
+      measurementId: "G-PG3RNP0RCM"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    
+    // Get references to Firebase services
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // DOM Elements
+    const loginBtn = document.getElementById('loginBtn');
+    const loginBtn2 = document.getElementById('loginBtn2');
+    const authModal = document.getElementById('authModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const continueBtn = document.getElementById('continueBtn');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const authError = document.getElementById('authError');
+    const userTypeContainer = document.getElementById('userTypeContainer');
+    const userTypeOptions = document.querySelectorAll('.user-type-option');
+    
+    let isRegistering = false;
+    let selectedUserType = null;
+    
+    // Helper function to show error message
+    function showError(message) {
+      authError.textContent = message;
+      authError.classList.remove('hide');
+    }
+    
+    // Functions
+    function openAuthModal() {
+      authModal.style.display = 'flex';
+      resetForm();
+    }
+    
+    function closeAuthModal() {
+      authModal.style.display = 'none';
+      resetForm();
+    }
+    
+    function resetForm() {
+      emailInput.value = '';
+      passwordInput.value = '';
+      authError.textContent = '';
+      authError.classList.add('hide');
+      userTypeContainer.classList.add('hide');
+      isRegistering = false;
+      selectedUserType = null;
+      userTypeOptions.forEach(opt => opt.classList.remove('selected'));
+    }
+    
+    // Event Listeners
+    loginBtn.addEventListener('click', openAuthModal);
+    if (loginBtn2) {
+      loginBtn2.addEventListener('click', openAuthModal);
+    }
+    
+    closeModalBtn.addEventListener('click', closeAuthModal);
+    continueBtn.addEventListener('click', handleContinue);
+    
+    userTypeOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        userTypeOptions.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        selectedUserType = option.getAttribute('data-type');
+      });
+    });
+    
+    // Check if user is already logged in
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // User is signed in, update UI accordingly
+        loginBtn.textContent = 'My Account';
+        if (loginBtn2) {
+          loginBtn2.textContent = 'My Account';
+        }
+        
+        loginBtn.removeEventListener('click', openAuthModal);
+        loginBtn.addEventListener('click', () => {
+          window.location.href = '/profile';
+        });
+        
+        if (loginBtn2) {
+          loginBtn2.removeEventListener('click', openAuthModal);
+          loginBtn2.addEventListener('click', () => {
+            window.location.href = '/profile';
+          });
+        }
+        
+        // Check if user is business and has an active subscription
+        db.collection('users').doc(user.uid).get()
+          .then(doc => {
+            if (doc.exists) {
+              const userData = doc.data();
+              if (userData.userType === 'business' && !userData.isSubscribed) {
+                // Business user without active subscription, redirect to subscription page
+                if (window.location.pathname !== '/business-subscription') {
+                  window.location.href = '/business-subscription';
+                }
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Error checking user subscription:', error);
+          });
+      }
+    });
+    
+    // Handle login/registration
+    async function handleContinue() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      // Basic validation
+      if (!email || !password) {
+        showError('Please enter both email and password');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters long');
+        return;
+      }
+      
+      try {
+        if (!isRegistering) {
+          // First, check if the user exists
+          auth.fetchSignInMethodsForEmail(email)
+            .then((methods) => {
+              if (methods && methods.length > 0) {
+                // User exists, attempt login
+                auth.signInWithEmailAndPassword(email, password)
+                  .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    console.log("User signed in:", user.email);
+                    
+                    // Check if business user has an active subscription
+                    db.collection('users').doc(user.uid).get()
+                      .then((doc) => {
+                        if (doc.exists) {
+                          const userData = doc.data();
+                          if (userData.userType === 'business' && !userData.isSubscribed) {
+                            // Business user without subscription, redirect to subscription page
+                            window.location.href = '/business-subscription';
+                          } else {
+                            // Normal user or business with subscription, redirect to home
+                            window.location.href = '/';
+                          }
+                        } else {
+                          // No user data, redirect to home
+                          window.location.href = '/';
+                        }
+                      });
+                  })
+                  .catch((error) => {
+                    console.error('Login error:', error);
+                    if (error.code === 'auth/wrong-password') {
+                      showError('Incorrect password. Please try again.');
+                    } else {
+                      showError(error.message || 'An error occurred during login.');
+                    }
+                  });
+              } else {
+                // User doesn't exist, show registration options
+                isRegistering = true;
+                userTypeContainer.classList.remove('hide');
+              }
+            })
+            .catch((error) => {
+              console.error('Error checking email:', error);
+              showError(error.message || 'An error occurred. Please try again.');
+            });
+        } else {
+          // Registration flow
+          if (!selectedUserType) {
+            showError('Please select an account type');
+            return;
+          }
+          
+          // Create user
+          auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+              // User created
+              const user = userCredential.user;
+              console.log("User created:", user.email);
+              
+              // Store user type in Firestore
+              return db.collection('users').doc(user.uid).set({
+                email: email,
+                userType: selectedUserType,
+                isSubscribed: false,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+            })
+            .then(() => {
+              // Redirect based on user type
+              if (selectedUserType === 'business') {
+                window.location.href = '/business-subscription';
+              } else {
+                window.location.href = '/';
+              }
+            })
+            .catch((error) => {
+              console.error('Registration error:', error);
+              
+              if (error.code === 'auth/email-already-in-use') {
+                showError('Email is already in use. Please login instead.');
+              } else if (error.code === 'auth/invalid-email') {
+                showError('Please enter a valid email address.');
+              } else if (error.code === 'auth/weak-password') {
+                showError('Password is too weak. It must be at least 6 characters.');
+              } else {
+                showError(error.message || 'An error occurred during registration.');
+              }
+            });
+        }
+      } catch (error) {
+        console.error('Authentication error:', error);
+        showError('An unexpected error occurred. Please try again.');
+      }
+    }
+    
+    // Close the modal if the user clicks outside of it
+    window.addEventListener('click', (event) => {
+      if (event.target === authModal) {
+        closeAuthModal();
+      }
+    });
+  </script>
+</body>
+</html>

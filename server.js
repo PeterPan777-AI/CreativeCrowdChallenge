@@ -135,7 +135,10 @@ const server = http.createServer((req, res) => {
     filePath = path.join(__dirname, 'admin.html');
   } else if (pathname === '/login' || pathname === '/login.html') {
     // Serve login page
-    filePath = path.join(__dirname, 'login.html');
+    filePath = path.join(__dirname, 'login-fixed.html');
+  } else if (pathname === '/login-fixed' || pathname === '/login-fixed.html') {
+    // Serve fixed login page
+    filePath = path.join(__dirname, 'login-fixed.html');
   } else if (pathname === '/profile' || pathname === '/profile.html') {
     // Serve profile page
     filePath = path.join(__dirname, 'profile.html');
