@@ -134,8 +134,8 @@ const server = http.createServer((req, res) => {
     // Serve admin login page
     filePath = path.join(__dirname, 'admin.html');
   } else if (pathname === '/login' || pathname === '/login.html') {
-    // Serve basic login page (without Firebase)
-    filePath = path.join(__dirname, 'basic-login.html');
+    // Serve login page with Firebase authentication
+    filePath = path.join(__dirname, 'login.html');
   } else if (pathname === '/login-fixed' || pathname === '/login-fixed.html') {
     // Serve fixed login page
     filePath = path.join(__dirname, 'login-fixed.html');
