@@ -79,73 +79,82 @@ const parseRequestBody = async (req) => {
   });
 };
 
-// Create the HTTP server
+// Create the HTTP server with improved routing
 const server = http.createServer(async (req, res) => {
-  console.log(`Request received: ${req.url}`);
+  // Parse the URL to get the path and query params
+  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+  const pathname = parsedUrl.pathname;
+  const queryParams = parsedUrl.searchParams;
   
-  // Handle API requests
-  if (req.url.startsWith('/api/')) {
-    try {
+  console.log(`Request: ${req.method} ${pathname}`);
+  console.log(`Query parameters: ${JSON.stringify(Object.fromEntries(queryParams))}`);
+  
+  try {
+    // Handle API requests
+    if (pathname.startsWith('/api/')) {
       await handleApiRequest(req, res);
-    } catch (error) {
-      console.error('API error:', error);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Internal server error' }));
+      return;
     }
-    return;
-  }
-  
-  // Serve static files - default to simple-test.html for the root
-  let filePath;
-  
-  // Check for routes without .html to redirect
-  if (req.url === '/competitions') {
-    console.log('Redirecting from /competitions to /competitions.html');
-    res.writeHead(302, { 'Location': '/competitions.html' });
-    res.end();
-    return;
-  } else if (req.url.startsWith('/preview-competition')) {
-    console.log('Serving preview-competition.html with query parameters');
-    filePath = path.join(__dirname, 'preview-competition.html');
-  // We're handling /competitions/[id] in the special case below
-  } else if (req.url === '/' || req.url === '/index.html') {
-    filePath = path.join(__dirname, 'simple-test.html');
-  } else {
-    filePath = path.join(__dirname, req.url);
-  }
-  
-  // Check for analytics demo mode in query parameters
-  if (req.url.includes('analyticsDemo=true')) {
-    console.log('Analytics demo mode detected!');
-    const queryParams = new URLSearchParams(req.url.split('?')[1] || '');
-    const params = {};
-    for(const [key, value] of queryParams.entries()) {
-      params[key] = value;
-    }
-    console.log(`Serving HTML file with query parameters: ${JSON.stringify(params)}`);
-  }
-  
-  // Fix for paths like /competitions/... - make sure we're not looking for non-existing files
-  if (req.url.match(/^\/competitions\/[a-zA-Z0-9-]+$/)) {
-    const competitionId = req.url.split('/')[2];
-    console.log(`Serving competition details for ID: ${competitionId}`);
     
-    // Read and serve the competition-details.html file with proper modification
-    fs.readFile(path.join(__dirname, 'competition-details.html'), 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading competition-details.html:', err);
-        res.writeHead(500);
-        res.end('Internal server error');
-        return;
-      }
+    // Pattern matching for competition detail pages
+    const competitionDetailMatch = pathname.match(/^\/competitions\/([a-zA-Z0-9-]+)$/);
+    if (competitionDetailMatch) {
+      const competitionId = competitionDetailMatch[1];
+      console.log(`Serving competition details page for ID: ${competitionId}`);
       
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(data);
-    });
-    return;
+      // Serve the competition details HTML directly
+      const detailsPath = path.join(__dirname, 'competition-details.html');
+      fs.readFile(detailsPath, 'utf8', (err, content) => {
+        if (err) {
+          console.error('Error reading competition-details.html:', err);
+          res.writeHead(500, {'Content-Type': 'text/html'});
+          res.end('<h1>Server Error</h1><p>Could not load competition details page.</p>');
+          return;
+        }
+        
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.end(content);
+      });
+      return;
+    }
+    
+    // Handle other special routes
+    if (pathname === '/competitions') {
+      console.log('Redirecting from /competitions to /competitions.html');
+      res.writeHead(302, { 'Location': '/competitions.html' });
+      res.end();
+      return;
+    } 
+    
+    if (pathname.startsWith('/preview-competition')) {
+      console.log('Serving preview-competition.html with query parameters');
+      const previewPath = path.join(__dirname, 'preview-competition.html');
+      serveFile(res, previewPath);
+      return;
+    }
+    
+    // Default route handling
+    let filePath;
+    if (pathname === '/' || pathname === '/index.html') {
+      filePath = path.join(__dirname, 'simple-test.html');
+    } else {
+      filePath = path.join(__dirname, pathname);
+    }
+    
+    // Check for analytics demo mode
+    if (queryParams.has('analyticsDemo') && queryParams.get('analyticsDemo') === 'true') {
+      console.log('Analytics demo mode detected!');
+      console.log(`Serving HTML file with query parameters: ${JSON.stringify(Object.fromEntries(queryParams))}`);
+    }
+    
+    // Serve the file
+    serveFile(res, filePath);
+    
+  } catch (error) {
+    console.error('Server error:', error);
+    res.writeHead(500, {'Content-Type': 'text/html'});
+    res.end('<h1>Server Error</h1><p>Something went wrong on the server.</p>');
   }
-  
-  serveFile(res, filePath);
 });
 
 // Handle API requests
