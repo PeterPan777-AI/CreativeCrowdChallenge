@@ -107,13 +107,7 @@ const server = http.createServer(async (req, res) => {
   } else if (req.url.startsWith('/preview-competition')) {
     console.log('Serving preview-competition.html with query parameters');
     filePath = path.join(__dirname, 'preview-competition.html');
-  } else if (req.url.match(/^\/competitions\/[a-zA-Z0-9-]+$/)) {
-    console.log('Serving competition-details.html for specific competition');
-    // Extract the competition ID from the URL
-    const competitionId = req.url.split('/')[2];
-    console.log(`Competition ID: ${competitionId}`);
-    // Set competition details HTML file path
-    filePath = path.join(__dirname, 'competition-details.html');
+  // We're handling /competitions/[id] in the special case below
   } else if (req.url === '/' || req.url === '/index.html') {
     filePath = path.join(__dirname, 'simple-test.html');
   } else {
@@ -129,6 +123,26 @@ const server = http.createServer(async (req, res) => {
       params[key] = value;
     }
     console.log(`Serving HTML file with query parameters: ${JSON.stringify(params)}`);
+  }
+  
+  // Fix for paths like /competitions/... - make sure we're not looking for non-existing files
+  if (req.url.match(/^\/competitions\/[a-zA-Z0-9-]+$/)) {
+    const competitionId = req.url.split('/')[2];
+    console.log(`Serving competition details for ID: ${competitionId}`);
+    
+    // Read and serve the competition-details.html file with proper modification
+    fs.readFile(path.join(__dirname, 'competition-details.html'), 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading competition-details.html:', err);
+        res.writeHead(500);
+        res.end('Internal server error');
+        return;
+      }
+      
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(data);
+    });
+    return;
   }
   
   serveFile(res, filePath);
