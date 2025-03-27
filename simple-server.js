@@ -107,6 +107,13 @@ const server = http.createServer(async (req, res) => {
   } else if (req.url.startsWith('/preview-competition')) {
     console.log('Serving preview-competition.html with query parameters');
     filePath = path.join(__dirname, 'preview-competition.html');
+  } else if (req.url.match(/^\/competitions\/[a-zA-Z0-9-]+$/)) {
+    console.log('Serving competition-details.html for specific competition');
+    // Extract the competition ID from the URL
+    const competitionId = req.url.split('/')[2];
+    // Set query parameter for the competition ID
+    req.url = `/competition-details.html?id=${competitionId}`;
+    filePath = path.join(__dirname, 'competition-details.html');
   } else if (req.url === '/' || req.url === '/index.html') {
     filePath = path.join(__dirname, 'simple-test.html');
   } else {
@@ -147,7 +154,9 @@ async function handleApiRequest(req, res) {
           deadline: 'April 15, 2025',
           entries: 24,
           categories: ['Photography'],
+          category: 'cat-i6',
           description: 'Capture the essence of summer in a single photograph...',
+          type: 'individual'
         },
         {
           id: 'writing-challenge',
@@ -155,7 +164,9 @@ async function handleApiRequest(req, res) {
           deadline: 'April 30, 2025',
           entries: 18,
           categories: ['Writing'],
+          category: 'cat-i2',
           description: 'Write a short story on the theme "New Beginnings"...',
+          type: 'individual'
         },
         {
           id: 'music-competition',
@@ -163,7 +174,63 @@ async function handleApiRequest(req, res) {
           deadline: 'May 10, 2025',
           entries: 7,
           categories: ['Music'],
+          category: 'cat-i1',
           description: 'Compose an original 2-minute piece in any genre...',
+          type: 'individual'
+        },
+        {
+          id: 'mock-comp-1',
+          title: 'AI Tool Innovation Challenge',
+          deadline: 'May 20, 2025',
+          entries: 15,
+          categories: ['Technology', 'AI'],
+          category: 'cat-b1',
+          description: 'Create an innovative AI tool that solves a real-world problem...',
+          type: 'business',
+          prize: '$5,000'
+        },
+        {
+          id: 'mock-comp-2',
+          title: 'Eco-Friendly Product Design',
+          deadline: 'June 5, 2025',
+          entries: 22,
+          categories: ['Sustainability', 'Product Design'],
+          category: 'cat-b3',
+          description: 'Design a sustainable product that reduces environmental impact...',
+          type: 'business',
+          prize: '$3,500'
+        },
+        {
+          id: 'mock-comp-5',
+          title: 'Pet Innovation Challenge',
+          deadline: 'May 30, 2025',
+          entries: 18,
+          categories: ['Pets', 'Innovation'],
+          category: 'cat-b4',
+          description: 'Create a new product or service that improves pet well-being...',
+          type: 'business',
+          prize: '$2,800'
+        },
+        {
+          id: 'mock-comp-10',
+          title: 'Cutest Cat Photo Contest',
+          deadline: 'April 25, 2025',
+          entries: 47,
+          categories: ['Pets', 'Photography'],
+          category: 'cat-i3',
+          description: 'Submit your cutest cat photos for a chance to win prizes...',
+          type: 'individual'
+        },
+        {
+          id: 'mock-comp-13',
+          title: 'Startup Pitch Competition',
+          deadline: 'June 15, 2025',
+          entries: 10,
+          categories: ['Business', 'Entrepreneurship'],
+          category: 'cat-b5',
+          description: 'Pitch your innovative startup idea to a panel of investors and experts...',
+          type: 'business',
+          prize: '$10,000'
         }
       ];
       
@@ -218,6 +285,8 @@ async function handleApiRequest(req, res) {
           title: 'Summer Photography Contest',
           deadline: 'April 15, 2025',
           entries: 24,
+          category: 'cat-i6',
+          type: 'individual',
           categories: ['Photography'],
           description: 'Capture the essence of summer in a single photograph. We\'re looking for vibrant colors, creative compositions, and images that tell a story about summer activities, nature, or emotions.',
           prizes: [
@@ -239,6 +308,8 @@ async function handleApiRequest(req, res) {
           title: 'Creative Writing Challenge',
           deadline: 'April 30, 2025',
           entries: 18,
+          category: 'cat-i2',
+          type: 'individual',
           categories: ['Writing'],
           description: 'Write a short story on the theme "New Beginnings." Explore what new beginnings mean to you or your characters. This could be about starting a new chapter in life, rebirth, transformation, or any interpretation that inspires you.',
           prizes: [
@@ -260,6 +331,8 @@ async function handleApiRequest(req, res) {
           title: 'Melody Makers Music Competition',
           deadline: 'May 10, 2025',
           entries: 7,
+          category: 'cat-i1',
+          type: 'individual',
           categories: ['Music'],
           description: 'Compose an original 2-minute piece in any genre. Show your musical creativity without boundaries - whether you prefer classical compositions, electronic beats, folk tunes, or experimental soundscapes.',
           prizes: [
@@ -276,6 +349,125 @@ async function handleApiRequest(req, res) {
             'No copyrighted samples unless you have rights',
             'One submission per participant'
           ]
+        },
+        'mock-comp-1': {
+          id: 'mock-comp-1',
+          title: 'AI Tool Innovation Challenge',
+          deadline: 'May 20, 2025',
+          entries: 15,
+          category: 'cat-b1',
+          type: 'business',
+          categories: ['Technology', 'AI'],
+          description: 'Create an innovative AI tool that solves a real-world problem. We\'re looking for practical applications of AI that can make a meaningful difference in people\'s lives or improve business efficiency.',
+          prizes: [
+            'First place: $5,000 + Investor pitch opportunity',
+            'Second place: $2,500 + Software development support',
+            'Third place: $1,000 + Industry mentorship',
+            'All finalists: Publicity in tech publications'
+          ],
+          rules: [
+            'Tool must use genuine AI/ML technology (not just automation)',
+            'Must demonstrate working prototype',
+            'All submissions include 5-minute demo video',
+            'Must be original work created for this competition',
+            'Teams of up to 3 people allowed'
+          ],
+          prize: '$5,000'
+        },
+        'mock-comp-2': {
+          id: 'mock-comp-2',
+          title: 'Eco-Friendly Product Design',
+          deadline: 'June 5, 2025',
+          entries: 22,
+          category: 'cat-b3',
+          type: 'business',
+          categories: ['Sustainability', 'Product Design'],
+          description: 'Design a sustainable product that reduces environmental impact. Focus on innovative use of recyclable materials, energy efficiency, waste reduction, or circular economy principles.',
+          prizes: [
+            'First place: $3,500 + Product development assistance',
+            'Second place: $1,500 + Marketing package',
+            'Third place: $750 + Sustainability certification guidance',
+            'People\'s Choice: Featured in Eco Business Magazine'
+          ],
+          rules: [
+            'Design must include manufacturing feasibility analysis',
+            'Must quantify environmental impact reduction',
+            'Submissions include material specifications and production plans',
+            'Proof of concept or prototype strongly encouraged',
+            'Must be commercially viable'
+          ],
+          prize: '$3,500'
+        },
+        'mock-comp-5': {
+          id: 'mock-comp-5',
+          title: 'Pet Innovation Challenge',
+          deadline: 'May 30, 2025',
+          entries: 18,
+          category: 'cat-b4',
+          type: 'business',
+          categories: ['Pets', 'Innovation'],
+          description: 'Create a new product or service that improves pet well-being. We\'re seeking innovations in pet healthcare, nutrition, enrichment, training, or owner convenience that enhance the lives of pets and their owners.',
+          prizes: [
+            'First place: $2,800 + Retail distribution opportunity',
+            'Second place: $1,200 + Product testing with veterinary partners',
+            'Third place: $600 + Marketing consultation',
+            'Special mention: Feature in Pet Lovers Magazine'
+          ],
+          rules: [
+            'Must address genuine pet wellness or owner needs',
+            'Submissions require veterinary safety assessment',
+            'Must include market analysis and pricing strategy',
+            'Prototype or detailed design required',
+            'Video demonstration recommended'
+          ],
+          prize: '$2,800'
+        },
+        'mock-comp-10': {
+          id: 'mock-comp-10',
+          title: 'Cutest Cat Photo Contest',
+          deadline: 'April 25, 2025',
+          entries: 47,
+          category: 'cat-i3',
+          type: 'individual',
+          categories: ['Pets', 'Photography'],
+          description: 'Submit your cutest cat photos for a chance to win prizes. We\'re looking for charming, funny, or heart-warming moments featuring feline friends that showcase their personality.',
+          prizes: [
+            'First place: $200 gift card for pet supplies',
+            'Second place: $100 gift card for pet supplies',
+            'Third place: $50 gift card for pet supplies',
+            'People\'s Choice: Custom cat portrait by professional artist'
+          ],
+          rules: [
+            'Photos must be of your own cat',
+            'Basic editing allowed (color correction, cropping)',
+            'No digital manipulation changing your cat\'s appearance',
+            'Maximum 3 entries per participant',
+            'Image resolution minimum 1080p'
+          ]
+        },
+        'mock-comp-13': {
+          id: 'mock-comp-13',
+          title: 'Startup Pitch Competition',
+          deadline: 'June 15, 2025',
+          entries: 10,
+          category: 'cat-b5',
+          type: 'business',
+          categories: ['Business', 'Entrepreneurship'],
+          description: 'Pitch your innovative startup idea to a panel of investors and experts. This competition seeks disruptive business models, innovative solutions to market problems, or unique product ideas with growth potential.',
+          prizes: [
+            'First place: $10,000 seed funding + Mentorship package',
+            'Second place: $5,000 + Investor introductions',
+            'Third place: $2,500 + Business strategy consultation',
+            'All finalists: Media coverage and networking reception'
+          ],
+          rules: [
+            'Must be pre-revenue or early-stage startups',
+            'Submissions include business plan and 10-slide pitch deck',
+            'Final round requires live pitch presentation',
+            'Market validation evidence required',
+            'Must demonstrate innovation and scalability'
+          ],
+          prize: '$10,000'
         }
       };
       

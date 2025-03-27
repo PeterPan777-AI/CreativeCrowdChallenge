@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Competition Details - CreativeCrowdChallenge</title>
+  <link rel="stylesheet" href="assets/main.css">
+  <link rel="manifest" href="/manifest.json">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="logo">
+        <img src="https://placehold.co/40x40" alt="Logo">
+        <h1>CreativeCrowdChallenge</h1>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/competitions" class="active">Competitions</a></li>
+          <li><a href="/leaderboard.html">Leaderboard</a></li>
+          <li><a href="/profile.html">Profile</a></li>
+          <li><a href="/admin.html">Admin</a></li>
+        </ul>
+      </nav>
+      <div class="user-menu">
+        <div class="login-container">
+          <a href="/login.html" class="login-button">Login</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="competition-detail-container">
+      <div id="competition-details" class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading competition details...</p>
+      </div>
+
+      <div class="competition-actions">
+        <button id="submit-button" class="primary-button">Submit Entry</button>
+        <button id="share-button" class="secondary-button">Share Competition</button>
+      </div>
+
+      <div class="entries-section">
+        <h3>Top Entries</h3>
+        <div id="top-entries" class="entries-grid">
+          <!-- Entries will be loaded here -->
+          <p>No entries yet. Be the first to submit!</p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 CreativeCrowdChallenge</p>
+      <p><a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // Fetch competition details
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        // Get competition ID from URL query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const competitionId = urlParams.get('id');
+        
+        if (!competitionId) {
+          showError('No competition ID specified');
+          return;
+        }
+        
+        // Fetch competition details from API
+        const response = await fetch(`/api/competitions/${competitionId}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
+        
+        const competition = await response.json();
+        
+        // Update the page with competition details
+        displayCompetitionDetails(competition);
+        
+        // Update page title
+        document.title = `${competition.title} - CreativeCrowdChallenge`;
+        
+        // Set up event listeners for buttons
+        document.getElementById('submit-button').addEventListener('click', () => {
+          // Check if user is logged in
+          const isLoggedIn = localStorage.getItem('user') !== null;
+          
+          if (isLoggedIn) {
+            window.location.href = `/submission-demo.html?competitionId=${competitionId}`;
+          } else {
+            alert('Please log in to submit an entry');
+            window.location.href = `/login.html?redirect=/competitions/${competitionId}`;
+          }
+        });
+        
+        document.getElementById('share-button').addEventListener('click', () => {
+          // Simple share functionality
+          const shareUrl = window.location.href;
+          const shareText = `Check out this competition: ${competition.title}`;
+          
+          // Try to use Web Share API if available
+          if (navigator.share) {
+            navigator.share({
+              title: competition.title,
+              text: shareText,
+              url: shareUrl,
+            })
+            .catch((error) => console.log('Error sharing:', error));
+          } else {
+            // Fallback to copying to clipboard
+            navigator.clipboard.writeText(shareUrl)
+              .then(() => {
+                alert('Competition URL copied to clipboard!');
+              })
+              .catch((err) => {
+                console.error('Could not copy text: ', err);
+                // Final fallback - prompt user to copy manually
+                prompt('Copy this link to share:', shareUrl);
+              });
+          }
+        });
+        
+      } catch (error) {
+        console.error('Error fetching competition details:', error);
+        showError('Failed to load competition details. Please try again later.');
+      }
+    });
+    
+    function displayCompetitionDetails(competition) {
+      const detailsContainer = document.getElementById('competition-details');
+      
+      // Remove loading state
+      detailsContainer.classList.remove('loading');
+      
+      // Clear the container
+      detailsContainer.innerHTML = '';
+      
+      // Create header section
+      const header = document.createElement('div');
+      header.className = 'competition-header';
+      
+      const title = document.createElement('h2');
+      title.textContent = competition.title;
+      
+      const metaInfo = document.createElement('div');
+      metaInfo.className = 'competition-meta';
+      
+      const deadline = document.createElement('p');
+      deadline.innerHTML = `<strong>Deadline:</strong> ${competition.deadline}`;
+      
+      const entries = document.createElement('p');
+      entries.innerHTML = `<strong>Entries:</strong> ${competition.entries || 0}`;
+      
+      const categories = document.createElement('p');
+      categories.innerHTML = `<strong>Categories:</strong> ${(competition.categories || []).join(', ')}`;
+      
+      metaInfo.appendChild(deadline);
+      metaInfo.appendChild(entries);
+      metaInfo.appendChild(categories);
+      
+      header.appendChild(title);
+      header.appendChild(metaInfo);
+      
+      // Create description section
+      const descriptionSection = document.createElement('div');
+      descriptionSection.className = 'competition-description';
+      
+      const descriptionTitle = document.createElement('h3');
+      descriptionTitle.textContent = 'About This Competition';
+      
+      const description = document.createElement('p');
+      description.textContent = competition.description;
+      
+      descriptionSection.appendChild(descriptionTitle);
+      descriptionSection.appendChild(description);
+      
+      // Create prizes section if available
+      let prizesSection = '';
+      if (competition.prizes && competition.prizes.length > 0) {
+        prizesSection = document.createElement('div');
+        prizesSection.className = 'competition-prizes';
+        
+        const prizesTitle = document.createElement('h3');
+        prizesTitle.textContent = 'Prizes';
+        
+        const prizesList = document.createElement('ul');
+        competition.prizes.forEach(prize => {
+          const prizeItem = document.createElement('li');
+          prizeItem.textContent = prize;
+          prizesList.appendChild(prizeItem);
+        });
+        
+        prizesSection.appendChild(prizesTitle);
+        prizesSection.appendChild(prizesList);
+      }
+      
+      // Create rules section if available
+      let rulesSection = '';
+      if (competition.rules && competition.rules.length > 0) {
+        rulesSection = document.createElement('div');
+        rulesSection.className = 'competition-rules';
+        
+        const rulesTitle = document.createElement('h3');
+        rulesTitle.textContent = 'Rules & Guidelines';
+        
+        const rulesList = document.createElement('ul');
+        competition.rules.forEach(rule => {
+          const ruleItem = document.createElement('li');
+          ruleItem.textContent = rule;
+          rulesList.appendChild(ruleItem);
+        });
+        
+        rulesSection.appendChild(rulesTitle);
+        rulesSection.appendChild(rulesList);
+      }
+      
+      // Add all sections to the container
+      detailsContainer.appendChild(header);
+      detailsContainer.appendChild(descriptionSection);
+      if (prizesSection) detailsContainer.appendChild(prizesSection);
+      if (rulesSection) detailsContainer.appendChild(rulesSection);
+    }
+    
+    function showError(message) {
+      const detailsContainer = document.getElementById('competition-details');
+      detailsContainer.classList.remove('loading');
+      detailsContainer.innerHTML = `
+        <div class="error-container">
+          <p class="error-message">${message}</p>
+          <button onclick="window.location.href='/competitions'">Back to Competitions</button>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
