@@ -61,14 +61,27 @@
     // Fetch competition details
     document.addEventListener('DOMContentLoaded', async function() {
       try {
-        // Get competition ID from URL query parameter
+        // Get competition ID from URL query parameter or URL path
+        let competitionId;
+        
+        // Try to get from query parameters first
         const urlParams = new URLSearchParams(window.location.search);
-        const competitionId = urlParams.get('id');
+        competitionId = urlParams.get('id');
+        
+        // If not found, extract from URL path
+        if (!competitionId) {
+          const pathParts = window.location.pathname.split('/');
+          if (pathParts.length > 2) {
+            competitionId = pathParts[pathParts.length - 1];
+          }
+        }
         
         if (!competitionId) {
           showError('No competition ID specified');
           return;
         }
+        
+        console.log('Loading competition with ID:', competitionId);
         
         // Fetch competition details from API
         const response = await fetch(`/api/competitions/${competitionId}`);
