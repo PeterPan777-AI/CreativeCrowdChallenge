@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreativeCrowdChallenge - Competition Preview</title>
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="manifest" href="/manifest.json">
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    .preview-banner {
+      background-color: #f0ad4e;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .preview-banner .material-icons {
+      margin-right: 8px;
+    }
+    
+    .preview-banner-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-preview {
+      background-color: #fff;
+      color: #f0ad4e;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-preview:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .competition-details {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .competition-header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .competition-image {
+      width: 100%;
+      height: 240px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-bottom: 15px;
+    }
+    
+    .competition-meta {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+    
+    .meta-item {
+      display: flex;
+      align-items: center;
+      color: #6c757d;
+      font-size: 14px;
+    }
+    
+    .meta-item .material-icons {
+      font-size: 18px;
+      margin-right: 5px;
+    }
+    
+    .competition-description {
+      line-height: 1.6;
+      color: #212529;
+    }
+    
+    .competition-rules {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .rules-list {
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+    
+    .rules-list li {
+      margin-bottom: 8px;
+    }
+    
+    .preview-limitations {
+      background-color: #e9ecef;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 30px;
+      font-size: 14px;
+      color: #495057;
+    }
+    
+    .preview-limitations h3 {
+      margin-top: 0;
+      font-size: 16px;
+      color: #212529;
+    }
+    
+    .preview-limitations ul {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+    
+    .competition-prizes {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .prize-card {
+      flex: 1;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .prize-card.first {
+      background-color: #ffd700;
+      color: #212529;
+    }
+    
+    .prize-card.second {
+      background-color: #c0c0c0;
+      color: #212529;
+    }
+    
+    .prize-card.third {
+      background-color: #cd7f32;
+      color: #fff;
+    }
+    
+    .prize-card h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+    
+    .prize-card p {
+      font-weight: bold;
+      font-size: 20px;
+      margin: 10px 0 0;
+    }
+    
+    .cta-container {
+      margin-top: 40px;
+      text-align: center;
+    }
+    
+    .btn-primary {
+      background-color: #4a6cf7;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-primary:hover {
+      background-color: #3a5ce6;
+    }
+    
+    @media (max-width: 768px) {
+      .competition-prizes {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <button class="menu-button" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </button>
+    <h1 class="header-title">Creative Crowd Challenge</h1>
+    <div class="header-actions">
+      <button id="header-login-btn" class="login-btn" onclick="window.location.href='/login'">
+        <span class="material-icons">login</span>
+        Login
+      </button>
+    </div>
+  </header>
+
+  <!-- Drawer Navigation -->
+  <nav class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h2>Menu</h2>
+    </div>
+    <div class="drawer-content">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">home</span>
+          <a href="/">Home</a>
+        </li>
+        <li class="nav-item active">
+          <span class="material-icons nav-item-icon">emoji_events</span>
+          <a href="/competitions">Competitions</a>
+        </li>
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">leaderboard</span>
+          <a href="/leaderboard">Leaderboard</a>
+        </li>
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">file_upload</span>
+          <a href="/submission-demo">Submission Demo</a>
+        </li>
+        <li class="nav-divider"></li>
+        <li class="nav-item">
+          <span class="material-icons nav-item-icon">login</span>
+          <a href="/login">Login</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Overlay for drawer -->
+  <div class="overlay" id="overlay"></div>
+
+  <main class="main-container">
+    <div class="container">
+      <section class="section">
+        <!-- Preview Mode Banner -->
+        <div class="preview-banner">
+          <div>
+            <span class="material-icons">visibility</span>
+            You're viewing this competition in preview mode
+          </div>
+          <div class="preview-banner-actions">
+            <button class="btn-preview" onclick="window.location.href='/login'">Register to Participate</button>
+            <button class="btn-preview" onclick="window.location.href='/competitions'">Browse More</button>
+          </div>
+        </div>
+        
+        <!-- Competition Details -->
+        <div class="competition-details">
+          <div class="competition-header">
+            <h1 id="competition-title">Competition Title</h1>
+            <img id="competition-image" src="https://placehold.co/800x400" alt="Competition Image" class="competition-image">
+            
+            <div class="competition-meta">
+              <div class="meta-item">
+                <span class="material-icons">category</span>
+                <span id="competition-category">Category</span>
+              </div>
+              <div class="meta-item">
+                <span class="material-icons">event</span>
+                <span id="competition-deadline">Deadline: Jan 1, 2025</span>
+              </div>
+              <div class="meta-item">
+                <span class="material-icons">people</span>
+                <span id="competition-participants">0 Participants</span>
+              </div>
+              <div class="meta-item">
+                <span class="material-icons">business</span>
+                <span id="competition-sponsor">Sponsored by: Company Name</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="competition-description" id="competition-description">
+            <p>This is a placeholder for the competition description. The actual description will be loaded dynamically based on the competition ID.</p>
+          </div>
+          
+          <div class="competition-rules">
+            <h2>Competition Rules</h2>
+            <ul class="rules-list" id="competition-rules">
+              <li>Rule 1: This is a placeholder rule</li>
+              <li>Rule 2: Another placeholder rule</li>
+              <li>Rule 3: Yet another placeholder rule</li>
+            </ul>
+          </div>
+          
+          <div class="competition-prizes">
+            <div class="prize-card first">
+              <h3>1st Place</h3>
+              <p id="first-prize">$500</p>
+            </div>
+            <div class="prize-card second">
+              <h3>2nd Place</h3>
+              <p id="second-prize">$250</p>
+            </div>
+            <div class="prize-card third">
+              <h3>3rd Place</h3>
+              <p id="third-prize">$100</p>
+            </div>
+          </div>
+          
+          <div class="preview-limitations">
+            <h3>Preview Mode Limitations</h3>
+            <p>In preview mode, you can explore the competition details, but cannot:</p>
+            <ul>
+              <li>Submit entries to this competition</li>
+              <li>Vote on other participants' submissions</li>
+              <li>Access the submission form</li>
+              <li>Receive updates about this competition</li>
+            </ul>
+            <p>Register or login to unlock full participation.</p>
+          </div>
+          
+          <div class="cta-container">
+            <button class="btn-primary" onclick="window.location.href='/login'">Register to Participate</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <h2>CreativeCrowdChallenge</h2>
+        <p>Unleash creativity through competition</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-links-column">
+          <h3>Platform</h3>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/competitions">Competitions</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-column">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="/terms">Terms of Service</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/copyright">Copyright Info</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-column">
+          <h3>Support</h3>
+          <ul>
+            <li><a href="/help">Help Center</a></li>
+            <li><a href="/faq">FAQs</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 CreativeCrowdChallenge. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize UI
+      initUI();
+      
+      // Fetch competition data
+      const urlParams = new URLSearchParams(window.location.search);
+      const competitionId = urlParams.get('id');
+      
+      if (competitionId) {
+        fetchCompetitionDetails(competitionId);
+      } else {
+        console.error('No competition ID provided in URL');
+        showError('Competition not found. Please try another competition.');
+      }
+    });
+    
+    // Initialize UI elements
+    function initUI() {
+      const menuToggle = document.getElementById('menu-toggle');
+      const drawer = document.getElementById('drawer');
+      const overlay = document.getElementById('overlay');
+      
+      menuToggle.addEventListener('click', function() {
+        drawer.classList.toggle('open');
+        overlay.classList.toggle('show');
+      });
+      
+      overlay.addEventListener('click', function() {
+        drawer.classList.remove('open');
+        overlay.classList.remove('show');
+      });
+    }
+    
+    // Fetch competition details
+    function fetchCompetitionDetails(competitionId) {
+      // Add preview parameter to get enhanced competition data
+      fetch(`/api/competitions/${competitionId}?preview=true`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Competition not found');
+          }
+          return response.json();
+        })
+        .then(data => {
+          updateCompetitionUI(data);
+        })
+        .catch(error => {
+          console.error('Error fetching competition details:', error);
+          showError('Failed to load competition details. Please try again later.');
+        });
+    }
+    
+    // Update UI with competition data
+    function updateCompetitionUI(competition) {
+      // Update title
+      document.title = `CreativeCrowdChallenge - ${competition.title} (Preview)`;
+      
+      // Update header details
+      document.getElementById('competition-title').textContent = competition.title;
+      document.getElementById('competition-category').textContent = competition.category;
+      document.getElementById('competition-deadline').textContent = `Deadline: ${formatDate(competition.endDate)}`;
+      document.getElementById('competition-participants').textContent = `${competition.participantCount || 0} Participants`;
+      document.getElementById('competition-sponsor').textContent = competition.businessName ? 
+        `Sponsored by: ${competition.businessName}` : 'Individual Challenge';
+      
+      // Update image if available
+      if (competition.imageUrl) {
+        document.getElementById('competition-image').src = competition.imageUrl;
+        document.getElementById('competition-image').alt = competition.title;
+      }
+      
+      // Update description
+      document.getElementById('competition-description').innerHTML = `<p>${competition.description || 'No description available.'}</p>`;
+      
+      // Update rules
+      updateRules(competition.rules);
+      
+      // Update prizes
+      updatePrizes(competition.prizes);
+    }
+    
+    // Update rules list
+    function updateRules(rules) {
+      const rulesContainer = document.getElementById('competition-rules');
+      rulesContainer.innerHTML = '';
+      
+      if (!rules || rules.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No specific rules provided for this competition.';
+        rulesContainer.appendChild(li);
+        return;
+      }
+      
+      rules.forEach(rule => {
+        const li = document.createElement('li');
+        li.textContent = rule;
+        rulesContainer.appendChild(li);
+      });
+    }
+    
+    // Update prizes
+    function updatePrizes(prizes) {
+      if (prizes) {
+        if (prizes.first) document.getElementById('first-prize').textContent = prizes.first;
+        if (prizes.second) document.getElementById('second-prize').textContent = prizes.second;
+        if (prizes.third) document.getElementById('third-prize').textContent = prizes.third;
+      }
+    }
+    
+    // Format date
+    function formatDate(dateString) {
+      if (!dateString) return 'Not specified';
+      
+      const date = new Date(dateString);
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+    
+    // Show error message
+    function showError(message) {
+      const container = document.querySelector('.competition-details');
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+          <span class="material-icons" style="font-size: 48px; color: #dc3545; margin-bottom: 20px;">error</span>
+          <h2>${message}</h2>
+          <p>Return to <a href="/competitions">All Competitions</a>.</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

@@ -98,12 +98,15 @@ const server = http.createServer(async (req, res) => {
   // Serve static files - default to simple-test.html for the root
   let filePath;
   
-  // Check for competitions route (without .html) to redirect
+  // Check for routes without .html to redirect
   if (req.url === '/competitions') {
     console.log('Redirecting from /competitions to /competitions.html');
     res.writeHead(302, { 'Location': '/competitions.html' });
     res.end();
     return;
+  } else if (req.url.startsWith('/preview-competition')) {
+    console.log('Serving preview-competition.html with query parameters');
+    filePath = path.join(__dirname, 'preview-competition.html');
   } else if (req.url === '/' || req.url === '/index.html') {
     filePath = path.join(__dirname, 'simple-test.html');
   } else {
@@ -194,11 +197,19 @@ async function handleApiRequest(req, res) {
     return;
   }
 
-  // GET /api/competition/:id
-  if (endpoint.match(/^\/competition\/[a-zA-Z0-9-]+$/) && req.method === 'GET') {
+  // GET /api/competitions/:id
+  if ((endpoint.match(/^\/competitions\/[a-zA-Z0-9-]+$/) || endpoint.match(/^\/competition\/[a-zA-Z0-9-]+$/)) && req.method === 'GET') {
     try {
-      const competitionId = endpoint.split('/')[2];
-      console.log(`Fetching competition with ID: ${competitionId}`);
+      // Extract competition ID from either /competitions/:id or /competition/:id
+      const parts = endpoint.split('/');
+      const competitionId = parts[2];
+      
+      // Check if this is a preview request
+      const urlParts = req.url.split('?');
+      const queryParams = new URLSearchParams(urlParts[1] || '');
+      const isPreview = queryParams.get('preview') === 'true';
+      
+      console.log(`Fetching competition with ID: ${competitionId} (Preview mode: ${isPreview})`);
       
       // Mock competition data for demo purposes
       const mockCompetitions = {

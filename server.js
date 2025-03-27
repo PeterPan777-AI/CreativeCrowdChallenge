@@ -214,6 +214,9 @@ const server = http.createServer((req, res) => {
   } else if (pathname === '/rating-component' || pathname === '/rating-component.html') {
     // Serve rating component page
     filePath = path.join(__dirname, 'rating-component.html');
+  } else if (pathname === '/preview-competition' || pathname === '/preview-competition.html') {
+    // Serve competition preview page
+    filePath = path.join(__dirname, 'preview-competition.html');
   } else if (pathname === '/simple-test' || pathname === '/simple-test.html') {
     // Special handling for the analytics dashboard
     filePath = path.join(__dirname, 'simple-test.html');
@@ -1646,7 +1649,8 @@ async function handleApiRequest(req, res) {
   // GET /api/competitions/:id
   if (endpoint.match(/^\/competitions\/[\w-]+$/) && req.method === 'GET') {
     const competitionId = endpoint.split('/').pop();
-    console.log(`Fetching details for competition: ${competitionId}`);
+    const previewMode = url.searchParams.has('preview');
+    console.log(`Fetching details for competition: ${competitionId} (Preview Mode: ${previewMode})`);
     
     if (!supabase) {
       console.log('Supabase not available, using mock competition data');
@@ -1655,6 +1659,36 @@ async function handleApiRequest(req, res) {
       if (!competition) {
         res.writeHead(404);
         res.end(JSON.stringify({ error: 'Competition not found' }));
+        return;
+      }
+      
+      // For preview mode, enhance the response with additional details
+      if (previewMode) {
+        // Get submission count for participant count
+        const submissions = MOCK_DATA.submissions.filter(s => s.competition_id === competitionId);
+        const participantCount = submissions.length;
+        
+        // Add rules and prizes
+        const enhancedCompetition = {
+          ...competition,
+          participantCount,
+          businessName: competition.business_id ? 'Example Business' : null,
+          rules: [
+            'All submissions must be original work',
+            'One entry per participant',
+            'Submission deadline is final',
+            'Judges decision is final'
+          ],
+          prizes: {
+            first: competition.prize || '$500',
+            second: competition.prize ? `$${parseInt(competition.prize.replace(/[^0-9]/g, '')) / 2}` : '$250',
+            third: competition.prize ? `$${parseInt(competition.prize.replace(/[^0-9]/g, '')) / 5}` : '$100'
+          },
+          imageUrl: `https://source.unsplash.com/random/800x400/?${encodeURIComponent(competition.category_name.toLowerCase())}`
+        };
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(enhancedCompetition));
         return;
       }
       
@@ -1692,6 +1726,40 @@ async function handleApiRequest(req, res) {
         return;
       }
       
+      // For preview mode, enhance the response with additional details
+      if (previewMode) {
+        // Count submissions for this competition
+        const { count, error: countError } = await supabase
+          .from('submissions')
+          .select('id', { count: 'exact', head: true })
+          .eq('competition_id', competitionId);
+          
+        const participantCount = countError ? 0 : count;
+        
+        // Add rules and prizes
+        const enhancedCompetition = {
+          ...data,
+          participantCount,
+          businessName: data.business_id ? 'Business Name' : null,
+          rules: [
+            'All submissions must be original work',
+            'One entry per participant',
+            'Submission deadline is final',
+            'Judges decision is final'
+          ],
+          prizes: {
+            first: data.prize || '$500',
+            second: data.prize ? `$${parseInt(data.prize.replace(/[^0-9]/g, '')) / 2}` : '$250',
+            third: data.prize ? `$${parseInt(data.prize.replace(/[^0-9]/g, '')) / 5}` : '$100'
+          },
+          imageUrl: `https://source.unsplash.com/random/800x400/?${encodeURIComponent(data.category_name.toLowerCase())}`
+        };
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(enhancedCompetition));
+        return;
+      }
+      
       res.writeHead(200);
       res.end(JSON.stringify(data));
     } catch (error) {
@@ -1702,6 +1770,36 @@ async function handleApiRequest(req, res) {
       if (!competition) {
         res.writeHead(404);
         res.end(JSON.stringify({ error: 'Competition not found' }));
+        return;
+      }
+      
+      // For preview mode, enhance the response with additional details
+      if (previewMode) {
+        // Get submission count for participant count
+        const submissions = MOCK_DATA.submissions.filter(s => s.competition_id === competitionId);
+        const participantCount = submissions.length;
+        
+        // Add rules and prizes
+        const enhancedCompetition = {
+          ...competition,
+          participantCount,
+          businessName: competition.business_id ? 'Example Business' : null,
+          rules: [
+            'All submissions must be original work',
+            'One entry per participant',
+            'Submission deadline is final',
+            'Judges decision is final'
+          ],
+          prizes: {
+            first: competition.prize || '$500',
+            second: competition.prize ? `$${parseInt(competition.prize.replace(/[^0-9]/g, '')) / 2}` : '$250',
+            third: competition.prize ? `$${parseInt(competition.prize.replace(/[^0-9]/g, '')) / 5}` : '$100'
+          },
+          imageUrl: `https://source.unsplash.com/random/800x400/?${encodeURIComponent(competition.category_name.toLowerCase())}`
+        };
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(enhancedCompetition));
         return;
       }
       

@@ -8,6 +8,28 @@
   <link rel="manifest" href="/manifest.json">
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    .btn-outline {
+      background-color: transparent;
+      color: #4a6cf7;
+      border: 1px solid #4a6cf7;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+      margin-left: 8px;
+    }
+    
+    .btn-outline:hover {
+      background-color: rgba(74, 108, 247, 0.1);
+    }
+    
+    .competition-card-footer {
+      display: flex;
+      align-items: center;
+    }
+  </style>
 </head>
 <body>
   <!-- Header -->
@@ -349,6 +371,7 @@
         </div>
         <div class="competition-card-footer">
           <a href="/competitions/${competition.id}" class="btn btn-primary">View Details</a>
+          <a href="/preview-competition?id=${competition.id}" class="btn btn-outline">Preview</a>
         </div>
       `;
 
