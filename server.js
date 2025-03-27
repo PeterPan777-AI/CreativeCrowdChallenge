@@ -220,7 +220,23 @@ const server = http.createServer((req, res) => {
   } else if (pathname.match(/^\/competitions\/[a-zA-Z0-9-]+$/)) {
     // Serve competition details page when URL is /competitions/{id}
     console.log(`Serving competition details for ID: ${pathname.split('/')[2]}`);
-    filePath = path.join(__dirname, 'competition-details.html');
+    // Modify content to include correct CSS path
+    const detailsPath = path.join(__dirname, 'competition-details.html');
+    fs.readFile(detailsPath, 'utf8', (err, content) => {
+      if (err) {
+        console.error('Error reading competition-details.html:', err);
+        res.writeHead(500, {'Content-Type': 'text/html'});
+        res.end('<h1>Server Error</h1><p>Could not load competition details page.</p>');
+        return;
+      }
+      
+      // Fix the CSS path by replacing relative path with absolute path
+      const fixedContent = content.replace('href="assets/main.css"', 'href="/assets/main.css"');
+      
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.end(fixedContent);
+    });
+    return;
   } else if (pathname === '/simple-test' || pathname === '/simple-test.html') {
     // Special handling for the analytics dashboard
     filePath = path.join(__dirname, 'simple-test.html');
