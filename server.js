@@ -217,6 +217,10 @@ const server = http.createServer((req, res) => {
   } else if (pathname === '/preview-competition' || pathname === '/preview-competition.html') {
     // Serve competition preview page
     filePath = path.join(__dirname, 'preview-competition.html');
+  } else if (pathname.match(/^\/competitions\/[a-zA-Z0-9-]+$/)) {
+    // Serve competition details page when URL is /competitions/{id}
+    console.log(`Serving competition details for ID: ${pathname.split('/')[2]}`);
+    filePath = path.join(__dirname, 'competition-details.html');
   } else if (pathname === '/simple-test' || pathname === '/simple-test.html') {
     // Special handling for the analytics dashboard
     filePath = path.join(__dirname, 'simple-test.html');
