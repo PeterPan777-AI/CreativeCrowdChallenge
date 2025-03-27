@@ -433,9 +433,20 @@
       
       // Update header details
       document.getElementById('competition-title').textContent = competition.title;
-      document.getElementById('competition-category').textContent = competition.category;
-      document.getElementById('competition-deadline').textContent = `Deadline: ${formatDate(competition.endDate)}`;
-      document.getElementById('competition-participants').textContent = `${competition.participantCount || 0} Participants`;
+      
+      // Handle categories display
+      let categoryText = Array.isArray(competition.categories) ? 
+        competition.categories.join(', ') : (competition.category || 'General');
+      document.getElementById('competition-category').textContent = categoryText;
+      
+      // Handle deadline display
+      document.getElementById('competition-deadline').textContent = `Deadline: ${competition.deadline || formatDate(competition.endDate)}`;
+      
+      // Handle participants count
+      document.getElementById('competition-participants').textContent = 
+        `${competition.entries || competition.participantCount || 0} Participants`;
+      
+      // Handle sponsor/business info
       document.getElementById('competition-sponsor').textContent = competition.businessName ? 
         `Sponsored by: ${competition.businessName}` : 'Individual Challenge';
       
@@ -452,7 +463,20 @@
       updateRules(competition.rules);
       
       // Update prizes
-      updatePrizes(competition.prizes);
+      if (competition.prizes) {
+        // Handle array of prize strings or object format
+        if (Array.isArray(competition.prizes)) {
+          const prizeObj = {};
+          competition.prizes.forEach((prize, index) => {
+            if (index === 0) prizeObj.first = prize;
+            if (index === 1) prizeObj.second = prize;
+            if (index === 2) prizeObj.third = prize;
+          });
+          updatePrizes(prizeObj);
+        } else {
+          updatePrizes(competition.prizes);
+        }
+      }
     }
     
     // Update rules list
