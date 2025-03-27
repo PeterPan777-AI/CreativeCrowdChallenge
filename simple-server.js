@@ -112,7 +112,7 @@ const server = http.createServer(async (req, res) => {
     // Extract the competition ID from the URL
     const competitionId = req.url.split('/')[2];
     console.log(`Competition ID: ${competitionId}`);
-    // Set query parameter for the competition ID
+    // Set competition details HTML file path
     filePath = path.join(__dirname, 'competition-details.html');
   } else if (req.url === '/' || req.url === '/index.html') {
     filePath = path.join(__dirname, 'simple-test.html');
