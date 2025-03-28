@@ -363,8 +363,33 @@ async function handleApiRequest(req, res) {
     try {
       console.log('Processing login request...');
       
+      // Parse the request body
       const requestBody = await parseRequestBody(req);
-      const { email, password } = JSON.parse(requestBody);
+      console.log('Received body:', requestBody);
+      
+      // Handle potential JSON parsing issues
+      let email, password;
+      try {
+        const parsedBody = JSON.parse(requestBody);
+        email = parsedBody.email;
+        password = parsedBody.password;
+      } catch (parseError) {
+        console.error('Error parsing JSON:', parseError);
+        // Try to handle form data if not JSON
+        const formDataParams = new URLSearchParams(requestBody);
+        email = formDataParams.get('email');
+        password = formDataParams.get('password');
+      }
+      
+      if (!email || !password) {
+        console.error('Missing email or password');
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          message: 'Email and password are required'
+        }));
+        return;
+      }
       
       console.log(`Login attempt for: ${email}`);
       
