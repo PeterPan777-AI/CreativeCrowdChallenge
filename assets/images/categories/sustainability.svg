@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <rect width="800" height="400" fill="#F0FDF4" />
+  <circle cx="400" cy="200" r="100" fill="#DCFCE7" stroke="#22C55E" stroke-width="2" />
+  <path d="M400,120 C370,120 350,140 350,170 C350,200 380,220 400,250 C420,220 450,200 450,170 C450,140 430,120 400,120" fill="#22C55E" />
+  <path d="M370,280 C320,270 300,250 320,230 C340,210 390,220 400,170" stroke="#16A34A" stroke-width="3" fill="none" />
+  <path d="M430,280 C480,270 500,250 480,230 C460,210 410,220 400,170" stroke="#16A34A" stroke-width="3" fill="none" />
+  <circle cx="400" cy="170" r="15" fill="#DCFCE7" stroke="#16A34A" stroke-width="2" />
+  <text x="400" y="320" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#16A34A">
+    Sustainability Challenge
+  </text>
+</svg>

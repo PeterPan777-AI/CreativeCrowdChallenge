@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <rect width="800" height="400" fill="#EFF6FF" />
+  <rect x="250" y="150" width="300" height="150" rx="5" fill="#ffffff" stroke="#3B82F6" stroke-width="2" />
+  <path d="M250,160 L550,160" stroke="#3B82F6" stroke-width="2" />
+  <circle cx="260" cy="155" r="3" fill="#EF4444" />
+  <circle cx="270" cy="155" r="3" fill="#F59E0B" />
+  <circle cx="280" cy="155" r="3" fill="#10B981" />
+  <path d="M270,200 L400,180 L530,230 L530,270 L270,270 Z" fill="#DBEAFE" stroke="#3B82F6" stroke-width="1" />
+  <path d="M270,200 L400,180 L530,230" stroke="#3B82F6" stroke-width="2" fill="none" />
+  <path d="M400,180 L400,270" stroke="#3B82F6" stroke-width="1" stroke-dasharray="5,5" />
+  <circle cx="400" cy="180" r="5" fill="#3B82F6" />
+  <circle cx="270" cy="200" r="5" fill="#3B82F6" />
+  <circle cx="530" cy="230" r="5" fill="#3B82F6" />
+  <text x="400" y="320" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#1D4ED8">
+    Marketing Competition
+  </text>
+</svg>

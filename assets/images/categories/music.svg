@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <rect width="800" height="400" fill="#EBF5FF" />
+  <circle cx="400" cy="180" r="100" fill="#3B82F6" opacity="0.7" />
+  <path d="M400 100 L400 250 M400 100 L450 120 L450 270 M365 150 A40 40 0 1 0 365 230 A40 40 0 1 0 365 150 M450 170 A40 40 0 1 0 450 250 A40 40 0 1 0 450 170" 
+        stroke="#1E40AF" stroke-width="8" fill="none" />
+  <text x="400" y="320" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#1E40AF">
+    Music Competition
+  </text>
+</svg>

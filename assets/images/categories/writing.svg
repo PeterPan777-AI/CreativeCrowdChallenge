@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <rect width="800" height="400" fill="#F3F4F6" />
+  <rect x="250" y="100" width="300" height="200" fill="#ffffff" stroke="#6B7280" stroke-width="2" />
+  <line x1="280" y1="140" x2="520" y2="140" stroke="#6B7280" stroke-width="2" />
+  <line x1="280" y1="180" x2="520" y2="180" stroke="#6B7280" stroke-width="2" />
+  <line x1="280" y1="220" x2="520" y2="220" stroke="#6B7280" stroke-width="2" />
+  <line x1="280" y1="260" x2="440" y2="260" stroke="#6B7280" stroke-width="2" />
+  <polygon points="220,120 240,100 240,280 220,260" fill="#F59E0B" />
+  <rect x="215" y="120" width="10" height="140" fill="#D97706" />
+  <text x="400" y="320" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#4B5563">
+    Writing Competition
+  </text>
+</svg>

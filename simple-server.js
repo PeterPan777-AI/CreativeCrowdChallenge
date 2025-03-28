@@ -49,6 +49,22 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon',
 };
 
+// Category image mapping - will be served from the client-side using category-images.js
+const categoryNames = {
+  'cat-i1': 'Music Competition',
+  'cat-i2': 'Writing Competition',
+  'cat-i3': 'Photography Competition',
+  'cat-i4': 'Art Competition',
+  'cat-i5': 'Design Competition',
+  'cat-i6': 'Film Competition',
+  'cat-b1': 'AI & Tech Competition',
+  'cat-b2': 'Product Innovation',
+  'cat-b3': 'Marketing Competition',
+  'cat-b4': 'Sustainability Challenge',
+  'cat-b5': 'Social Impact Challenge',
+  'cat-b6': 'Startup Challenge'
+};
+
 // Function to serve static files
 const serveFile = (res, filePath) => {
   fs.readFile(filePath, (err, data) => {
@@ -295,6 +311,35 @@ async function handleApiRequest(req, res) {
       console.error('Error fetching competitions:', error);
       res.writeHead(500);
       res.end(JSON.stringify({ error: 'Failed to fetch competitions' }));
+    }
+    return;
+  }
+  
+  // GET /api/categories
+  if (endpoint === '/categories' && req.method === 'GET') {
+    try {
+      console.log('Fetching categories data...');
+      
+      // Create category data for API response
+      const categoryData = Object.keys(categoryNames).map(id => {
+        const isBusinessCat = id.startsWith('cat-b');
+        return {
+          id,
+          name: categoryNames[id],
+          type: isBusinessCat ? 'business' : 'individual',
+          imagePath: `/assets/images/categories/${id.startsWith('cat-b') ? 
+            ['tech', 'product', 'marketing', 'sustainability', 'social', 'startup'][parseInt(id.slice(5))-1] : 
+            ['music', 'writing', 'photography', 'art', 'design', 'film'][parseInt(id.slice(5))-1]
+          }.svg`
+        };
+      });
+      
+      res.writeHead(200);
+      res.end(JSON.stringify(categoryData));
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: 'Failed to fetch categories' }));
     }
     return;
   }

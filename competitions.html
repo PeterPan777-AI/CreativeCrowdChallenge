@@ -29,6 +29,75 @@
       display: flex;
       align-items: center;
     }
+    
+    /* Enhanced styles for competition cards with SVG images */
+    .competition-card {
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      overflow: hidden;
+    }
+    
+    .competition-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .competition-image {
+      position: relative;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f9fafb;
+      overflow: hidden;
+    }
+    
+    .competition-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Specific styling for SVG category images */
+    .competition-image img[src$=".svg"] {
+      object-fit: contain;
+      padding: 1rem;
+    }
+    
+    .competition-card-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
+    }
+    
+    .competition-type {
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      color: white;
+    }
+    
+    .competition-type.individual {
+      background-color: #3b82f6;
+    }
+    
+    .competition-type.business {
+      background-color: #10b981;
+    }
+    
+    .competition-category {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #1f2937;
+    }
   </style>
 </head>
 <body>
@@ -175,7 +244,12 @@
     </div>
   </footer>
 
+  <script src="/assets/js/category-images.js"></script>
   <script>
+    // Global variables to store data
+    let allCategories = [];
+    let allCompetitions = [];
+    
     document.addEventListener('DOMContentLoaded', function() {
       // Initialize menu toggle functionality
       const menuToggle = document.getElementById('menu-toggle');
@@ -194,12 +268,74 @@
         });
       }
 
-      // Fetch competitions and display them
-      fetchCompetitions();
+      // Fetch categories first, then competitions
+      fetchCategories()
+        .then(() => fetchCompetitions())
+        .catch(error => {
+          console.error('Error in initialization sequence:', error);
+        });
     });
+    
+    function fetchCategories() {
+      return fetch('/api/categories')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch categories');
+          }
+          return response.json();
+        })
+        .then(data => {
+          allCategories = data;
+          console.log('Categories loaded:', allCategories.length);
+          populateCategoryDropdown(data);
+        })
+        .catch(error => {
+          console.error('Error fetching categories:', error);
+          // If API fails, we can still use the functions in category-images.js
+          console.log('Using default categories from category-images.js');
+        });
+    }
+
+    function populateCategoryDropdown(categories) {
+      const dropdown = document.getElementById('competition-category');
+      if (!dropdown) return;
+      
+      // Keep the "All Categories" option and clear the rest
+      dropdown.innerHTML = '<option value="all">All Categories</option>';
+      
+      // Group categories by type
+      const businessCategories = categories.filter(cat => cat.type === 'business');
+      const individualCategories = categories.filter(cat => cat.type === 'individual');
+      
+      // Add business categories optgroup
+      if (businessCategories.length > 0) {
+        const businessGroup = document.createElement('optgroup');
+        businessGroup.label = 'Business Categories';
+        businessCategories.forEach(category => {
+          const option = document.createElement('option');
+          option.value = category.id;
+          option.textContent = category.name;
+          businessGroup.appendChild(option);
+        });
+        dropdown.appendChild(businessGroup);
+      }
+      
+      // Add individual categories optgroup
+      if (individualCategories.length > 0) {
+        const individualGroup = document.createElement('optgroup');
+        individualGroup.label = 'Individual Categories';
+        individualCategories.forEach(category => {
+          const option = document.createElement('option');
+          option.value = category.id;
+          option.textContent = category.name;
+          individualGroup.appendChild(option);
+        });
+        dropdown.appendChild(individualGroup);
+      }
+    }
 
     function fetchCompetitions() {
-      fetch('/api/competitions')
+      return fetch('/api/competitions')
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -207,6 +343,7 @@
           return response.json();
         })
         .then(data => {
+          allCompetitions = data;
           displayCompetitions(data);
         })
         .catch(error => {
@@ -310,36 +447,25 @@
       const startDate = competition.startDate ? formatCompactDate(competition.startDate) : '';
       const endDate = (competition.endDate || competition.deadline) ? formatCompactDate(competition.endDate || competition.deadline) : '';
       
-      // Generate placeholder image based on category
-      const category = competition.category || '';
+      // Get category name and image path
+      const categoryId = competition.category || '';
+      let categoryName = '';
       let imageUrl = '';
       
-      // Select image based on competition category
-      if (category.startsWith('cat-b1')) {
-        imageUrl = 'https://images.unsplash.com/photo-1677442135962-22cef2f0690a?q=80&w=2940&auto=format&fit=crop';
-      } else if (category.startsWith('cat-b2')) {
-        imageUrl = 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=2940&auto=format&fit=crop';
-      } else if (category.startsWith('cat-b3')) {
-        imageUrl = 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2913&auto=format&fit=crop';
-      } else if (category.startsWith('cat-b4')) {
-        imageUrl = 'https://images.unsplash.com/photo-1560743641-3914f2c45636?q=80&w=2787&auto=format&fit=crop';
-      } else if (category.startsWith('cat-b5')) {
-        imageUrl = 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2940&auto=format&fit=crop';
-      } else if (category.startsWith('cat-b6')) {
-        imageUrl = 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=2940&auto=format&fit=crop';
-      } else if (category.startsWith('cat-i1')) {
-        imageUrl = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=2940&auto=format&fit=crop';
-      } else if (category.startsWith('cat-i2')) {
-        imageUrl = 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=2940&auto=format&fit=crop';
-      } else if (category.startsWith('cat-i3') || category.startsWith('cat-i5')) {
-        imageUrl = 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2943&auto=format&fit=crop';
-      } else if (category.startsWith('cat-i4')) {
-        imageUrl = 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=2574&auto=format&fit=crop';
-      } else if (category.startsWith('cat-i6')) {
-        imageUrl = 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?q=80&w=2940&auto=format&fit=crop';
+      // Try to find the category in our loaded categories
+      const categoryObj = allCategories.find(cat => cat.id === categoryId);
+      if (categoryObj) {
+        categoryName = categoryObj.name;
+        imageUrl = categoryObj.imagePath;
       } else {
-        // Default image if no specific category
-        imageUrl = 'https://images.unsplash.com/photo-1496449903678-68ddcb189a24?q=80&w=2940&auto=format&fit=crop';
+        // Fallback to using the category-images.js utility functions
+        try {
+          categoryName = getCategoryName(categoryId);
+          imageUrl = getCategoryImagePath(categoryId);
+        } catch (e) {
+          console.error('Error getting category info:', e);
+          imageUrl = '/assets/images/categories/default.svg';
+        }
       }
       
       // Create the card HTML with image
@@ -348,7 +474,7 @@
           <img src="${imageUrl}" alt="${competition.title}" loading="lazy">
           <div class="competition-card-header">
             <span class="competition-type ${competition.type || 'individual'}">${competition.type || 'Individual'}</span>
-            <span class="competition-category">${competition.category_name || competition.category || ''}</span>
+            <span class="competition-category">${competition.category_name || categoryName || categoryId || ''}</span>
           </div>
         </div>
         <div class="competition-card-content">

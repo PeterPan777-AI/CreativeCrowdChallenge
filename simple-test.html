@@ -22,6 +22,9 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/assets/icon-192x192.png">
   
+  <!-- Custom CSS for Competition Cards -->
+  <link rel="stylesheet" href="/assets/main.css">
+  
   <style>
     /* Base styles */
     body {
@@ -3808,6 +3811,49 @@
       }, 1000);
     }
     
+    // Helper function to get category name
+    function getCategoryName(categoryId) {
+      const categoryMap = {
+        'cat-i1': 'Music',
+        'cat-i2': 'Writing',
+        'cat-i3': 'Photography',
+        'cat-i4': 'Art',
+        'cat-i5': 'Design',
+        'cat-i6': 'Film',
+        'cat-b1': 'AI & Tech',
+        'cat-b2': 'Marketing',
+        'cat-b3': 'Sustainability',
+        'cat-b4': 'Product Design',
+        'cat-b5': 'Business Innovation',
+        'cat-b6': 'Social Impact'
+      };
+      
+      return categoryMap[categoryId] || 'General';
+    }
+    
+    // Helper function to get category image
+    function getCategoryImage(categoryId) {
+      const defaultImage = '/assets/images/categories/default.jpg';
+      
+      const categoryImageMap = {
+        'cat-i1': '/assets/images/categories/music.jpg',
+        'cat-i2': '/assets/images/categories/writing.jpg',
+        'cat-i3': '/assets/images/categories/photography.jpg',
+        'cat-i4': '/assets/images/categories/art.jpg',
+        'cat-i5': '/assets/images/categories/design.jpg',
+        'cat-i6': '/assets/images/categories/film.jpg',
+        'cat-b1': '/assets/images/categories/tech.jpg',
+        'cat-b2': '/assets/images/categories/marketing.jpg',
+        'cat-b3': '/assets/images/categories/sustainability.jpg',
+        'cat-b4': '/assets/images/categories/product.jpg',
+        'cat-b5': '/assets/images/categories/business.jpg',
+        'cat-b6': '/assets/images/categories/social.jpg'
+      };
+      
+      // Return the image path for the category or the default image
+      return categoryImageMap[categoryId] || defaultImage;
+    }
+    
     function loadCompetitions() {
       // Load both individual and business competitions
       loadIndividualCompetitions();
@@ -3860,8 +3906,13 @@
                 }
               }
               
+              // Get category name and image
+              const categoryName = getCategoryName(competition.category_id) || competition.category || 'General';
+              const categoryImage = getCategoryImage(competition.category_id);
+              
               // Set HTML content for the card
               card.innerHTML = `
+                <div class="competition-image" style="height: 150px; background-image: url('${categoryImage}'); background-size: cover; background-position: center; border-radius: 8px 8px 0 0;"></div>
                 <h3>${competition.title}</h3>
                 <div class="competition-meta">
                   <div class="meta-item"><strong>Ends:</strong> ${deadline}</div>
@@ -3869,7 +3920,7 @@
                 </div>
                 <p>${competition.description}</p>
                 <div>
-                  <span class="badge primary">${competition.category || 'General'}</span>
+                  <span class="badge primary">${categoryName}</span>
                   <span class="badge success">${competition.status || 'Active'}</span>
                   <span class="badge info">Individual</span>
                 </div>
@@ -3931,8 +3982,13 @@
                 }
               }
               
+              // Get category name and image
+              const categoryName = getCategoryName(competition.category_id) || competition.category || 'General';
+              const categoryImage = getCategoryImage(competition.category_id);
+              
               // Set HTML content for the card
               card.innerHTML = `
+                <div class="competition-image" style="height: 150px; background-image: url('${categoryImage}'); background-size: cover; background-position: center; border-radius: 8px 8px 0 0;"></div>
                 <h3>${competition.title}</h3>
                 <div class="competition-meta">
                   <div class="meta-item"><strong>Ends:</strong> ${deadline}</div>
@@ -3940,7 +3996,7 @@
                 </div>
                 <p>${competition.description}</p>
                 <div>
-                  <span class="badge primary">${competition.category || 'General'}</span>
+                  <span class="badge primary">${categoryName}</span>
                   <span class="badge success">${competition.status || 'Active'}</span>
                   <span class="badge warning">Business</span>
                 </div>
@@ -6448,6 +6504,21 @@
         card.style.marginBottom = '15px';
         card.style.borderLeft = recommendation.isPreview ? '3px solid #8B5CF6' : '';
         
+        // Get category name and image
+        const categoryName = getCategoryName(recommendation.category_id) || 
+            (recommendation.category ? recommendation.category.charAt(0).toUpperCase() + recommendation.category.slice(1) : 'General');
+        const categoryImage = getCategoryImage(recommendation.category_id);
+        
+        // Create image container
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'competition-image';
+        imageContainer.style.height = '150px';
+        imageContainer.style.backgroundImage = `url('${categoryImage}')`;
+        imageContainer.style.backgroundSize = 'cover';
+        imageContainer.style.backgroundPosition = 'center';
+        imageContainer.style.borderRadius = '8px 8px 0 0';
+        card.appendChild(imageContainer);
+        
         // Competition title
         const title = document.createElement('h4');
         title.textContent = recommendation.title;
@@ -6505,12 +6576,10 @@
         badges.style.marginBottom = '15px';
         
         // Category badge
-        if (recommendation.category) {
-          const categoryBadge = document.createElement('span');
-          categoryBadge.className = 'badge primary';
-          categoryBadge.textContent = recommendation.category.charAt(0).toUpperCase() + recommendation.category.slice(1);
-          badges.appendChild(categoryBadge);
-        }
+        const categoryBadge = document.createElement('span');
+        categoryBadge.className = 'badge primary';
+        categoryBadge.textContent = categoryName;
+        badges.appendChild(categoryBadge);
         
         // Business badge if from a business competition
         if (recommendation.business_id) {

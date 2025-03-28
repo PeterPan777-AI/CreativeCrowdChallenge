@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <rect width="800" height="400" fill="#ECFDF5" />
+  <circle cx="400" cy="180" r="100" fill="#10B981" fill-opacity="0.2" />
+  <path d="M400,120 L370,180 L400,240 L430,180 Z" fill="#059669" />
+  <circle cx="400" cy="180" r="20" fill="#10B981" />
+  <path d="M340,140 C300,160 300,200 340,220" stroke="#059669" stroke-width="5" fill="none" />
+  <path d="M460,140 C500,160 500,200 460,220" stroke="#059669" stroke-width="5" fill="none" />
+  <path d="M350,250 L450,250" stroke="#059669" stroke-width="5" fill="none" />
+  <path d="M380,110 L420,110" stroke="#059669" stroke-width="5" fill="none" />
+  <text x="400" y="320" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#059669">
+    AI & Tech Competition
+  </text>
+</svg>
