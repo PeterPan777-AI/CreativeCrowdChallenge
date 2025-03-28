@@ -357,6 +357,268 @@ async function handleApiRequest(req, res) {
     }
     return;
   }
+  
+  // POST /api/auth/login - Handle admin authentication
+  if (endpoint === '/auth/login' && req.method === 'POST') {
+    try {
+      console.log('Processing login request...');
+      
+      const requestBody = await parseRequestBody(req);
+      const { email, password } = JSON.parse(requestBody);
+      
+      console.log(`Login attempt for: ${email}`);
+      
+      // Check for admin credentials
+      if (email === 'admin@example.com' && password === 'admin123') {
+        console.log('Admin login successful');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          user: {
+            id: 'admin-123',
+            email: email,
+            role: 'admin',
+            name: 'Admin User',
+            avatar: null
+          },
+          message: 'Login successful'
+        }));
+        return;
+      }
+      
+      // Check for business user credentials
+      if (email === 'business@example.com' && password === 'password123') {
+        console.log('Business user login successful');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          user: {
+            id: 'business-123',
+            email: email,
+            role: 'business',
+            name: 'Business User',
+            avatar: null
+          },
+          message: 'Login successful'
+        }));
+        return;
+      }
+      
+      // Check for individual user credentials
+      if (email === 'user@example.com' && password === 'password123') {
+        console.log('Individual user login successful');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          user: {
+            id: 'user-123',
+            email: email,
+            role: 'individual',
+            name: 'Individual User',
+            avatar: null
+          },
+          message: 'Login successful'
+        }));
+        return;
+      }
+      
+      // Invalid credentials
+      console.log('Login failed: Invalid credentials');
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        success: false,
+        message: 'Invalid email or password'
+      }));
+    } catch (error) {
+      console.error('Error processing login:', error);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        success: false,
+        message: 'Server error during login'
+      }));
+    }
+    return;
+  }
+  
+  // GET /api/leaderboards/[competitionId] - Get leaderboard for a competition
+  if (endpoint.match(/^\/leaderboards\/[a-zA-Z0-9-]+$/) && req.method === 'GET') {
+    try {
+      // Extract competition ID from path
+      const competitionId = endpoint.split('/')[2];
+      console.log(`Fetching leaderboard for competition: ${competitionId}`);
+      
+      // Mock leaderboard data for demonstration
+      const mockLeaderboard = {
+        competitionId: competitionId,
+        title: "Competition Leaderboard",
+        updatedAt: new Date().toISOString(),
+        entries: [
+          {
+            id: 'submission-1',
+            rank: 1,
+            title: 'Innovative AI Assistant',
+            username: 'tech_wizard',
+            average_rating: 9.8,
+            vote_count: 45
+          },
+          {
+            id: 'submission-2',
+            rank: 2,
+            title: 'Smart Home Solution',
+            username: 'home_innovator',
+            average_rating: 9.5,
+            vote_count: 38
+          },
+          {
+            id: 'submission-3',
+            rank: 3,
+            title: 'AR Shopping Experience',
+            username: 'future_retail',
+            average_rating: 9.3,
+            vote_count: 41
+          },
+          {
+            id: 'submission-4',
+            rank: 4,
+            title: 'AI Code Generator',
+            username: 'code_master',
+            average_rating: 9.1,
+            vote_count: 32
+          },
+          {
+            id: 'submission-5',
+            rank: 5,
+            title: 'Blockchain Payment System',
+            username: 'crypto_genius',
+            average_rating: 8.9,
+            vote_count: 36
+          },
+          {
+            id: 'submission-6',
+            rank: 6,
+            title: 'Sustainable Transport App',
+            username: 'eco_traveler',
+            average_rating: 8.7,
+            vote_count: 29
+          },
+          {
+            id: 'submission-7',
+            rank: 7,
+            title: 'ML-powered Health Monitor',
+            username: 'health_tech',
+            average_rating: 8.6,
+            vote_count: 33
+          },
+          {
+            id: 'submission-8',
+            rank: 8,
+            title: 'Voice-controlled Smart Office',
+            username: 'office_future',
+            average_rating: 8.4,
+            vote_count: 27
+          },
+          {
+            id: 'submission-9',
+            rank: 9,
+            title: 'Virtual Reality Workspace',
+            username: 'vr_worker',
+            average_rating: 8.2,
+            vote_count: 30
+          },
+          {
+            id: 'submission-10',
+            rank: 10,
+            title: 'AI Content Generator',
+            username: 'content_creator',
+            average_rating: 8.0,
+            vote_count: 25
+          }
+        ]
+      };
+      
+      // Respond with the mock leaderboard data
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(mockLeaderboard));
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        success: false,
+        message: 'Error fetching leaderboard data'
+      }));
+    }
+    return;
+  }
+  
+  // GET /api/leaderboards/category/[categoryId] - Get leaderboard for a category
+  if (endpoint.match(/^\/leaderboards\/category\/[a-zA-Z0-9-]+$/) && req.method === 'GET') {
+    try {
+      // Extract category ID from path
+      const categoryId = endpoint.split('/')[3];
+      console.log(`Fetching category leaderboard for: ${categoryId}`);
+      
+      // Create a mock category leaderboard
+      const mockCategoryLeaderboard = {
+        categoryId: categoryId,
+        categoryName: categoryNames[categoryId] || "Unknown Category",
+        updatedAt: new Date().toISOString(),
+        entries: [
+          {
+            id: 'submission-c1',
+            rank: 1,
+            title: 'Category Winner Project',
+            username: 'category_expert',
+            average_rating: 9.7,
+            vote_count: 42
+          },
+          {
+            id: 'submission-c2',
+            rank: 2,
+            title: 'Runner-up Solution',
+            username: 'innovative_mind',
+            average_rating: 9.4,
+            vote_count: 39
+          },
+          {
+            id: 'submission-c3',
+            rank: 3,
+            title: 'Top-tier Implementation',
+            username: 'skilled_developer',
+            average_rating: 9.2,
+            vote_count: 35
+          },
+          {
+            id: 'submission-c4',
+            rank: 4,
+            title: 'Cutting-edge Approach',
+            username: 'tech_pioneer',
+            average_rating: 9.0,
+            vote_count: 31
+          },
+          {
+            id: 'submission-c5',
+            rank: 5,
+            title: 'Innovative Method',
+            username: 'creative_solution',
+            average_rating: 8.8,
+            vote_count: 29
+          }
+        ]
+      };
+      
+      // Respond with the mock category leaderboard data
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(mockCategoryLeaderboard));
+    } catch (error) {
+      console.error('Error fetching category leaderboard:', error);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        success: false,
+        message: 'Error fetching category leaderboard data'
+      }));
+    }
+    return;
+  }
 
   // GET /api/competitions/:id
   if ((endpoint.match(/^\/competitions\/[a-zA-Z0-9-]+$/) || endpoint.match(/^\/competition\/[a-zA-Z0-9-]+$/)) && req.method === 'GET') {
