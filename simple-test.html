@@ -1411,7 +1411,7 @@
       <nav class="drawer-nav">
         <a href="#" class="drawer-nav-item" data-screen="home">Home</a>
         <a href="#" class="drawer-nav-item" data-screen="competitions">Competitions</a>
-        <a href="/leaderboard.html" class="drawer-nav-item">Leaderboard</a>
+        <a href="javascript:void(0);" class="drawer-nav-item" onclick="window.location.href='/leaderboard.html';">Leaderboard</a>
         <a href="#" class="drawer-nav-item" data-screen="profile">Profile</a>
         <a href="#" class="drawer-nav-item" data-screen="submissions">My Submissions</a>
         <a href="#" class="drawer-nav-item" data-screen="categories">Categories</a>
@@ -6880,10 +6880,10 @@
       // Handle drawer navigation items
       drawerNavItems.forEach(item => {
         item.addEventListener('click', function(e) {
-          // Check if this is the leaderboard link which has a direct href
+          // Handle the leaderboard link - use direct redirect
           if (this.textContent.trim() === 'Leaderboard') {
-            // Don't prevent default - let the browser handle the href
-            // But still close the drawer
+            e.preventDefault();
+            window.location.href = '/leaderboard.html';
             closeDrawer();
             return;
           }
