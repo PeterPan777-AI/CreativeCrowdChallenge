@@ -6880,6 +6880,14 @@
       // Handle drawer navigation items
       drawerNavItems.forEach(item => {
         item.addEventListener('click', function(e) {
+          // Check if this is the leaderboard link which has a direct href
+          if (this.textContent.trim() === 'Leaderboard') {
+            // Don't prevent default - let the browser handle the href
+            // But still close the drawer
+            closeDrawer();
+            return;
+          }
+          
           e.preventDefault();
           const targetScreen = this.getAttribute('data-screen');
           
