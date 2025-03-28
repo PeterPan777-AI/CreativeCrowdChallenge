@@ -3832,9 +3832,9 @@
         .then(competitions => {
           console.log('All competitions loaded:', competitions);
           
-          // Filter for individual competitions (those without a business_id or with empty business_id)
+          // Filter for individual competitions
           const individualCompetitions = competitions.filter(comp => 
-            !comp.business_id || comp.business_id === '');
+            comp.type === 'individual');
           
           console.log('Individual competitions:', individualCompetitions);
           
@@ -3903,9 +3903,9 @@
           return response.json();
         })
         .then(competitions => {
-          // Filter for business competitions (those with a business_id)
+          // Filter for business competitions
           const businessCompetitions = competitions.filter(comp => 
-            comp.business_id && comp.business_id !== '');
+            comp.type === 'business');
           
           console.log('Business competitions:', businessCompetitions);
           
@@ -3981,7 +3981,7 @@
               option.value = competition.id;
               
               // Add a prefix to distinguish between individual and business competitions
-              const prefix = competition.business_id ? '[Business] ' : '[Individual] ';
+              const prefix = competition.type === 'business' ? '[Business] ' : '[Individual] ';
               option.textContent = prefix + competition.title;
               
               competitionSelect.appendChild(option);
