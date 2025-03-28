@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CreativeCrowdChallenge - Competitions</title>
+  <meta name="description" content="Browse and participate in creative competitions on the Creative Crowd Challenge platform.">
+  <meta name="keywords" content="competitions, creative challenges, contests, creative crowd, innovation">
   <link rel="stylesheet" href="/assets/main.css">
   <link rel="manifest" href="/manifest.json">
   <!-- Material Icons -->
@@ -74,6 +76,40 @@
       background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
     }
     
+    /* Accessibility-specific styles */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      padding: 8px;
+      background-color: #ffffff;
+      color: #4a6cf7;
+      z-index: 1000;
+      transition: top 0.3s;
+    }
+    
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid #4a6cf7;
+    }
+    
+    /* Focus styles for keyboard navigation */
+    a:focus, button:focus, select:focus, input:focus, .competition-card:focus {
+      outline: 3px solid #4a6cf7;
+      outline-offset: 2px;
+    }
+    
+    /* High contrast mode support */
+    @media (forced-colors: active) {
+      .btn, .btn-outline, .btn-primary {
+        border: 2px solid currentColor;
+      }
+      
+      .competition-card {
+        border: 1px solid currentColor;
+      }
+    }
+    
     .competition-type {
       font-size: 0.75rem;
       font-weight: bold;
@@ -101,10 +137,13 @@
   </style>
 </head>
 <body>
+  <!-- Skip to main content link for screen readers -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Header -->
-  <header class="header">
-    <button class="menu-button" id="menu-toggle">
-      <span class="material-icons">menu</span>
+  <header class="header" role="banner">
+    <button class="menu-button" id="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="drawer">
+      <span class="material-icons" aria-hidden="true">menu</span>
     </button>
     <h1 class="header-title">Creative Crowd Challenge</h1>
     <div class="header-actions">
@@ -113,77 +152,67 @@
   </header>
 
   <!-- Drawer Navigation -->
-  <nav class="drawer" id="drawer">
+  <nav class="drawer" id="drawer" role="navigation" aria-label="Main navigation" aria-hidden="true">
     <div class="drawer-header">
       <h2>Menu</h2>
+      <button class="close-drawer" id="close-drawer" aria-label="Close navigation menu">
+        <span class="material-icons" aria-hidden="true">close</span>
+      </button>
     </div>
     <div class="drawer-content">
-      <ul class="nav-list" id="nav-list">
-        <li class="nav-item">
-          <span class="material-icons nav-item-icon">home</span>
-          <a href="/">Home</a>
+      <ul class="nav-list" id="nav-list" role="menu">
+        <li class="nav-item" role="none">
+          <span class="material-icons nav-item-icon" aria-hidden="true">home</span>
+          <a href="/" role="menuitem">Home</a>
         </li>
-        <li class="nav-item active">
-          <span class="material-icons nav-item-icon">emoji_events</span>
-          <a href="/competitions">Competitions</a>
+        <li class="nav-item active" role="none">
+          <span class="material-icons nav-item-icon" aria-hidden="true">emoji_events</span>
+          <a href="/competitions" role="menuitem" aria-current="page">Competitions</a>
         </li>
-        <li class="nav-item">
-          <span class="material-icons nav-item-icon">leaderboard</span>
-          <a href="/leaderboard">Leaderboard</a>
+        <li class="nav-item" role="none">
+          <span class="material-icons nav-item-icon" aria-hidden="true">leaderboard</span>
+          <a href="/leaderboard" role="menuitem">Leaderboard</a>
         </li>
-        <li class="nav-item">
-          <span class="material-icons nav-item-icon">file_upload</span>
-          <a href="/submission-demo">Submission Demo</a>
+        <li class="nav-item" role="none">
+          <span class="material-icons nav-item-icon" aria-hidden="true">file_upload</span>
+          <a href="/submission-demo" role="menuitem">Submission Demo</a>
         </li>
-        <li class="nav-divider"></li>
-        <li class="nav-item">
-          <span class="material-icons nav-item-icon">login</span>
-          <a href="/login">Login</a>
+        <li class="nav-divider" role="separator"></li>
+        <li class="nav-item" role="none">
+          <span class="material-icons nav-item-icon" aria-hidden="true">login</span>
+          <a href="/login" role="menuitem">Login</a>
         </li>
       </ul>
     </div>
   </nav>
 
   <!-- Overlay for drawer -->
-  <div class="overlay" id="overlay"></div>
+  <div class="overlay" id="overlay" tabindex="-1" aria-hidden="true"></div>
 
-  <main class="main-container">
+  <main class="main-container" id="main-content">
     <div class="container">
       <h1 class="page-title">Competitions</h1>
       
-      <div class="filter-section">
+      <div class="filter-section" role="search" aria-label="Filter competitions">
         <div class="filter-controls">
           <div class="filter-group">
-            <label for="competition-type">Type:</label>
-            <select id="competition-type" class="filter-select">
+            <label for="competition-type" id="type-label">Type:</label>
+            <select id="competition-type" class="filter-select" aria-labelledby="type-label">
               <option value="all">All Types</option>
               <option value="individual">Individual</option>
               <option value="business">Business</option>
             </select>
           </div>
           <div class="filter-group">
-            <label for="competition-category">Category:</label>
-            <select id="competition-category" class="filter-select">
+            <label for="competition-category" id="category-label">Category:</label>
+            <select id="competition-category" class="filter-select" aria-labelledby="category-label">
               <option value="all">All Categories</option>
-              <!-- Business Categories -->
-              <option value="cat-b1">Best AI Tool</option>
-              <option value="cat-b2">Most Innovative Gadget</option>
-              <option value="cat-b3">Top Eco-Friendly Product</option>
-              <option value="cat-b4">Best Pet Innovation</option>
-              <option value="cat-b5">Most Innovative Startup Idea</option>
-              <option value="cat-b6">Best Indie Fashion Brand</option>
-              <!-- Individual Categories -->
-              <option value="cat-i1">New Music Score</option>
-              <option value="cat-i2">Best Lyrics (Music or Poetry)</option>
-              <option value="cat-i3">Cutest Cat</option>
-              <option value="cat-i4">Cutest Dog</option>
-              <option value="cat-i5">Funniest Pet Video</option>
-              <option value="cat-i6">Best DIY Craft vs. Art</option>
+              <!-- The options will be populated dynamically by JavaScript -->
             </select>
           </div>
           <div class="filter-group">
-            <label for="competition-sort">Sort By:</label>
-            <select id="competition-sort" class="filter-select">
+            <label for="competition-sort" id="sort-label">Sort By:</label>
+            <select id="competition-sort" class="filter-select" aria-labelledby="sort-label">
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
               <option value="deadline">Deadline</option>
@@ -193,10 +222,10 @@
         </div>
       </div>
 
-      <div id="competitions-list" class="competitions-grid">
+      <div id="competitions-list" class="competitions-grid" role="region" aria-label="Competitions list" aria-live="polite">
         <!-- Competitions will be loaded here via JavaScript -->
-        <div class="loading-spinner">
-          <div class="spinner"></div>
+        <div class="loading-spinner" role="status">
+          <div class="spinner" aria-hidden="true"></div>
           <p>Loading competitions...</p>
         </div>
       </div>
@@ -425,11 +454,14 @@
     }
 
     function createCompetitionCard(competition) {
-      const card = document.createElement('div');
+      const card = document.createElement('article');
       card.className = 'competition-card';
       card.dataset.id = competition.id;
       card.dataset.type = competition.type || 'individual';
       card.dataset.category = competition.category || '';
+      card.setAttribute('tabindex', '0'); // Make card focusable
+      card.setAttribute('role', 'article');
+      card.setAttribute('aria-label', `${competition.title} - ${competition.type || 'Individual'} competition`);
 
       // Calculate days remaining for deadline
       const deadlineDate = new Date(competition.endDate || competition.deadline);
@@ -471,42 +503,52 @@
       // Create the card HTML with image
       card.innerHTML = `
         <div class="competition-image">
-          <img src="${imageUrl}" alt="${competition.title}" loading="lazy">
+          <img src="${imageUrl}" alt="${competition.title} ${categoryName ? '- ' + categoryName : ''}" loading="lazy">
           <div class="competition-card-header">
-            <span class="competition-type ${competition.type || 'individual'}">${competition.type || 'Individual'}</span>
-            <span class="competition-category">${competition.category_name || categoryName || categoryId || ''}</span>
+            <span class="competition-type ${competition.type || 'individual'}" aria-label="Competition type: ${competition.type || 'Individual'}">${competition.type || 'Individual'}</span>
+            <span class="competition-category" aria-label="Category: ${competition.category_name || categoryName || ''}">${competition.category_name || categoryName || categoryId || ''}</span>
           </div>
         </div>
         <div class="competition-card-content">
-          <h3 class="competition-title">${competition.title}</h3>
+          <h3 class="competition-title" id="title-${competition.id}">${competition.title}</h3>
           <p class="competition-description">${competition.description}</p>
-          <div class="competition-details">
+          <div class="competition-details" aria-label="Competition details">
             <div class="competition-detail">
-              <span class="material-icons">date_range</span>
-              <span>${startDate} - ${endDate}</span>
+              <span class="material-icons" aria-hidden="true">date_range</span>
+              <span>Date: ${startDate} - ${endDate}</span>
             </div>
             <div class="competition-detail">
-              <span class="material-icons">timer</span>
+              <span class="material-icons" aria-hidden="true">timer</span>
               <span>${daysText}</span>
             </div>
             <div class="competition-detail">
-              <span class="material-icons">card_giftcard</span>
+              <span class="material-icons" aria-hidden="true">card_giftcard</span>
               <span>Prize: ${competition.prize || 'TBD'}</span>
             </div>
           </div>
         </div>
         <div class="competition-card-footer">
-          <a href="/competitions/${competition.id}" class="btn btn-primary">View Details</a>
-          <a href="/preview-competition?id=${competition.id}" class="btn btn-outline" style="display: flex; align-items: center;">
-            <span class="material-icons" style="font-size: 16px; margin-right: 4px;">visibility</span>
+          <a href="/competitions/${competition.id}" class="btn btn-primary" aria-describedby="title-${competition.id}">View Details</a>
+          <a href="/preview-competition?id=${competition.id}" class="btn btn-outline" style="display: flex; align-items: center;" aria-describedby="title-${competition.id}">
+            <span class="material-icons" style="font-size: 16px; margin-right: 4px;" aria-hidden="true">visibility</span>
             Preview
           </a>
         </div>
       `;
 
+      // Add click event listener
       card.addEventListener('click', function(e) {
         // Prevent navigation if clicking on the button (it will handle its own navigation)
         if (!e.target.closest('.btn')) {
+          window.location.href = `/competitions/${competition.id}`;
+        }
+      });
+
+      // Add keyboard navigation support
+      card.addEventListener('keydown', function(e) {
+        // Navigate on Enter or Space key press
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
           window.location.href = `/competitions/${competition.id}`;
         }
       });
