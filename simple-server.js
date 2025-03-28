@@ -154,6 +154,20 @@ const server = http.createServer(async (req, res) => {
       return;
     } 
     
+    if (pathname === '/admin') {
+      console.log('Redirecting from /admin to /admin.html');
+      res.writeHead(302, { 'Location': '/admin.html' });
+      res.end();
+      return;
+    }
+    
+    if (pathname === '/leaderboard') {
+      console.log('Redirecting from /leaderboard to /leaderboard.html');
+      res.writeHead(302, { 'Location': '/leaderboard.html' });
+      res.end();
+      return;
+    }
+    
     if (pathname.startsWith('/preview-competition')) {
       console.log('Serving preview-competition.html with query parameters');
       const previewPath = path.join(__dirname, 'preview-competition.html');
