@@ -377,52 +377,99 @@ const MOCK_DATA = {
     {
       id: 'mock-comp-1',
       title: 'AI Tool Innovation Challenge',
-      description: 'Design an innovative AI tool for business productivity',
+      description: 'Design an innovative AI tool for business productivity. This competition aims to discover groundbreaking AI solutions that can streamline workflows, automate repetitive tasks, and enhance decision-making processes. Contestants should focus on real-world applications that solve specific business problems. The winning solution will demonstrate exceptional usability, technical innovation, and measurable productivity improvements.',
       prize: '$500',
       deadline: '2025-04-30',
       category: 'cat-b1',  // Best AI Tool
       category_name: 'Best AI Tool',
       business_id: 'mock-business-1',
+      business_name: 'TechInnovate Solutions',
       created_at: '2025-03-15',
       status: 'active',
       type: 'business',
       startDate: '2025-03-15', 
-      endDate: '2025-04-30'
+      endDate: '2025-04-30',
+      image_url: 'https://images.unsplash.com/photo-1677442135116-8f4893816eff?q=80&w=900',
+      submission_count: 24,
+      average_rating: 7.8,
+      rules: [
+        "All submissions must be original work",
+        "Solutions must be presented with a working prototype or detailed mockup",
+        "Participants must provide documentation explaining the AI implementation",
+        "Entries will be judged on innovation, usability, and business impact"
+      ],
+      judging_criteria: {
+        innovation: "40%",
+        usability: "30%",
+        business_impact: "30%"
+      }
     },
     {
       id: 'mock-comp-2',
       title: 'Mobile App UI Challenge',
-      description: 'Design an intuitive mobile interface for a fitness app',
+      description: 'Design an intuitive mobile interface for a fitness app that motivates users and tracks their progress effectively. The ideal design should incorporate modern UI principles while maintaining simplicity and ease of use. Your submission should include a comprehensive design system with color palettes, typography choices, and interactive elements that enhance the overall user experience.',
       prize: '$750',
       deadline: '2025-05-15',
       category: 'cat-b2',  // Most Innovative Gadget
       category_name: 'Most Innovative Gadget',
       business_id: 'mock-business-2',
+      business_name: 'FitLife Technologies',
       created_at: '2025-03-10',
       status: 'active',
       type: 'business',
       startDate: '2025-03-10', 
-      endDate: '2025-05-15'
+      endDate: '2025-05-15',
+      image_url: 'https://images.unsplash.com/photo-1616349341626-1e88d6129f95?q=80&w=900',
+      submission_count: 36,
+      average_rating: 8.2,
+      rules: [
+        "Design must be optimized for both iOS and Android platforms",
+        "Include at least 5 key screens (Home, Profile, Workout, Progress, Settings)",
+        "Show both light and dark mode versions",
+        "Provide a clickable prototype using Figma or Adobe XD"
+      ],
+      judging_criteria: {
+        visual_design: "35%",
+        usability: "35%",
+        originality: "20%",
+        technical_feasibility: "10%"
+      }
     },
     {
       id: 'mock-comp-3',
       title: 'Marketing Campaign Concept',
-      description: 'Develop a creative marketing campaign for an eco-friendly product line',
+      description: 'Develop a creative marketing campaign for an eco-friendly product line that resonates with environmentally conscious consumers. Your campaign should effectively communicate the brand\'s commitment to sustainability while highlighting the unique benefits of their products. Consider multiple channels including social media, print advertising, and guerrilla marketing tactics to create a cohesive and impactful campaign.',
       prize: '$1000',
       deadline: '2025-06-01',
       category: 'cat-b3',  // Top Eco-Friendly Product
       category_name: 'Top Eco-Friendly Product',
       business_id: 'mock-business-1',
+      business_name: 'EcoVibe Products',
       created_at: '2025-03-05',
       status: 'active',
       type: 'business',
       startDate: '2025-03-05', 
-      endDate: '2025-06-01'
+      endDate: '2025-06-01',
+      image_url: 'https://images.unsplash.com/photo-1580450058873-57c1e1dccf79?q=80&w=900',
+      submission_count: 18,
+      average_rating: 7.5,
+      rules: [
+        "Campaign must include a strong, memorable slogan",
+        "Provide mockups for at least 3 different marketing channels",
+        "Include a implementation timeline and budget allocation",
+        "Target audience and market research must be clearly defined"
+      ],
+      judging_criteria: {
+        creativity: "30%",
+        market_relevance: "25%",
+        execution_quality: "25%",
+        brand_alignment: "20%"
+      }
     },
     {
       id: 'mock-comp-4',
       title: 'Photography Contest: Urban Life',
-      description: 'Capture the essence of urban living through creative photography',
+      description: 'Capture the essence of urban living through creative photography that tells compelling stories about city life. We\'re looking for images that reveal the hidden beauty, unexpected moments, and authentic human connections within busy urban environments. Your photographs should offer unique perspectives that make viewers see familiar cityscapes with fresh eyes.',
       prize: '$300',
       deadline: '2025-05-20',
       category: 'cat-i6',  // Best DIY Craft vs. Art
@@ -431,12 +478,27 @@ const MOCK_DATA = {
       status: 'active',
       type: 'individual',
       startDate: '2025-03-18', 
-      endDate: '2025-05-20'
+      endDate: '2025-05-20',
+      image_url: 'https://images.unsplash.com/photo-1560574188-6a6774965120?q=80&w=900',
+      submission_count: 42,
+      average_rating: 8.1,
+      rules: [
+        "Submit up to 3 photographs (color or black & white)",
+        "Minimal editing allowed - no composite images or heavy manipulation",
+        "Must be taken within the last 12 months",
+        "Include location information and brief story behind each photo"
+      ],
+      judging_criteria: {
+        technical_quality: "25%",
+        composition: "25%",
+        storytelling: "30%",
+        originality: "20%"
+      }
     },
     {
       id: 'mock-comp-5',
       title: 'Short Story Competition',
-      description: 'Write a compelling short story in under 2000 words on the theme of "Discovery"',
+      description: 'Write a compelling short story in under 2000 words on the theme of "Discovery." We invite writers to explore this theme in any genre – from science fiction to literary fiction, fantasy to historical narratives. Your story should take readers on a journey that reveals something unexpected, whether it\'s a personal revelation, scientific breakthrough, or emotional insight. The most outstanding stories will feature strong characterization, engaging plot development, and meaningful exploration of the theme.',
       prize: '$400',
       deadline: '2025-05-25',
       category: 'cat-i2',  // Best Lyrics (Music or Poetry)
@@ -445,12 +507,27 @@ const MOCK_DATA = {
       status: 'active',
       type: 'individual',
       startDate: '2025-03-20', 
-      endDate: '2025-05-25'
+      endDate: '2025-05-25',
+      image_url: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=900',
+      submission_count: 55,
+      average_rating: 7.9,
+      rules: [
+        "Maximum 2000 words, minimum 1000 words",
+        "Must be original and previously unpublished work",
+        "Entries must be submitted in English",
+        "One submission per participant"
+      ],
+      judging_criteria: {
+        originality: "25%",
+        theme_exploration: "25%",
+        narrative_quality: "30%",
+        language_use: "20%"
+      }
     },
     {
       id: 'mock-comp-6',
       title: 'DIY Home Decor Challenge',
-      description: 'Create an innovative home decoration using recycled materials',
+      description: 'Create an innovative home decoration using recycled materials that combines functionality with artistic vision. This challenge encourages participants to transform everyday waste into beautiful, practical items for the home. Your creation should demonstrate creative problem-solving, craftsmanship, and environmental consciousness. We\'re looking for pieces that could inspire others to reconsider the potential of discarded materials.',
       prize: '$250',
       deadline: '2025-04-15',
       category: 'cat-i6',  // Best DIY Craft vs. Art
@@ -459,7 +536,22 @@ const MOCK_DATA = {
       status: 'active',
       type: 'individual',
       startDate: '2025-03-01', 
-      endDate: '2025-04-15'
+      endDate: '2025-04-15',
+      image_url: 'https://images.unsplash.com/photo-1603204077578-2aa99b81f622?q=80&w=900',
+      submission_count: 28,
+      average_rating: 7.6,
+      rules: [
+        "At least 80% of materials must be recycled or upcycled",
+        "Submit photos of the creation process and final piece",
+        "Include a materials list and brief description of your approach",
+        "Items must be functional as well as decorative"
+      ],
+      judging_criteria: {
+        creativity: "30%",
+        craftsmanship: "25%",
+        functionality: "25%",
+        environmental_impact: "20%"
+      }
     },
     {
       id: 'mock-comp-7',
@@ -571,9 +663,9 @@ const MOCK_DATA = {
       competition_id: 'mock-comp-1',
       user_id: 'user-1',
       username: 'creativePro',
-      title: 'Productivity AI Tool',
-      description: 'An innovative AI tool for enhancing business productivity',
-      media_url: 'https://via.placeholder.com/300',
+      title: 'WorkflowAI - Smart Task Automation',
+      description: 'WorkflowAI is a comprehensive productivity tool that uses artificial intelligence to analyze your work patterns and automatically optimize your daily tasks. The system identifies repetitive processes, suggests automation workflows, and learns from your feedback to continuously improve. Key features include smart email prioritization, meeting summarization, automated document formatting, and cross-platform task synchronization. Our unique differentiator is the adaptive learning system that becomes more personalized over time.',
+      media_url: 'https://images.unsplash.com/photo-1661347333292-b85d594ee580?q=80&w=720',
       media_type: 'image',
       created_at: '2025-03-18',
       vote_count: 24,
@@ -581,16 +673,34 @@ const MOCK_DATA = {
       average_rating: 7.7,
       rank: 2,
       status: 'approved',
-      profile_image: 'https://via.placeholder.com/50'
+      profile_image: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=100',
+      comments: [
+        {
+          user_id: 'judge-1',
+          username: 'TechExpert',
+          comment: 'Impressive automation capabilities. The email prioritization feature is particularly useful for busy professionals.',
+          created_at: '2025-03-22',
+          rating: 8
+        },
+        {
+          user_id: 'user-5',
+          username: 'productivityNerd',
+          comment: 'I love how intuitive the interface is! Would be even better with mobile app integration.',
+          created_at: '2025-03-21',
+          rating: 7
+        }
+      ],
+      technical_details: "Built using Python for backend processing with TensorFlow for machine learning components. Frontend developed with React for responsive dashboard visualization. REST API architecture allows for seamless third-party integrations.",
+      demo_url: "https://workflowai-demo.example.com"
     },
     {
       id: 'submission-2',
       competition_id: 'mock-comp-1',
       user_id: 'user-2',
       username: 'designGuru',
-      title: 'AI Assistant Dashboard',
-      description: 'An intuitive dashboard for controlling AI assistants',
-      media_url: 'https://via.placeholder.com/300',
+      title: 'IntelliAssist - AI Productivity Hub',
+      description: 'IntelliAssist is a centralized command center for all your AI assistants and productivity tools. The dashboard unifies disparate AI services into a single, coherent interface where users can manage, customize, and deploy various AI tools without switching between applications. Features include voice command integration, custom AI assistant training, productivity metrics tracking, and scheduled automation routines. Our solution addresses the fragmentation problem in the current AI assistant ecosystem by providing a unified control panel.',
+      media_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=720',
       media_type: 'image',
       created_at: '2025-03-19',
       vote_count: 18,
@@ -598,16 +708,34 @@ const MOCK_DATA = {
       average_rating: 7.0,
       rank: 3,
       status: 'approved',
-      profile_image: 'https://via.placeholder.com/50'
+      profile_image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=100',
+      comments: [
+        {
+          user_id: 'judge-2',
+          username: 'AIInnovator',
+          comment: 'The interface design is clean and intuitive. Would benefit from more customization options for power users.',
+          created_at: '2025-03-22',
+          rating: 7
+        },
+        {
+          user_id: 'user-6',
+          username: 'techEnthusiast',
+          comment: 'Great concept! Being able to control all my AI tools from one place is a game-changer.',
+          created_at: '2025-03-20',
+          rating: 8
+        }
+      ],
+      technical_details: "Developed using Node.js backend with a React and Material UI frontend. Uses GraphQL for efficient data fetching. Implements OAuth 2.0 for secure third-party service connections.",
+      demo_url: "https://intelliassist-demo.example.com"
     },
     {
       id: 'submission-3',
       competition_id: 'mock-comp-1',
       user_id: 'user-3',
       username: 'artisanCreator',
-      title: 'Smart AI Content Generator',
-      description: 'Versatile AI tool that creates various types of content automatically',
-      media_url: 'https://via.placeholder.com/300',
+      title: 'ContentForge AI - Smart Creation Suite',
+      description: "ContentForge AI is a comprehensive content generation platform that transforms simple prompts into polished, professional-quality content across multiple formats. Users can generate blog posts, social media content, marketing copy, presentation slides, and even basic video scripts through an intuitive interface. The platform standout feature is its context-awareness engine, which ensures all generated content maintains brand voice consistency and adapts to different target audiences. It also includes advanced editing tools, SEO optimization, and performance analytics to measure content effectiveness.",
+      media_url: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=720',
       media_type: 'image',
       created_at: '2025-03-20',
       vote_count: 31,
@@ -615,7 +743,33 @@ const MOCK_DATA = {
       average_rating: 8.0,
       rank: 1,
       status: 'approved',
-      profile_image: 'https://via.placeholder.com/50'
+      profile_image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100',
+      comments: [
+        {
+          user_id: 'judge-3',
+          username: 'ContentStrategist',
+          comment: 'An exceptional tool that addresses a real business need. The multi-format capabilities and brand voice consistency are particularly impressive.',
+          created_at: '2025-03-23',
+          rating: 9
+        },
+        {
+          user_id: 'user-7',
+          username: 'marketingPro',
+          comment: "I have tested similar tools, but ContentForge quality is significantly better. The SEO integration is brilliant!",
+          created_at: '2025-03-21',
+          rating: 8
+        },
+        {
+          user_id: 'user-8',
+          username: 'startupFounder',
+          comment: 'This could save our small marketing team countless hours. Very impressed with the user interface.',
+          created_at: '2025-03-22',
+          rating: 8
+        }
+      ],
+      technical_details: "Built with a Python/Django backend utilizing OpenAI GPT-4 API with custom fine-tuning. React frontend with advanced text editing capabilities. Implements content versioning and collaborative editing features.",
+      demo_url: "https://contentforge-demo.example.com",
+      additional_materials: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
     },
     {
       id: 'submission-4',

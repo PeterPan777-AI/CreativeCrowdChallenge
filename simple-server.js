@@ -4,7 +4,7 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 // Supabase client initialization
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+let supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 // Log credentials for debugging (without exposing full values)
@@ -14,6 +14,12 @@ console.log(`Supabase Anon Key available: ${Boolean(supabaseAnonKey)}`);
 // Make sure we have valid credentials
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Missing Supabase credentials. Using mock data only.');
+}
+
+// Validate and fix Supabase URL if needed
+if (supabaseUrl && !supabaseUrl.match(/^https?:\/\//)) {
+  supabaseUrl = 'https://' + supabaseUrl;
+  console.log(`Added https:// prefix to Supabase URL: ${supabaseUrl}`);
 }
 
 // Initialize Supabase client only if credentials are available
@@ -26,6 +32,7 @@ if (supabaseUrl && supabaseAnonKey) {
     console.log('Supabase client initialized successfully');
   } catch (error) {
     console.error('Invalid Supabase URL:', error.message);
+    console.log('Using mock data due to invalid Supabase URL');
   }
 }
 
