@@ -242,12 +242,17 @@
   </div>
   
   <script>
+    // Function to navigate to home
+    function navigateToHome() {
+      window.location.href = '/';
+    }
+    
     document.addEventListener('DOMContentLoaded', () => {
       // Initialize navigation
       const navItems = [
         { path: '/', text: 'Home', icon: 'home' },
-        { path: '/competitions', text: 'Competitions', icon: 'emoji_events' },
-        { path: '/leaderboard', text: 'Leaderboards', icon: 'leaderboard' }
+        { path: '/competitions.html', text: 'Competitions', icon: 'emoji_events' },
+        { path: '/leaderboard.html', text: 'Leaderboards', icon: 'leaderboard' }
       ];
       
       const authItems = [];
@@ -331,7 +336,7 @@
       
       // Login button
       loginBtn.addEventListener('click', function() {
-        window.location.href = '/login';
+        window.location.href = '/login.html';
       });
       
       // Initialize the app
@@ -547,7 +552,7 @@
         voteNowBtn.className = 'btn btn-primary';
         voteNowBtn.textContent = 'Vote on Submissions';
         voteNowBtn.addEventListener('click', function() {
-          window.location.href = '/competitions';
+          window.location.href = '/competitions.html';
         });
         
         voteNowDiv.appendChild(voteNowBtn);
